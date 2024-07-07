@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import CreateCommunity from "../Community/CreateCommunity";
 
 const Navbar = () => {
     
@@ -39,6 +40,7 @@ const Navbar = () => {
             <div className="hover:cursor-pointer px-4 py-2 rounded-xl flex gap-4">
               <FontAwesomeIcon icon={faBell} className="" size="lg" />
             </div>
+            <CreateCommunity />
             <UserButton afterSignOutUrl="/" />
           </SignedIn>
           <SignedOut>
