@@ -1,0 +1,2 @@
+text --> zinc-600
+backgroud --> gray-300
