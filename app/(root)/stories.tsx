@@ -8,7 +8,7 @@ export const Stories = () => {
     return (
         <>
             <div id="stories">
-                <div className="flex flex-row items-center gap-x-4 p-2 *: overflow-x-scroll scrollbar-hidden bg-white rounded-md">
+                <div className="flex flex-row items-center gap-x-4 p-2 px-4 *: overflow-x-scroll scrollbar-hidden bg-white rounded-md">
                     <div className="flex flex-col items-center w-16 relative">
                         <Image
                             src={user?.imageUrl as string || "/images/1.jpeg"}

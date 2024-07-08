@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema } from "mongoose";
 
 interface ITag extends Document {
     name: string;
@@ -9,9 +9,9 @@ interface ITag extends Document {
 
 const tagSchema: Schema<ITag> = new Schema({
     name: { type: String, required: true, unique: true },
-    posts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
-    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     createdAt: { type: Date, default: Date.now }
 });
 
-const Tag = mongoose.model<ITag>('Tag', tagSchema);
+const Tag = mongoose.model<ITag>("Tag", tagSchema);

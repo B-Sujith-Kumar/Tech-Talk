@@ -24,7 +24,7 @@ export default async function Home() {
         <>
             {userId && <Stories />}
             {userId && <div className="bg-white rounded-md mt-2 p-2">
-                <div className="flex flex-row gap-x-4 items-center">
+                <div className="flex flex-row gap-x-4 items-center px-2">
                     <Avatar>
                         <AvatarImage src={user?.imageUrl} alt={user?.firstName ? user.firstName[0] : ""} />
                         <AvatarFallback>
@@ -35,13 +35,13 @@ export default async function Home() {
                         <DialogTrigger className="w-full">
                             <textarea
                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:opacity-50 peer placeholder-transparent h-8 scrollbar-hidden bg-gray-100"
-                                placeholder="What's on your mind?"
+                                placeholder="What&apos;s on your mind?"
                                 name="comment"
                                 required
                                 minLength={5}
                             />
                         </DialogTrigger>
-                        <DialogContent className="bg-white rounded-md overflow-auto scrollbar-hidden"
+                        <DialogContent className="bg-white rounded-md overflow-auto scrollbar-hidden max-w-3xl max-md:max-w-2xl max-sm:max-w-[90%] max-md:rounded-lg"
                             aria-describedby="modal-description"
                         >
                             <DialogHeader>
@@ -94,13 +94,13 @@ export default async function Home() {
                                 </DialogTitle>
                                 <div>
                                     <textarea
-                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:opacity-50 peer placeholder-transparent h-60 scrollbar-hidden bg-gray-100"
-                                        placeholder="What's on your mind?"
+                                        className="blockrounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:opacity-50 peer placeholder-transparent h-60 scrollbar-hidden bg-gray-100 w-full"
+                                        placeholder="What&apos;s on your mind?"
                                         name="comment"
                                         required
                                         minLength={5}
                                     />
-                                    <div className="mt-4">
+                                    <div className="mt-4 max-sm:hidden">
                                         <div className="flex flex-row gap-6 *:flex *:flex-row *:gap-2 *:items-center *:cursor-pointer">
                                             <div>
                                                 <ImageUpIcon className="w-4 h-4 text-blue-500" />
@@ -124,6 +124,65 @@ export default async function Home() {
                                             </div>
                                         </div>
                                     </div>
+                                    <Select>
+                                        <SelectTrigger className="sm:hidden mt-2 bg-gray-100 text-gray-600 border-none text-xs">
+                                            More Options
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white text-gray-600 border-none text-xs py-2">
+                                            <div className="flex flex-col gap-6 *:flex *:flex-row *:gap-2 *:items-center *:cursor-pointer *:px-4">
+                                                <div>
+                                                    <ImageUpIcon className="w-4 h-4 text-blue-500" />
+                                                    <span className="text-xs">Image/Video</span>
+                                                </div>
+                                                <div>
+                                                    <PaperclipIcon className="w-4 h-4 text-yellow-500" />
+                                                    <span className="text-xs">Attachment</span>
+                                                </div>
+                                                <div>
+                                                    <VideoIcon className="w-4 h-4 text-red-500" />
+                                                    <span className="text-xs">Live</span>
+                                                </div>
+                                                <div>
+                                                    <HashIcon className="w-4 h-4 text-green-500" />
+                                                    <span className="text-xs">Tags</span>
+                                                </div>
+                                                <div>
+                                                    <AtSignIcon className="w-4 h-4 text-gray-500" />
+                                                    <span className="text-xs">Mention</span>
+                                                </div>
+                                                <div className="ml-auto">
+                                                    <Select>
+                                                        <SelectTrigger className="bg-white text-gray-600 border-none">
+                                                            <SelectValue placeholder="Public" />
+                                                        </SelectTrigger>
+                                                        <SelectContent className="bg-white text-gray-600 border-none">
+                                                            <SelectGroup>
+                                                                <SelectLabel>
+                                                                    Who can see this?
+                                                                </SelectLabel>
+                                                                <SelectItem value="public">Public</SelectItem>
+                                                                <SelectItem value="private">Private</SelectItem>
+                                                            </SelectGroup>
+                                                            <SelectGroup>
+                                                                <SelectLabel>
+                                                                    Communities
+                                                                </SelectLabel>
+                                                                <SelectItem value="JS Developers">
+                                                                    JS Developers
+                                                                </SelectItem>
+                                                                <SelectItem value="React Developers">
+                                                                    React Developers
+                                                                </SelectItem>
+                                                                <SelectItem value="Next.js Developers">
+                                                                    Next.js Developers
+                                                                </SelectItem>
+                                                            </SelectGroup>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            </div>
+                                        </SelectContent>
+                                    </Select>
                                     <Button type="submit" variant="primary" className="w-full h-8 mt-4" >
                                         Share Post
                                     </Button>

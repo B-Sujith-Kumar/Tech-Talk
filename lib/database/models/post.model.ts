@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema } from "mongoose";
 
 interface IPost extends Document {
     author: mongoose.Schema.Types.ObjectId;
@@ -20,25 +20,25 @@ interface IEngagement extends Document {
 }
 
 const engagementSchema = new Schema<IEngagement>({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     createdAt: { type: Date, default: Date.now }
 });
 
 const postSchema: Schema<IPost> = new Schema({
-    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     title: { type: String, required: true },
     content: { type: String, required: true },
-    tags: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag', default: []}],
-    community: { type: mongoose.Schema.Types.ObjectId, ref: 'Community' },
+    tags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tag", default: [] }],
+    community: { type: mongoose.Schema.Types.ObjectId, ref: "Community" },
     upvotes: [engagementSchema],
     downvotes: [engagementSchema],
-    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
     views: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now }
 });
 
 // Static method to find trending posts based on engagement within the last 24 hours
-postSchema.statics.findTrendingPosts = async function() {
+postSchema.statics.findTrendingPosts = async function () {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
 
@@ -47,23 +47,23 @@ postSchema.statics.findTrendingPosts = async function() {
             $addFields: {
                 recentUpvotes: {
                     $filter: {
-                        input: '$upvotes',
-                        as: 'upvote',
-                        cond: { $gte: ['$$upvote.createdAt', yesterday] }
+                        input: "$upvotes",
+                        as: "upvote",
+                        cond: { $gte: ["$$upvote.createdAt", yesterday] }
                     }
                 },
                 recentDownvotes: {
                     $filter: {
-                        input: '$downvotes',
-                        as: 'downvote',
-                        cond: { $gte: ['$$downvote.createdAt', yesterday] }
+                        input: "$downvotes",
+                        as: "downvote",
+                        cond: { $gte: ["$$downvote.createdAt", yesterday] }
                     }
                 },
                 recentComments: {
                     $filter: {
-                        input: '$comments',
-                        as: 'comment',
-                        cond: { $gte: ['$$comment.createdAt', yesterday] }
+                        input: "$comments",
+                        as: "comment",
+                        cond: { $gte: ["$$comment.createdAt", yesterday] }
                     }
                 }
             }
@@ -72,8 +72,8 @@ postSchema.statics.findTrendingPosts = async function() {
             $addFields: {
                 engagementScore: {
                     $subtract: [
-                        { $add: [{ $size: '$recentUpvotes' }, { $size: '$recentComments' }] },
-                        { $size: '$recentDownvotes' }
+                        { $add: [{ $size: "$recentUpvotes" }, { $size: "$recentComments" }] },
+                        { $size: "$recentDownvotes" }
                     ]
                 }
             }
@@ -83,4 +83,4 @@ postSchema.statics.findTrendingPosts = async function() {
     ]);
 };
 
-const Post = mongoose.model<IPost>('Post', postSchema);
+const Post = mongoose.model<IPost>("Post", postSchema);
