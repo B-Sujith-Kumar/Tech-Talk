@@ -61,7 +61,7 @@ export default async function Home() {
                                             </span>
                                             <span className="text-xs">
                                                 <Select>
-                                                    <SelectTrigger className="bg-white text-gray-600 border-none h-2">
+                                                    <SelectTrigger className="bg-white text-gray-600 border-none h-2 focus:ring-0 focus:border-none focus:ring-offset-0 focus:ring-opacity-0 focus:border-transparent focus:border-collapse active:border-collapse">
                                                         <SelectValue placeholder="Public" />
                                                     </SelectTrigger>
                                                     <SelectContent className="bg-white text-gray-600 border-none">
@@ -125,7 +125,7 @@ export default async function Home() {
                                         </div>
                                     </div>
                                     <Select>
-                                        <SelectTrigger className="sm:hidden mt-2 bg-gray-100 text-gray-600 border-none text-xs">
+                                        <SelectTrigger className="sm:hidden mt-2 bg-gray-100 text-gray-600 border-none text-xs focus:ring-0 focus:border-none focus:ring-offset-0 focus:ring-opacity-0 focus:border-transparent focus:border-collapse active:border-collapse">
                                             More Options
                                         </SelectTrigger>
                                         <SelectContent className="bg-white text-gray-600 border-none text-xs py-2">
@@ -152,7 +152,7 @@ export default async function Home() {
                                                 </div>
                                                 <div className="ml-auto">
                                                     <Select>
-                                                        <SelectTrigger className="bg-white text-gray-600 border-none">
+                                                        <SelectTrigger className="bg-white text-gray-600 border-none focus:ring-0 focus:border-none focus:ring-offset-0 focus:ring-opacity-0 focus:border-transparent focus:border-collapse active:border-collapse">
                                                             <SelectValue placeholder="Public" />
                                                         </SelectTrigger>
                                                         <SelectContent className="bg-white text-gray-600 border-none">
@@ -219,7 +219,7 @@ export default async function Home() {
                         </div>
                         <div className="ml-auto">
                             <Select>
-                                <SelectTrigger className="bg-white text-gray-600 border-none">
+                                <SelectTrigger className="bg-white text-gray-600 border-none focus:ring-0 focus:border-none focus:ring-offset-0 focus:ring-opacity-0 focus:border-transparent focus:border-collapse active:border-collapse">
                                     <SelectValue placeholder="Public" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-white text-gray-600 border-none">
@@ -249,7 +249,7 @@ export default async function Home() {
                         </div>
                     </div>
                     <Select>
-                        <SelectTrigger className="sm:hidden bg-gray-100 text-gray-600 border-none text-xs">
+                        <SelectTrigger className="sm:hidden bg-gray-100 text-gray-600 border-none text-xs focus:ring-0 focus:border-none focus:ring-offset-0 focus:ring-opacity-0 focus:border-transparent focus:border-collapse active:border-collapse">
                             More Options
                         </SelectTrigger>
                         <SelectContent className="bg-white text-gray-600 border-none text-xs py-2">
@@ -276,7 +276,7 @@ export default async function Home() {
                                 </div>
                                 <div className="ml-auto">
                                     <Select>
-                                        <SelectTrigger className="bg-white text-gray-600 border-none">
+                                        <SelectTrigger className="bg-white text-gray-600 border-none focus:ring-0 focus:border-none focus:ring-offset-0 focus:ring-opacity-0 focus:border-transparent focus:border-collapse active:border-collapse">
                                             <SelectValue placeholder="Public" />
                                         </SelectTrigger>
                                         <SelectContent className="bg-white text-gray-600 border-none">
@@ -313,7 +313,7 @@ export default async function Home() {
                 <div className="border h-0 w-full"></div>
                 <div className="flex flex-row text-xs min-w-fit">
                     <Select>
-                        <SelectTrigger className="bg-gray-100 border text-gray-600 text-xs focus:ring-0 focus:border-none focus:ring-offset-0 focus:ring-opacity-0 focus:border-transparent focus:border-collapse active:border-collapse">
+                        <SelectTrigger className="bg-gray-100 border-gray-100 text-gray-600 text-xs focus:ring-0 focus:border-none focus:ring-offset-0 focus:ring-opacity-0 focus:border-transparent focus:border-collapse active:border-collapse">
                             <SelectValue placeholder="Latest" />
                         </SelectTrigger>
                         <SelectContent className="bg-white text-gray-600 border-none text-xs">
