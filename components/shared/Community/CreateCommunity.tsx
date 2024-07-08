@@ -23,6 +23,7 @@ import Image from "next/image";
 import { BuildingIcon } from "lucide-react";
 import { createCommunity } from "@/lib/actions/community.actions";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 
 type community = {
   name?: string;
@@ -32,6 +33,7 @@ type community = {
 const CreateCommunity = ({ userId }: { userId: string | null }) => {
   console.log(userId);
   const router = useRouter();
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [slide, setSlide] = useState(1);
   const [banner, setBanner] = useState<string>("");
@@ -83,6 +85,10 @@ const CreateCommunity = ({ userId }: { userId: string | null }) => {
       if (res?.success) {
         setOpen(false);
         router.push("/community");
+        toast({
+          title: "Community created",
+          description: "Congratulations! Your community has been created successfully.",
+        });
         console.log("Community created");
       } else {
         console.log("Failed to create community");
@@ -94,7 +100,7 @@ const CreateCommunity = ({ userId }: { userId: string | null }) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="bg-gray-100 rounded-md p-2 cursor-pointer" >
+      <DialogTrigger className="bg-gray-100 rounded-md p-2 cursor-pointer">
         <BuildingIcon size={18} />
       </DialogTrigger>
       <div className="max-md:px-4">

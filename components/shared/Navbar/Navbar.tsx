@@ -43,7 +43,7 @@ const Navbar = ({userId}: {userId: string | null}) => {
                             />
                             <input
                                 type="text"
-                                className="bg-gray-100 border-0 px-3 placeholder:text-gray-400 py-1 outline-none flex-1"
+                                className="bg-gray-100 border-0 px-3 placeholder:text-gray-400 py-[7px] outline-none flex-1"
                                 placeholder="Search"
                             />
                         </div>

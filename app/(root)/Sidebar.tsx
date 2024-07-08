@@ -12,7 +12,7 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
     const { isSignedIn, user } = useUser();
     return <>
         <div className={` ${isMobile === false ? "w-1/5 xl:w-1/5 max-lg:hidden space-y-3" : ""} `}>
-            {isSignedIn && <div id="profile" className="bg-white rounded-md p-2">
+            {isSignedIn && <div id="profile" className="bg-white rounded-md p-3">
                 <div className="flex flex-col gap-3 items-center bg-gray-100 rounded-md p-2 overflow-x-scroll scrollbar-hidden">
                     <div className="flex flex-row items-center justify-start gap-2 w-full px-2">
                         <Avatar>
@@ -21,12 +21,12 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
                                 {user.fullName}
                             </AvatarFallback>
                         </Avatar>
-                        <div className="flex flex-col -space-y-1 text-wrap">
+                        <div className="flex flex-col space-y-[1px] text-wrap">
                             <span className="text-base font-medium">
                                 {user.fullName}
                             </span>
                             <span className="text-xs">
-                                {user.username}
+                                @{user.username}
                             </span>
                         </div>
                     </div>
@@ -59,7 +59,7 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
                 </div>
             </div>}
             <div id="links">
-                <div className="bg-white rounded-md p-2 mt-2">
+                <div className="bg-white rounded-md p-3 mt-2">
                     <div className="flex flex-col gap-1">
                         <Link href="/" className={` flex flex-row items-center gap-3  text-gray-600 p-2 hover:bg-indigo-600/90 hover:text-white hover:rounded-lg
                 ${pathname === "/" && "bg-indigo-600/90 text-white rounded-lg"} `}
