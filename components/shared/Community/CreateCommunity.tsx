@@ -21,13 +21,18 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { UploadButton } from "@/lib/uploadthing";
 import Image from "next/image";
 import { BuildingIcon } from "lucide-react";
+import { createCommunity } from "@/lib/actions/community.actions";
+import { useRouter } from "next/navigation";
 
 type community = {
   name?: string;
   description?: string;
 };
 
-const CreateCommunity = () => {
+const CreateCommunity = ({ userId }: { userId: string | null }) => {
+  console.log(userId);
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
   const [slide, setSlide] = useState(1);
   const [banner, setBanner] = useState<string>("");
   const [icon, setIcon] = useState<string>("");
@@ -64,9 +69,32 @@ const CreateCommunity = () => {
     setSlide((prev) => prev + 1);
   };
 
+  const handleSubmit = async () => {
+    const formData: any = {
+      name: communityName,
+      description: communityDescription,
+      banner,
+      icon,
+      tags,
+      createdBy: userId,
+    };
+    try {
+      const res = await createCommunity(formData);
+      if (res?.success) {
+        setOpen(false);
+        router.push("/community");
+        console.log("Community created");
+      } else {
+        console.log("Failed to create community");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
-    <Dialog>
-      <DialogTrigger className="bg-gray-100 rounded-md p-2 cursor-pointer">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger className="bg-gray-100 rounded-md p-2 cursor-pointer" >
         <BuildingIcon size={18} />
       </DialogTrigger>
       <div className="max-md:px-4">
@@ -284,7 +312,7 @@ const CreateCommunity = () => {
                 {slide === 3 && (
                   <Button
                     className="bg-blue-700 text-white rounded-full"
-                    onClick={() => setSlide((prev) => prev + 1)}
+                    onClick={handleSubmit}
                     disabled={!tags.length}
                   >
                     Create

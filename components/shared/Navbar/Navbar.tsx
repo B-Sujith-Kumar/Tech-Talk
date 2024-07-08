@@ -16,7 +16,7 @@ import Sidebar from "@/app/(root)/Sidebar";
 import { useRouter } from "next/navigation";
 import CreateCommunity from "../Community/CreateCommunity";
 
-const Navbar = () => {
+const Navbar = ({userId}: {userId: string | null}) => {
     const router = useRouter();
     return (
         <>
@@ -76,7 +76,7 @@ const Navbar = () => {
                         <div className="bg-gray-100 rounded-md p-2 cursor-pointer">
                             <Bookmark size={18} />
                         </div>
-                        <CreateCommunity />
+                        <CreateCommunity userId={userId} />
                         <div className="sm:hidden">
                         <UserButton
                             afterSignOutUrl="/"

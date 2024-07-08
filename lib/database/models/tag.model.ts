@@ -1,6 +1,7 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, models, Schema } from "mongoose";
 
-interface ITag extends Document {
+export interface ITag extends Document {
+    _id?: mongoose.Schema.Types.ObjectId;
     name: string;
     posts: mongoose.Schema.Types.ObjectId[];
     followers: mongoose.Schema.Types.ObjectId[];
@@ -16,4 +17,5 @@ const tagSchema: Schema<ITag> = new Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
-const Tag = mongoose.model<ITag>("Tag", tagSchema);
+const Tag = models.Tag || mongoose.model<ITag>("Tag", tagSchema);
+export default Tag;

@@ -1,10 +1,12 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, models, Schema } from 'mongoose';
 
-interface ICommunity extends Document {
+export interface ICommunity extends Document {
+    _id?: mongoose.Schema.Types.ObjectId;
     name: string;
     description?: string;
     banner?: string;
     icon?: string;
+    createdBy: mongoose.Schema.Types.ObjectId;
     tags: mongoose.Schema.Types.ObjectId[];
     members: mongoose.Schema.Types.ObjectId[];
     createdAt: Date;
@@ -15,10 +17,11 @@ const communitySchema: Schema<ICommunity> = new Schema({
     description: { type: String, default: '' },
     banner: { type: String, default: '' },
     icon: { type: String, default: '' },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     tags: [{ type: mongoose.Schema.ObjectId, ref: 'Tag', required: true }],
     members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     createdAt: { type: Date, default: Date.now }
 });
 
-const Community = mongoose.model<ICommunity>('Community', communitySchema);
+const Community = models.Community || mongoose.model<ICommunity>('Community', communitySchema);
 export default Community

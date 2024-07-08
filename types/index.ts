@@ -14,3 +14,12 @@ export type updateUserType = {
     lastName: string;
     profilePicture: string;
 }
+
+export type createCommunityType = {
+    name: string;
+    description: string;
+    createdBy: string;
+    tags: string[];
+    icon?: string;
+    banner?: string;
+}

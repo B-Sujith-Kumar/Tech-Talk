@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, models, Schema } from "mongoose";
 
 interface IPost extends Document {
     author: mongoose.Schema.Types.ObjectId;
@@ -83,4 +83,4 @@ postSchema.statics.findTrendingPosts = async function () {
     ]);
 };
 
-const Post = mongoose.model<IPost>("Post", postSchema);
+const Post = models.Post || mongoose.model<IPost>("Post", postSchema);
