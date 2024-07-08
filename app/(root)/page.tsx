@@ -313,7 +313,7 @@ export default async function Home() {
                 <div className="border h-0 w-full"></div>
                 <div className="flex flex-row text-xs min-w-fit">
                     <Select>
-                        <SelectTrigger className="bg-gray-100 text-gray-600 border-none text-xs">
+                        <SelectTrigger className="bg-gray-100 border text-gray-600 text-xs focus:ring-0 focus:border-none focus:ring-offset-0 focus:ring-opacity-0 focus:border-transparent focus:border-collapse active:border-collapse">
                             <SelectValue placeholder="Latest" />
                         </SelectTrigger>
                         <SelectContent className="bg-white text-gray-600 border-none text-xs">

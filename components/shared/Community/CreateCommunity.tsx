@@ -108,7 +108,7 @@ const CreateCommunity = () => {
                             <div className="flex flex-col gap-4">
                                 <input
                                     type="text"
-                                    className="rounded-2xl px-3 py-4 focus:outline-none w-[70%] bg-gray-300 placeholder:text-sm placeholder:text-gray-600 max-sm:w-full"
+                                    className="rounded-2xl px-3 py-4 focus:outline-none w-4/5 bg-gray-300 placeholder:text-sm placeholder:text-gray-600 max-sm:w-full"
                                     placeholder="Community name*"
                                     value={communityName}
                                     onChange={(e) => setCommunityName(e.target.value)}
@@ -117,7 +117,7 @@ const CreateCommunity = () => {
                                     <p className="text-xs text-red-600">{errors.name}</p>
                                 )}
                                 <Textarea
-                                    className="rounded-2xl px-3 py-4 focus-visible:ring-0 focus:outline-none w-[70%] bg-gray-300 placeholder:text-sm placeholder:text-gray-600 max-sm:w-full"
+                                    className="rounded-2xl px-3 py-4 focus-visible:ring-0 focus:outline-none w-4/5 bg-gray-300 placeholder:text-sm placeholder:text-gray-600 max-sm:w-full"
                                     placeholder="Community description*"
                                     rows={10}
                                     maxLength={256}
