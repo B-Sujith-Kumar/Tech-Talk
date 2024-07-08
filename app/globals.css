@@ -8,3 +8,17 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
+.hide-on-overflow {
+    display: inline-block;
+    max-width: 100%;
+    white-space: wrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    visibility: hidden;
+}
+
+.hide-on-overflow::before {
+    content: attr(data-text);
+    visibility: visible;
+}

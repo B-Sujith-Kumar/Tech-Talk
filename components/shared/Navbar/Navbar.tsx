@@ -88,7 +88,7 @@ const Navbar = () => {
                     </SignedOut>
                     <Sheet>
                         <SheetTrigger>
-                            <Menu size={18} className="md:hidden" />
+                            <Menu size={18} className="lg:hidden" />
                         </SheetTrigger>
                         <SheetContent className="flex flex-row sm:flex-col p-4 bg-white w-fit sm:h-screen z-50 pt-6">
                             <Sidebar isMobile={true} />

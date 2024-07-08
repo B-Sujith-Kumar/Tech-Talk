@@ -11,9 +11,9 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
     const pathname = usePathname();
     const { isSignedIn, user } = useUser();
     return <>
-        <div className={` ${isMobile === false ? "w-1/6 max-lg:hidden space-y-3" : ""} `}>
+        <div className={` ${isMobile === false ? "w-1/5 xl:w-1/6 max-lg:hidden space-y-3" : ""} `}>
             {isSignedIn && <div id="profile" className="bg-white rounded-md p-2">
-                <div className="flex flex-col gap-3 items-center bg-gray-100 rounded-md p-2 overflow-scroll scrollbar-hidden">
+                <div className="flex flex-col gap-3 items-center bg-gray-100 rounded-md p-2 overflow-x-scroll scrollbar-hidden">
                     <div className="flex flex-row items-center justify-start gap-2 w-full px-2">
                         <Avatar>
                             <AvatarImage src={user.imageUrl} />
@@ -21,7 +21,7 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
                                 {user.fullName}
                             </AvatarFallback>
                         </Avatar>
-                        <div className="flex flex-col ml-2 -space-y-1">
+                        <div className="flex flex-col -space-y-1 text-wrap">
                             <span className="text-base font-medium">
                                 {user.fullName}
                             </span>
@@ -61,32 +61,32 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
             <div id="links">
                 <div className="bg-white rounded-md p-2 mt-2">
                     <div className="flex flex-col">
-                        <Link href="/" className={` flex flex-row items-center gap-3  text-gray-600 p-2 hover:bg-blue-600/90 hover:text-white hover:rounded-lg
-                ${pathname === "/" && "bg-blue-600/90 text-white rounded-lg"} `}
+                        <Link href="/" className={` flex flex-row items-center gap-3  text-gray-600 p-2 hover:bg-indigo-600/90 hover:text-white hover:rounded-lg
+                ${pathname === "/" && "bg-indigo-600/90 text-white rounded-lg"} `}
                         >
                             <HouseIcon size={18} />
                             Feed
                         </Link>
-                        <Link href="/profile" className={` flex flex-row items-center gap-3  text-gray-600  p-2 hover:bg-blue-600/90 hover:text-white  hover:rounded-lg
-                ${pathname === "/profile" && "bg-blue-600/90 text-white rounded-lg"} `}
+                        <Link href="/profile" className={` flex flex-row items-center gap-3  text-gray-600  p-2 hover:bg-indigo-600/90 hover:text-white  hover:rounded-lg
+                ${pathname === "/profile" && "bg-indigo-600/90 text-white rounded-lg"} `}
                         >
                             <HandshakeIcon size={18} />
                             Friends
                         </Link>
-                        <Link href="/events" className={` flex flex-row items-center gap-3  text-gray-600  p-2 hover:bg-blue-600/90 hover:text-white  hover:rounded-lg
-                ${pathname === "/events" && "bg-blue-600/90 text-white  rounded-lg"} `}
+                        <Link href="/events" className={` flex flex-row items-center gap-3  text-gray-600  p-2 hover:bg-indigo-600/90 hover:text-white  hover:rounded-lg
+                ${pathname === "/events" && "bg-indigo-600/90 text-white  rounded-lg"} `}
                         >
                             <LucideCalendarRange size={18} />
                             Events
                         </Link>
-                        <Link href="/videos" className={` flex flex-row items-center gap-3  text-gray-600  p-2 hover:bg-blue-600/90 hover:text-gray-200 hover:rounded-lg
-                ${pathname === "/videos" && "bg-blue-600/90 text-gray-200 rounded-lg"} `}
+                        <Link href="/videos" className={` flex flex-row items-center gap-3  text-gray-600  p-2 hover:bg-indigo-600/90 hover:text-gray-200 hover:rounded-lg
+                ${pathname === "/videos" && "bg-indigo-600/90 text-gray-200 rounded-lg"} `}
                         >
                             <Video size={18} />
                             Videos
                         </Link>
-                        <Link href="/images" className={` flex flex-row items-center gap-3  text-gray-600  p-2 hover:bg-blue-600/90 hover:text-gray-200 hover:rounded-lg
-                ${pathname === "/images" && "bg-blue-600/90 text-gray-200 rounded-lg"} `}
+                        <Link href="/images" className={` flex flex-row items-center gap-3  text-gray-600  p-2 hover:bg-indigo-600/90 hover:text-gray-200 hover:rounded-lg
+                ${pathname === "/images" && "bg-indigo-600/90 text-gray-200 rounded-lg"} `}
                         >
                             <Images size={18} />
                             Images
