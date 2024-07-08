@@ -15,9 +15,9 @@ export const Stories = () => {
                             alt={user?.fullName as string || "User"}
                             width={400}
                             height={400}
-                            className="min-w-16 h-auto rounded-full border-2 object-cover cursor-pointer"
+                            className="min-w-16 h-16 rounded-full border-2 object-cover cursor-pointer"
                         />
-                        <p className="absolute bottom-4 left-10 bg-indigo-600 text-white rounded-full cursor-pointer mx-auto text-center w-6 h-6 border-2 border-gray-200">
+                        <p className="absolute bottom-4 left-10 bg-indigo-600 text-white rounded-full cursor-pointer mx-auto text-center w-6 h-6 border-2 border-gray-200 flex justify-center items-center">
                             +
                         </p>
                         <span className="text-xs mt-1">
@@ -31,7 +31,7 @@ export const Stories = () => {
                                 alt="Image 2"
                                 width={400}
                                 height={400}
-                                className={` min-w-16 h-auto rounded-full border-2 object-cover cursor-pointer p-1
+                                className={` min-w-16 h-16 rounded-full border-2 object-cover cursor-pointer p-1
                                 ${i % 2 === 0 ? "border-indigo-500" : ""}
                                 `}
                             />
