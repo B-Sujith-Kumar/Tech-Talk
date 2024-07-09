@@ -32,7 +32,8 @@ const userSchema: Schema<IUser> = new Schema({
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] }],
     followedTags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tag", default: [] }],
     firstLogin: { type: Boolean, default: true },
-    createdAt: { type: Date, default: Date.now }
+}, {
+    timestamps: true
 });
 
 const User = models.User || mongoose.model<IUser>("User", userSchema);

@@ -1,0 +1,370 @@
+"use client";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger, DialogHeader } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AtSignIcon, HashIcon, ImageUpIcon, PaperclipIcon, VideoIcon } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { createPostSchema } from "@/schemas/post.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormField, FormItem, FormLabel, FormMessage, FormControl, FormDescription } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import TextBox from "@/components/shared/TextBox/TextBox";
+
+export const CreatePost = () => {
+    const { user } = useUser();
+
+    const form = useForm<z.infer<typeof createPostSchema>>({
+        resolver: zodResolver(createPostSchema),
+        defaultValues: {
+            title: "",
+            content: "",
+            tags: [],
+            community: "",
+        }
+    });
+    async function onSubmit(data: z.infer<typeof createPostSchema>) {
+        console.log(data);
+    }
+
+    return <>
+        <div className="bg-white rounded-xl mt-6 p-2 px-4 pt-4">
+            <div className="flex flex-row gap-x-4 items-center px-2 ">
+                <Avatar>
+                    <AvatarImage
+                        src={user?.imageUrl}
+                        alt={user?.firstName ? user.firstName[0] : ""}
+                    />
+                    <AvatarFallback>
+                        {user?.firstName && user?.lastName}
+                    </AvatarFallback>
+                </Avatar>
+                <Dialog>
+                    <DialogTrigger className="w-full">
+                        <textarea
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:opacity-50 peer placeholder-transparent h-10 scrollbar-hidden bg-gray-100 max-sm:placeholder:text-xs"
+                            placeholder="What's on your mind?"
+                            name="comment"
+                            required
+                            minLength={5}
+                        />
+                    </DialogTrigger>
+                    <DialogContent
+                        className="bg-white rounded-md overflow-auto scrollbar-hidden max-w-3xl max-md:max-w-2xl max-sm:max-w-[90%] max-md:rounded-lg"
+                        aria-describedby="modal-description"
+                    >
+                        <DialogHeader>
+                            <DialogTitle>
+                                <div className="flex flex-row items-center justify-start gap-2 w-full px-2">
+                                    <Avatar>
+                                        <AvatarImage
+                                            src={user?.imageUrl as string}
+                                            className="rounded-full border-2 border-gray-400 w-16 h-auto"
+                                        />
+                                        <AvatarFallback>
+                                            {user?.firstName && user?.lastName}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex flex-col ml-2 space-y-1 mb-2">
+                                        <span className="text-base font-medium">
+                                            {user?.firstName && user?.lastName
+                                                ? `${user.firstName} ${user.lastName}`
+                                                : ""}
+                                        </span>
+                                        <span className="text-xs">
+                                            <Select>
+                                                <SelectTrigger className="bg-white text-gray-600 border-none h-2 focus:ring-0 focus:border-none focus:ring-offset-0 focus:ring-opacity-0 focus:border-transparent focus:border-collapse active:border-collapse">
+                                                    <SelectValue placeholder="Public" />
+                                                </SelectTrigger>
+                                                <SelectContent className="bg-white text-gray-600 border-none">
+                                                    <SelectGroup>
+                                                        <SelectLabel>Who can see this?</SelectLabel>
+                                                        <SelectItem value="public">Public</SelectItem>
+                                                        <SelectItem value="private">Private</SelectItem>
+                                                    </SelectGroup>
+                                                    <SelectGroup>
+                                                        <SelectLabel>Communities</SelectLabel>
+                                                        <SelectItem value="JS Developers">
+                                                            JS Developers
+                                                        </SelectItem>
+                                                        <SelectItem value="React Developers">
+                                                            React Developers
+                                                        </SelectItem>
+                                                        <SelectItem value="Next.js Developers">
+                                                            Next.js Developers
+                                                        </SelectItem>
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                        </span>
+                                    </div>
+                                </div>
+                            </DialogTitle>
+                            <div>
+                                <Form {...form}>
+                                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                                        <FormField
+                                            control={form.control}
+                                            name="title"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        Title of your post
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="Enter Title Here" {...field}
+                                                            className="blockrounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:opacity-50 peer placeholder-transparent scrollbar-hidden bg-gray-100 w-full"
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="content"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        Content of your post
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        {/* <textarea
+                                                            {...field}
+                                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:opacity-50 peer placeholder-transparent h-60 scrollbar-hidden bg-gray-100 max-sm:placeholder:text-xs"
+                                                        >
+
+                                                        </textarea> */}
+                                                        <TextBox description={field.name} onValueChange={field.onChange} {...field} />
+                                                    </FormControl>
+                                                    <FormDescription>
+                                                        This is your public display name.
+                                                    </FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <div className="mt-4 max-sm:hidden">
+                                            <div className="flex flex-row gap-6 *:flex *:flex-row *:gap-2 *:items-center *:cursor-pointer">
+                                                <div>
+                                                    <ImageUpIcon className="w-4 h-4 text-blue-500" />
+                                                    <span className="text-xs">Image/Video</span>
+                                                </div>
+                                                <div>
+                                                    <PaperclipIcon className="w-4 h-4 text-yellow-500" />
+                                                    <span className="text-xs">Attachment</span>
+                                                </div>
+                                                <div>
+                                                    <VideoIcon className="w-4 h-4 text-red-500" />
+                                                    <span className="text-xs">Live</span>
+                                                </div>
+                                                <div>
+                                                    <HashIcon className="w-4 h-4 text-green-500" />
+                                                    <span className="text-xs">Tags</span>
+                                                </div>
+                                                <div>
+                                                    <AtSignIcon className="w-4 h-4 text-gray-500" />
+                                                    <span className="text-xs">Mention</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <Select>
+                                            <SelectTrigger className="sm:hidden mt-2 bg-gray-100 text-gray-600 border-none text-xs focus:ring-0 focus:border-none focus:ring-offset-0 focus:ring-opacity-0 focus:border-transparent focus:border-collapse active:border-collapse">
+                                                More Options
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-white text-gray-600 border-none text-xs py-2">
+                                                <div className="flex flex-col gap-6 *:flex *:flex-row *:gap-2 *:items-center *:cursor-pointer *:px-4">
+                                                    <div>
+                                                        <ImageUpIcon className="w-4 h-4 text-blue-500" />
+                                                        <span className="text-xs">Image/Video</span>
+                                                    </div>
+                                                    <div>
+                                                        <PaperclipIcon className="w-4 h-4 text-yellow-500" />
+                                                        <span className="text-xs">Attachment</span>
+                                                    </div>
+                                                    <div>
+                                                        <VideoIcon className="w-4 h-4 text-red-500" />
+                                                        <span className="text-xs">Live</span>
+                                                    </div>
+                                                    <div>
+                                                        <HashIcon className="w-4 h-4 text-green-500" />
+                                                        <span className="text-xs">Tags</span>
+                                                    </div>
+                                                    <div>
+                                                        <AtSignIcon className="w-4 h-4 text-gray-500" />
+                                                        <span className="text-xs">Mention</span>
+                                                    </div>
+                                                    <div className="ml-auto">
+                                                        <Select>
+                                                            <SelectTrigger className="bg-white text-gray-600 border-none focus:ring-0 focus:border-none focus:ring-offset-0 focus:ring-opacity-0 focus:border-transparent focus:border-collapse active:border-collapse">
+                                                                <SelectValue placeholder="Public" />
+                                                            </SelectTrigger>
+                                                            <SelectContent className="bg-white text-gray-600 border-none">
+                                                                <SelectGroup>
+                                                                    <SelectLabel>Who can see this?</SelectLabel>
+                                                                    <SelectItem value="public">Public</SelectItem>
+                                                                    <SelectItem value="private">
+                                                                        Private
+                                                                    </SelectItem>
+                                                                </SelectGroup>
+                                                                <SelectGroup>
+                                                                    <SelectLabel>Communities</SelectLabel>
+                                                                    <SelectItem value="JS Developers">
+                                                                        JS Developers
+                                                                    </SelectItem>
+                                                                    <SelectItem value="React Developers">
+                                                                        React Developers
+                                                                    </SelectItem>
+                                                                    <SelectItem value="Next.js Developers">
+                                                                        Next.js Developers
+                                                                    </SelectItem>
+                                                                </SelectGroup>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                            </SelectContent>
+                                        </Select>
+                                        <div className="flex gap-4">
+                                            <Button
+                                                type="reset"
+                                                variant="destructive"
+                                                className="w-full"
+                                                onClick={() => form.reset()}
+                                            >
+                                                Clear Post
+                                            </Button>
+                                            <Button
+                                                type="submit"
+                                                variant="primary"
+                                                className="w-full"
+                                            >
+                                                Share Post
+                                            </Button>
+                                        </div>
+                                    </form>
+                                </Form>
+                            </div>
+                        </DialogHeader>
+                    </DialogContent>
+                </Dialog>
+                <Button
+                    type="submit"
+                    variant="primary"
+                    className="w-fit h-10 px-6 py-4"
+                >
+                    Share Post
+                </Button>
+            </div>
+            <hr className="mt-2 mb-2" />
+            <div className="px-2 overflow-auto scrollbar-hidden">
+                <div className="flex flex-row gap-6 *:flex *:flex-row *:gap-2 *:items-center *:cursor-pointer max-sm:hidden">
+                    <div>
+                        <ImageUpIcon className="w-4 h-4 text-blue-500" />
+                        <span className="text-xs">Image/Video</span>
+                    </div>
+                    <div>
+                        <PaperclipIcon className="w-4 h-4 text-yellow-500" />
+                        <span className="text-xs">Attachment</span>
+                    </div>
+                    <div>
+                        <VideoIcon className="w-4 h-4 text-red-500" />
+                        <span className="text-xs">Live</span>
+                    </div>
+                    <div>
+                        <HashIcon className="w-4 h-4 text-green-500" />
+                        <span className="text-xs">Tags</span>
+                    </div>
+                    <div>
+                        <AtSignIcon className="w-4 h-4 text-gray-500" />
+                        <span className="text-xs">Mention</span>
+                    </div>
+                    <div className="ml-auto">
+                        <Select>
+                            <SelectTrigger className="bg-white text-gray-600 border-none focus:ring-0 focus:border-none focus:ring-offset-0 focus:ring-opacity-0 focus:border-transparent focus:border-collapse active:border-collapse">
+                                <SelectValue placeholder="Public" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-white text-gray-600 border-none">
+                                <SelectGroup>
+                                    <SelectLabel>Who can see this?</SelectLabel>
+                                    <SelectItem value="public">Public</SelectItem>
+                                    <SelectItem value="private">Private</SelectItem>
+                                </SelectGroup>
+                                <SelectGroup>
+                                    <SelectLabel>Communities</SelectLabel>
+                                    <SelectItem value="JS Developers">
+                                        JS Developers
+                                    </SelectItem>
+                                    <SelectItem value="React Developers">
+                                        React Developers
+                                    </SelectItem>
+                                    <SelectItem value="Next.js Developers">
+                                        Next.js Developers
+                                    </SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+                <Select>
+                    <SelectTrigger className="sm:hidden bg-gray-100 text-gray-600 border-none text-xs focus:ring-0 focus:border-none focus:ring-offset-0 focus:ring-opacity-0 focus:border-transparent focus:border-collapse active:border-collapse">
+                        More Options
+                    </SelectTrigger>
+                    <SelectContent className="bg-white text-gray-600 border-none text-xs py-2">
+                        <div className="flex flex-col gap-6 *:flex *:flex-row *:gap-2 *:items-center *:cursor-pointer *:px-4">
+                            <div>
+                                <ImageUpIcon className="w-4 h-4 text-blue-500" />
+                                <span className="text-xs">Image/Video</span>
+                            </div>
+                            <div>
+                                <PaperclipIcon className="w-4 h-4 text-yellow-500" />
+                                <span className="text-xs">Attachment</span>
+                            </div>
+                            <div>
+                                <VideoIcon className="w-4 h-4 text-red-500" />
+                                <span className="text-xs">Live</span>
+                            </div>
+                            <div>
+                                <HashIcon className="w-4 h-4 text-green-500" />
+                                <span className="text-xs">Tags</span>
+                            </div>
+                            <div>
+                                <AtSignIcon className="w-4 h-4 text-gray-500" />
+                                <span className="text-xs">Mention</span>
+                            </div>
+                            <div className="ml-auto">
+                                <Select>
+                                    <SelectTrigger className="bg-white text-gray-600 border-none focus:ring-0 focus:border-none focus:ring-offset-0 focus:ring-opacity-0 focus:border-transparent focus:border-collapse active:border-collapse">
+                                        <SelectValue placeholder="Public" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-white text-gray-600 border-none">
+                                        <SelectGroup>
+                                            <SelectLabel>Who can see this?</SelectLabel>
+                                            <SelectItem value="public">Public</SelectItem>
+                                            <SelectItem value="private">Private</SelectItem>
+                                        </SelectGroup>
+                                        <SelectGroup>
+                                            <SelectLabel>Communities</SelectLabel>
+                                            <SelectItem value="JS Developers">
+                                                JS Developers
+                                            </SelectItem>
+                                            <SelectItem value="React Developers">
+                                                React Developers
+                                            </SelectItem>
+                                            <SelectItem value="Next.js Developers">
+                                                Next.js Developers
+                                            </SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                    </SelectContent>
+                </Select>
+            </div>
+        </div>
+    </>
+}

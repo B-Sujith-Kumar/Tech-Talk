@@ -34,7 +34,8 @@ const postSchema: Schema<IPost> = new Schema({
     downvotes: [engagementSchema],
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
     views: { type: Number, default: 0 },
-    createdAt: { type: Date, default: Date.now }
+}, {
+    timestamps: true
 });
 
 // Static method to find trending posts based on engagement within the last 24 hours
@@ -84,3 +85,5 @@ postSchema.statics.findTrendingPosts = async function () {
 };
 
 const Post = models.Post || mongoose.model<IPost>("Post", postSchema);
+
+export default Post;
