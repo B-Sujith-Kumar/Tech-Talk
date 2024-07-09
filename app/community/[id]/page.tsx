@@ -87,7 +87,7 @@ const Page = async ({ params: { id } }: SearchParamProps) => {
         </div>
       </div>
       <div className="flex gap-3">
-        <div className="xl:w-[70%]">
+        <div className="xl:w-[70%] max-md:mt-4">
           <Select>
             <SelectTrigger className="w-[120px] active:bg-inherit bg-inherit focus-visible:ring-0 borer-0 ring-0 outline-none focus:ring-0 ring-offset-0">
               <SelectValue placeholder="Sort By" />
