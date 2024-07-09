@@ -1,3 +1,5 @@
+import CommunityOptions from "@/components/shared/Community/CommunityOptions";
+import CommunityPost from "@/components/shared/Community/CommunityPost";
 import JoinCommunity from "@/components/shared/Community/JoinCommunity";
 import { getCommunity } from "@/lib/actions/community.actions";
 import { getUserObjectId } from "@/lib/actions/user.actions";
@@ -9,6 +11,14 @@ import mongoose from "mongoose";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Dot } from "lucide-react";
 
 const Page = async ({ params: { id } }: SearchParamProps) => {
   const res = await getCommunity(id);
@@ -19,7 +29,7 @@ const Page = async ({ params: { id } }: SearchParamProps) => {
     .map((member: any) => member._id === userObjectId)
     .includes(true);
   return (
-    <div>
+    <div className="sm:px-6">
       <div className="relative">
         <Image
           src={community.banner}
@@ -50,13 +60,17 @@ const Page = async ({ params: { id } }: SearchParamProps) => {
           </div>
           <div>
             <div className="flex items-center gap-3 flex-wrap">
-              {(isMember || (!isMember && community.createdBy._id.toString() === userObjectId)) && <Link
-                href={`/post/create`}
-                className="flex gap-2 items-center border border-gray-500 px-3 py-2 rounded-full text-gray-700 font-medium "
-              >
-                <FontAwesomeIcon icon={faPlus} />
-                Create a post
-              </Link>}
+              {(isMember ||
+                (!isMember &&
+                  community.createdBy._id.toString() === userObjectId)) && (
+                <Link
+                  href={`/post/create`}
+                  className="flex gap-2 items-center border border-gray-500 px-3 py-2 rounded-full text-gray-700 font-medium "
+                >
+                  <FontAwesomeIcon icon={faPlus} />
+                  Create a post
+                </Link>
+              )}
               {isMember && (
                 <div className="border rounded-full py-2 px-3  border-gray-500">
                   <FontAwesomeIcon icon={faBell} size="lg" />
@@ -67,9 +81,58 @@ const Page = async ({ params: { id } }: SearchParamProps) => {
                 communityId={community._id?.toString()}
                 userId={userObjectId}
               />
-              <div className="border rounded-full text-gray-700 border-gray-500 p-2 px-3">
-                <FontAwesomeIcon icon={faEllipsis} />
+              <CommunityOptions community={community} />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="flex gap-3">
+        <div className="xl:w-[70%]">
+          <Select>
+            <SelectTrigger className="w-[120px] active:bg-inherit bg-inherit focus-visible:ring-0 borer-0 ring-0 outline-none focus:ring-0 ring-offset-0">
+              <SelectValue placeholder="Sort By" />
+            </SelectTrigger>
+            <SelectContent className="bg-white ">
+              <SelectItem
+                value="light"
+                className="py-3 hover:bg-gray-200 cursor-pointer"
+              >
+                Latest
+              </SelectItem>
+              <SelectItem
+                value="dark"
+                className="py-3 hover:bg-gray-200 cursor-pointer"
+              >
+                Trending
+              </SelectItem>
+              <SelectItem
+                value="system"
+                className="py-3 hover:bg-gray-200 cursor-pointer"
+              >
+                Popular
+              </SelectItem>
+            </SelectContent>
+          </Select>
+
+          <CommunityPost />
+        </div>
+        <div className="bg-white px-4 py-2 max-xl:hidden w-[30%] text-gray-700 rounded-lg h-fit text-sm">
+          <h1 className="font-semibold">/c/{community.name}</h1>
+          <p className="mt-2 text-sm text-gray-500">{community.description}</p>
+          <div className="mt-2 flex justify-between">
+            <div className="flex flex-col gap1">
+              <h1 className="font-bold">{community.members.length}</h1>
+              <p className="text-gray-500">Members</p>
+            </div>
+            <div className="flex flex-col gap1">
+              <h1 className="font-bold">52</h1>
+              <div className="text-gray-500 flex items-center gap-1">
+                <Dot className="bg-green-500 rounded-full" size={7} color="#10b981" />Online
               </div>
+            </div>
+            <div className="flex flex-col gap1">
+              <h1 className="font-bold">Top 1%</h1>
+              <p className="text-gray-500">Rank by size</p>
             </div>
           </div>
         </div>
