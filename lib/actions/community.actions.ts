@@ -5,13 +5,17 @@ import Community, { ICommunity } from "../database/models/community.model";
 import Tag from "../database/models/tag.model";
 import { createCommunityType } from "@/types";
 import { connectToDatabase } from "../database";
+import { revalidatePath } from "next/cache";
+import mongoose from "mongoose";
 
 export const createCommunity = async (data: createCommunityType) => {
   try {
     await connectToDatabase();
     const user: IUser | null = await User.findOne({ clerkId: data.createdBy });
     if (!user) {
-      return JSON.parse(JSON.stringify({error: "User not found", success: false}));
+      return JSON.parse(
+        JSON.stringify({ error: "User not found", success: false })
+      );
     }
     const community: ICommunity = await Community.create({
       name: data.name,
@@ -36,9 +40,81 @@ export const createCommunity = async (data: createCommunityType) => {
       }
     }
     await community.save();
-    return JSON.parse(JSON.stringify({communityId: community._id, success: true}));
+    return JSON.parse(
+      JSON.stringify({ communityId: community._id, success: true })
+    );
   } catch (error) {
     console.log(error);
-    return JSON.parse(JSON.stringify({error, success: true}));
+    return JSON.parse(JSON.stringify({ error, success: true }));
   }
 };
+
+export const getCommunity = async (communityId: string) => {
+  try {
+    await connectToDatabase();
+    const community: ICommunity | null = await Community.findById(
+      communityId
+    ).populate(["tags", "members", "createdBy"]);
+    if (!community) {
+      return JSON.parse(
+        JSON.stringify({ error: "Community not found", success: false })
+      );
+    }
+    return JSON.parse(JSON.stringify({ community, success: true }));
+  } catch (error) {
+    console.log(error);
+    return JSON.parse(JSON.stringify({ error, success: false }));
+  }
+};
+
+export const joinCommunity = async (communityId: string, userId: string) => {
+  try {
+    await connectToDatabase();
+    const community: ICommunity | null = await Community.findById(communityId);
+    if (!community) {
+      return JSON.parse(
+        JSON.stringify({ error: "Community not found", success: false })
+      );
+    }
+    const user: IUser | null = await User.findOne({ _id: userId });
+    if (!user) {
+      return JSON.parse(
+        JSON.stringify({ error: "User not found", success: false })
+      );
+    }
+    community.members.push(user._id!);
+    await community.save();
+    revalidatePath(`/community/${communityId}`);
+    return JSON.parse(JSON.stringify({ success: true }));
+  } catch (error) {
+    console.log(error);
+    return JSON.parse(JSON.stringify({ error, success: false }));
+  }
+};
+
+export const leaveCommunity = async (communityId: string, userId: string) => {
+  try {
+    await connectToDatabase();
+    const community: ICommunity | null = await Community.findById(communityId);
+    if (!community) {
+      return JSON.parse(
+        JSON.stringify({ error: "Community not found", success: false })
+      );
+    }
+    const user: IUser | null = await User.findOne({ _id: userId });
+    if (!user) {
+      return JSON.parse(
+        JSON.stringify({ error: "User not found", success: false })
+      );
+    }
+    community.members = community.members.filter(
+      (member) => member.toString() !== user._id?.toString()
+    );
+    await community.save();
+    revalidatePath(`/community/${communityId}`);
+    return JSON.parse(JSON.stringify({ success: true }));
+    } catch (error) {
+    console.log(error);
+    return JSON.parse(JSON.stringify({ error, success: false }));
+    }
+}

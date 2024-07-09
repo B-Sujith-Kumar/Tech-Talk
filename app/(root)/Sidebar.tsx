@@ -12,8 +12,8 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
     const { isSignedIn, user } = useUser();
     return <>
         <div className={` ${isMobile === false ? "w-1/5 xl:w-1/5 max-lg:hidden space-y-3" : ""} `}>
-            {isSignedIn && <div id="profile" className="bg-white rounded-md p-3">
-                <div className="flex flex-col gap-3 items-center bg-gray-100 rounded-md p-2 overflow-x-scroll scrollbar-hidden">
+            {isSignedIn && <div id="profile" className="bg-white rounded-md max-md:mt-3 p-3 max-md:p-0">
+                <div className="flex flex-col gap-3 items-center bg-gray-100 rounded-md overflow-x-scroll scrollbar-hidden p-1">
                     <div className="flex flex-row items-center justify-start gap-2 w-full px-2">
                         <Avatar>
                             <AvatarImage src={user.imageUrl} />

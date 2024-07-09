@@ -31,7 +31,6 @@ type community = {
 };
 
 const CreateCommunity = ({ userId }: { userId: string | null }) => {
-  console.log(userId);
   const router = useRouter();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
@@ -84,7 +83,7 @@ const CreateCommunity = ({ userId }: { userId: string | null }) => {
       const res = await createCommunity(formData);
       if (res?.success) {
         setOpen(false);
-        router.push("/community");
+        router.push(`/community/${res.communityId}`);
         toast({
           title: "Community created",
           description: "Congratulations! Your community has been created successfully.",

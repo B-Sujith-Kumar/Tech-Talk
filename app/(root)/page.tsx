@@ -42,7 +42,7 @@ export default async function Home() {
     <>
       {userId && <Stories />}
       {userId && (
-        <div className="bg-white rounded-xl mt-6 p-2 px-4 pt-4">
+        <div className="bg-white rounded-xl mt-6 p-2 px-2 pt-4">
           <div className="flex flex-row gap-x-4 items-center px-2 ">
             <Avatar>
               <AvatarImage
@@ -222,7 +222,7 @@ export default async function Home() {
               Share Post
             </Button>
           </div>
-          <hr className="mt-2 mb-2" />
+          <hr className="mt-4 mb-2" />
           <div className="px-2 overflow-auto scrollbar-hidden">
             <div className="flex flex-row gap-6 *:flex *:flex-row *:gap-2 *:items-center *:cursor-pointer max-sm:hidden">
               <div>

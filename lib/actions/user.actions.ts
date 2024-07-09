@@ -46,3 +46,16 @@ export const deleteUser = async (clerkId: string) => {
         handleError(error);
     }
 }
+
+export const getUserObjectId = async (clerkId: string) => {
+    try {
+        await connectToDatabase();
+        const user: IUser | null = await User.findOne({ clerkId });
+        if (!user) {
+            throw new Error("User not found");
+        }
+        return user._id?.toString();
+    } catch (error) {
+        handleError(error);
+    }
+}
