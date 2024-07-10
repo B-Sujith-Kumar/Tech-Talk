@@ -41,6 +41,9 @@ export default function TextBox({
                     }
                 },
                 codeBlock: {
+                    HTMLAttributes: {
+                        class: "bg-gray-300 p-2 rounded-md text-black"
+                    },
                     languageClassPrefix: "language-",
                     exitOnArrowDown: true,
                     exitOnTripleEnter: true,
@@ -60,7 +63,7 @@ export default function TextBox({
 
     useEffect(() => {
         if (clearText) {
-            editor?.commands.clearContent(true);
+            editor?.commands.setContent("Write your post content here...");
         }
     }, [clearText]);
 

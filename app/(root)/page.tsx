@@ -22,14 +22,16 @@ import {
 import { badgeVariants } from "@/components/ui/badge";
 import Link from "next/link";
 import { CreatePost } from "./_components/CreatePost";
+import { getCommunitiesJoinedByUser } from "@/lib/actions/user.actions";
 
 export default async function Home() {
     const { userId } = auth();
     const user = await currentUser();
+    const { data } = await getCommunitiesJoinedByUser();
     return (
         <>
             {userId && <Stories />}
-            {userId && <CreatePost />}
+            {userId && <CreatePost communities={data} />}
             <div className="flex items-center gap-2 text-xs" id="sortBy">
                 <div className="border h-0 w-full"></div>
                 <div className="flex flex-row text-xs min-w-fit">

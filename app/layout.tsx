@@ -7,6 +7,7 @@ import { auth, ClerkProvider } from "@clerk/nextjs";
 import Navbar from "@/components/shared/Navbar/Navbar";
 import React from "react";
 import Sidebar from "./(root)/Sidebar";
+import { Toaster } from "@/components/ui/toaster";
 
 config.autoAddCss = false;
 
@@ -27,6 +28,7 @@ export default function RootLayout({
         <ClerkProvider>
             <html lang="en">
                 <body className={inter.className}>
+                    <Toaster />
                     <Navbar userId={userId} />
                     {children}
                 </body>

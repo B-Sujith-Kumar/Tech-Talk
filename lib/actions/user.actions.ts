@@ -4,6 +4,9 @@ import User, { IUser } from "../database/models/user.model";
 import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import { revalidatePath } from "next/cache";
+import { isAuth } from "../auth";
+import { currentUser } from "@clerk/nextjs/server";
+import Community from "../database/models/community.model";
 
 export const createUser = async (user: createUserType) => {
     try {
@@ -57,5 +60,19 @@ export const getUserObjectId = async (clerkId: string) => {
         return user._id?.toString();
     } catch (error) {
         handleError(error);
+    }
+}
+
+export async function getCommunitiesJoinedByUser() {
+    let auth = await isAuth();
+    if (!auth) return { status: 500, message: "User not authenticated" };
+    try {
+        await connectToDatabase();
+        const user = await currentUser();
+        const data = await Community.find({ members: user?.publicMetadata?.userId });
+        return { status: 200, data: JSON.parse(JSON.stringify(data)) };
+    }
+    catch (error: any) {
+        return { status: 500, message: error.message };
     }
 }

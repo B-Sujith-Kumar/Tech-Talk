@@ -1,10 +1,11 @@
 import mongoose, { Document, models, Schema } from "mongoose";
 
-interface IPost extends Document {
+export interface IPost extends Document {
     author: mongoose.Schema.Types.ObjectId;
     title: string;
+    coverImage: string;
     content: string;
-    tags: string[];
+    tags: mongoose.Schema.Types.ObjectId[];
     community?: mongoose.Schema.Types.ObjectId;
     upvotes: IEngagement[];
     downvotes: IEngagement[];
@@ -27,6 +28,7 @@ const engagementSchema = new Schema<IEngagement>({
 const postSchema: Schema<IPost> = new Schema({
     author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     title: { type: String, required: true },
+    coverImage: { type: String },
     content: { type: String, required: true },
     tags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tag", default: [] }],
     community: { type: mongoose.Schema.Types.ObjectId, ref: "Community" },
