@@ -1,4 +1,3 @@
-// <<<<<<< HEAD
 "use client";
 
 import Link from "next/link";
@@ -16,7 +15,10 @@ import Sidebar from "@/app/(root)/Sidebar";
 import { useRouter } from "next/navigation";
 import CreateCommunity from "../Community/CreateCommunity";
 
-const Navbar = ({userId}: {userId: string | null}) => {
+const Navbar = ({ userId, communities }: {
+    userId: string | null,
+    communities: any[]
+}) => {
     const router = useRouter();
     return (
         <>
@@ -78,16 +80,16 @@ const Navbar = ({userId}: {userId: string | null}) => {
                         </div>
                         <CreateCommunity userId={userId} />
                         <div className="sm:hidden">
-                        <UserButton
-                            afterSignOutUrl="/"
-                            />  
-                            </div>
-                            <div className="max-sm:hidden">
-                        <UserButton
-                            afterSignOutUrl="/"
-                            showName={true}
+                            <UserButton
+                                afterSignOutUrl="/"
                             />
-                            </div>
+                        </div>
+                        <div className="max-sm:hidden">
+                            <UserButton
+                                afterSignOutUrl="/"
+                                showName={true}
+                            />
+                        </div>
                     </SignedIn>
                     <SignedOut>
                         <Button variant="outline" className="hover:bg-indigo-500 hover:text-white" onClick={() => router.push("/sign-in")}>
@@ -99,7 +101,10 @@ const Navbar = ({userId}: {userId: string | null}) => {
                             <Menu size={18} className="lg:hidden" />
                         </SheetTrigger>
                         <SheetContent className="flex flex-row sm:flex-col p-4 bg-white w-fit sm:h-screen z-50 pt-6">
-                            <Sidebar isMobile={true} />
+                            <Sidebar
+                                isMobile={true}
+                                communitites={communities}
+                            />
                         </SheetContent>
                     </Sheet>
                 </div>

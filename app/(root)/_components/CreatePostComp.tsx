@@ -282,9 +282,10 @@ export const CreatePost = ({ communities }: {
                         Clear Form
                     </Button>
                     <Button
-                        type="submit"
+                        type="button"
                         variant="primary"
                         className="w-fit"
+                        onClick={form.handleSubmit(onSubmit)}
                     >
                         Share Post
                     </Button>

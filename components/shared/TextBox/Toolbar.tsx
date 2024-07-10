@@ -1,14 +1,37 @@
 "use client";
 
 import { type Editor } from "@tiptap/react";
-import { BoldIcon, StrikethroughIcon, ItalicIcon, ListIcon, ListOrderedIcon, Heading1Icon, Heading2Icon, Heading3Icon, CodeIcon } from "lucide-react";
+import { BoldIcon, StrikethroughIcon, ItalicIcon, ListIcon, ListOrderedIcon, Heading1Icon, Heading2Icon, Heading3Icon, CodeIcon, LinkIcon } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
+import { useCallback } from "react";
 type Props = {
     editor: Editor | null;
+    render: boolean;
 }
 
-export function Toolbar({ editor }: Props) {
-    if (!editor) return null;
+export function Toolbar({ editor, render }: Props) {
+    if (!editor || render === false) return null;
+    const setLink = useCallback(() => {
+        const previousUrl = editor.getAttributes('link').href
+        const url = window.prompt('URL', previousUrl)
+
+        // cancelled
+        if (url === null) {
+            return
+        }
+
+        // empty
+        if (url === '') {
+            editor.chain().focus().extendMarkRange('link').unsetLink()
+                .run()
+
+            return
+        }
+
+        // update link
+        editor.chain().focus().extendMarkRange('link').setLink({ href: url })
+            .run()
+    }, [editor])
     return <>
         <div className="flex gap-1 my-2">
             <Toggle
@@ -45,6 +68,13 @@ export function Toolbar({ editor }: Props) {
                 onPressedChange={() => editor.chain().focus().toggleItalic().run()}
             >
                 <ItalicIcon size={20} className="w-4 h-4" />
+            </Toggle>
+            <Toggle
+                size="sm"
+                pressed={editor.isActive("link")}
+                onPressedChange={() => setLink()}
+            >
+                <LinkIcon size={20} className="w-4 h-4" />
             </Toggle>
             <Toggle
                 size="sm"
