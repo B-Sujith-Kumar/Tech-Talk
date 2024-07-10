@@ -4,7 +4,7 @@ export default async function PostPageLayout({
     children: React.ReactNode
 }) {
     return (
-        <div className="bg-white rounded-md p-4 prose prose prose-invert prose-lg">
+        <div className="pt-16 pb-8 bg-gray-100 overflow-y-scroll scrollbar-hidden min-h-screen">
             {children}
         </div>
     )

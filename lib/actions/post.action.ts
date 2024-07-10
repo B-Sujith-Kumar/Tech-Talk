@@ -77,7 +77,7 @@ export async function getAllPosts() {
 export async function getPostById(postID: mongoose.Schema.Types.ObjectId) {
     try {
         await connectToDatabase();
-        let post: IPost = await Post.findById(postID).populate("tags").populate("author").populate("community");
+        let post = await Post.findById(postID).populate("tags").populate("author").populate("community");
         return { status: 200, data: post }
     }
     catch (error: any) {
