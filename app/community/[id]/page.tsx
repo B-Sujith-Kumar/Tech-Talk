@@ -127,7 +127,12 @@ const Page = async ({ params: { id } }: SearchParamProps) => {
             <div className="flex flex-col gap1">
               <h1 className="font-bold">52</h1>
               <div className="text-gray-500 flex items-center gap-1">
-                <Dot className="bg-green-500 rounded-full" size={7} color="#10b981" />Online
+                <Dot
+                  className="bg-green-500 rounded-full"
+                  size={7}
+                  color="#10b981"
+                />
+                Online
               </div>
             </div>
             <div className="flex flex-col gap1">
