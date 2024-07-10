@@ -1,7 +1,10 @@
 import CommunityOptions from "@/components/shared/Community/CommunityOptions";
 import CommunityPost from "@/components/shared/Community/CommunityPost";
 import JoinCommunity from "@/components/shared/Community/JoinCommunity";
-import { getCommunity } from "@/lib/actions/community.actions";
+import {
+  getCommunity,
+  getCommunityPosts,
+} from "@/lib/actions/community.actions";
 import { getUserObjectId } from "@/lib/actions/user.actions";
 import { SearchParamProps } from "@/types";
 import { auth } from "@clerk/nextjs";
@@ -28,6 +31,8 @@ const Page = async ({ params: { id } }: SearchParamProps) => {
   const isMember = community.members
     .map((member: any) => member._id === userObjectId)
     .includes(true);
+  const { posts, success } = await getCommunityPosts(id);
+  console.log(posts, success);
   return (
     <div className="sm:px-6">
       <div className="relative">
@@ -113,8 +118,9 @@ const Page = async ({ params: { id } }: SearchParamProps) => {
               </SelectItem>
             </SelectContent>
           </Select>
-
-          <CommunityPost />
+          {posts && posts.map((post: any) => (
+            <CommunityPost post={post} key={post._id} />
+          ))}
         </div>
         <div className="bg-white px-4 py-2 max-xl:hidden w-[30%] text-gray-700 rounded-lg h-fit text-sm">
           <p className="font-semibold text-base">/c/{community.name}</p>

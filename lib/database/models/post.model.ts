@@ -1,11 +1,13 @@
 import mongoose, { Document, models, Schema } from "mongoose";
+import { ITag } from "./tag.model";
+import { IUser } from "./user.model";
 
 export interface IPost extends Document {
-    author: mongoose.Schema.Types.ObjectId;
+    author: IUser
     title: string;
     coverImage: string;
     content: string;
-    tags: mongoose.Schema.Types.ObjectId[];
+    tags: ITag[];
     community?: mongoose.Schema.Types.ObjectId;
     upvotes: IEngagement[];
     downvotes: IEngagement[];
