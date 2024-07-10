@@ -143,6 +143,7 @@ export default async function Home() {
                             </div>
                         </div>
                     ))}
+                    {/* for first post only show picture and remaining all as n */}
                     {new Array(5).fill(0).map((_, i) => (
                         <div className="bg-white rounded-xl p-4 mt-3" key={i}>
                             <div className="flex flex-row gap-2 items-center">

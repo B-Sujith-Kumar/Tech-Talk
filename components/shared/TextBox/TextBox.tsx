@@ -4,15 +4,19 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Toolbar } from "./Toolbar";
 import { useEffect, useState } from "react";
+import Link from "@tiptap/extension-link";
+import { Node } from "@tiptap/core";
 
 export default function TextBox({
     description,
     onValueChange,
     clearText,
+    editable
 }: {
     description?: string,
-    onValueChange: (richText: string) => void,
-    clearText?: boolean
+    onValueChange?: (richText: string) => void,
+    clearText?: boolean,
+    editable?: boolean
 }) {
     const editor = useEditor({
         extensions: [
@@ -49,6 +53,17 @@ export default function TextBox({
                     exitOnTripleEnter: true,
                 }
             }),
+            Link.configure({
+                openOnClick: false,
+                autolink: true,
+                linkOnPaste: true,
+                HTMLAttributes: {
+                    class: "text-blue-500 underline"
+                }
+            }),
+            Node.create({
+                whitespace: "pre",
+            })
         ],
         content: description,
         editorProps: {
@@ -57,8 +72,14 @@ export default function TextBox({
             }
         },
         onUpdate({ editor }) {
-            onValueChange(editor.getHTML());
+            if (onValueChange) {
+                onValueChange(editor.getHTML());
+            }
         },
+        parseOptions: {
+            preserveWhitespace: "full",
+        },
+        editable: editable,
     });
 
     useEffect(() => {
@@ -69,7 +90,7 @@ export default function TextBox({
 
     return <>
         <div className="flex flex-col justify-stretch min-h-[250px]">
-            <Toolbar editor={editor} />
+            <Toolbar editor={editor} render={editable as boolean} />
             <EditorContent editor={editor}
                 placeholder="Write your post content here..."
             />

@@ -5,6 +5,7 @@ import { isAuth } from "../auth";
 import Post, { IPost } from "../database/models/post.model";
 import Tag, { ITag } from "../database/models/tag.model";
 import mongoose from "mongoose";
+import { connectToDatabase } from "../database";
 
 export async function createPost(data: {
     title: string;
@@ -20,6 +21,7 @@ export async function createPost(data: {
             message: "Unauthorized"
         }
         const user = await currentUser();
+        await connectToDatabase();
         let post: IPost;
         if (data.community === "public" || !data.community || data.community === "") {
             post = await Post.create({
@@ -63,8 +65,20 @@ export async function createPost(data: {
 
 export async function getAllPosts() {
     try {
+        await connectToDatabase();
         let posts = await Post.find().populate("tags").populate("author").populate("community");
         return { status: 200, data: posts }
+    }
+    catch (error: any) {
+        return { status: 500, message: error.message }
+    }
+}
+
+export async function getPostById(postID: mongoose.Schema.Types.ObjectId) {
+    try {
+        await connectToDatabase();
+        let post: IPost = await Post.findById(postID).populate("tags").populate("author").populate("community");
+        return { status: 200, data: post }
     }
     catch (error: any) {
         return { status: 500, message: error.message }
