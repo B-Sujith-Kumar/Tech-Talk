@@ -117,15 +117,15 @@ const Page = async ({ params: { id } }: SearchParamProps) => {
           <CommunityPost />
         </div>
         <div className="bg-white px-4 py-2 max-xl:hidden w-[30%] text-gray-700 rounded-lg h-fit text-sm">
-          <h1 className="font-semibold">/c/{community.name}</h1>
+          <p className="font-semibold text-base">/c/{community.name}</p>
           <p className="mt-2 text-sm text-gray-500">{community.description}</p>
           <div className="mt-2 flex justify-between">
             <div className="flex flex-col gap1">
-              <h1 className="font-bold">{community.members.length}</h1>
+              <p className="font-bold">{community.members.length}</p>
               <p className="text-gray-500">Members</p>
             </div>
             <div className="flex flex-col gap1">
-              <h1 className="font-bold">52</h1>
+              <p className="font-bold">52</p>
               <div className="text-gray-500 flex items-center gap-1">
                 <Dot
                   className="bg-green-500 rounded-full"
@@ -136,7 +136,7 @@ const Page = async ({ params: { id } }: SearchParamProps) => {
               </div>
             </div>
             <div className="flex flex-col gap1">
-              <h1 className="font-bold">Top 1%</h1>
+              <p className="font-bold">Top 1%</p>
               <p className="text-gray-500">Rank by size</p>
             </div>
           </div>
