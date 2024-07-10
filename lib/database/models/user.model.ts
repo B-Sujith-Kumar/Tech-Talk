@@ -11,6 +11,7 @@ export interface IUser extends Document {
     profilePicture?: string;
     githubLink?: string;
     linkedinLink?: string;
+    location?: string;
     followers?: mongoose.Schema.Types.ObjectId[];
     following?: mongoose.Schema.Types.ObjectId[];
     followedTags?: mongoose.Schema.Types.ObjectId[];
@@ -28,6 +29,7 @@ const userSchema: Schema<IUser> = new Schema({
     profilePicture: { type: String, default: "" },
     githubLink: { type: String, default: "" },
     linkedinLink: { type: String, default: "" },
+    location: { type: String, default: "" },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] }],
     followedTags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tag", default: [] }],
