@@ -52,7 +52,7 @@ export async function createPost(data: {
                 post.tags.push(existingTag._id as mongoose.Schema.Types.ObjectId);
                 await existingTag.save();
             }
-        })?? []);
+        }) ?? []);
         await post.save();
         return { status: 200, message: "Post created successfully" }
     }

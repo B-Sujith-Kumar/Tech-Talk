@@ -6,8 +6,12 @@ import { HandshakeIcon, HouseIcon, Images, LucideCalendarRange, Video } from "lu
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUser } from "@clerk/nextjs";
+import { ICommunity } from "@/lib/database/models/community.model";
 
-export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
+export default function Sidebar({ isMobile = false, communitites }: {
+    isMobile?: boolean,
+    communitites: ICommunity[]
+}) {
     const pathname = usePathname();
     const { isSignedIn, user } = useUser();
     return <>
@@ -95,45 +99,28 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }) {
                     {isSignedIn && <>
                         <div className="border-t border-gray-200 w-full my-2"></div>
                         <span className="text-[0.6rem] text-gray-500 mt-2 p-2">
-                            PAGES YOU LIKE
+                            COMMUNITIES YOU ARE IN
                         </span>
                         <div className="flex flex-col p-2 gap-2 *:flex *:flex-row *:items-center *:gap-2 *:cursor-pointer">
-                            <div>
-                                <Image src="/images/1.jpeg" width={50} height={50}
-                                    alt="Image 1"
-                                    className="h-6 w-6 rounded"
-                                />
-                                <span className="text-xs text-gray-600 font-medium">
-                                    JavaScript Developers
-                                </span>
-                            </div>
-                            <div>
-                                <Image src="/images/1.jpeg" width={50} height={50}
-                                    alt="Image 1"
-                                    className="h-6 w-6 rounded"
-                                />
-                                <span className="text-xs text-gray-600 font-medium">
-                                    JavaScript Developers
-                                </span>
-                            </div>
-                            <div>
-                                <Image src="/images/1.jpeg" width={50} height={50}
-                                    alt="Image 1"
-                                    className="h-6 w-6 rounded"
-                                />
-                                <span className="text-xs text-gray-600 font-medium">
-                                    JavaScript Developers
-                                </span>
-                            </div>
-                            <div>
-                                <Image src="/images/1.jpeg" width={50} height={50}
-                                    alt="Image 1"
-                                    className="h-6 w-6 rounded"
-                                />
-                                <span className="text-xs text-gray-600 font-medium">
-                                    JavaScript Developers
-                                </span>
-                            </div>
+                            {
+                                communitites?.map((community, index) => (
+                                    <Link
+                                        key={index}
+                                        href={`/community/${community._id}`}
+                                    >
+                                        <Image
+                                            src={community.icon as string}
+                                            width={50}
+                                            height={50}
+                                            alt={community.name}
+                                            className="h-6 w-6 rounded"
+                                        />
+                                        <span className="text-xs text-gray-600 font-medium">
+                                            {community.name}
+                                        </span>
+                                    </Link>
+                                ))
+                            }
                         </div>
                         <span className="text-[0.6rem] text-gray-500 font-medium mt-2 p-2">
                             View All
