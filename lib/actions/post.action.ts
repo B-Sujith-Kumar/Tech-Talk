@@ -26,6 +26,7 @@ export async function createPost(data: {
                 author: user?.publicMetadata.userId,
                 title: data.title,
                 content: data.content,
+                coverImage: data.coverImage,
             });
         }
         else {
@@ -34,6 +35,7 @@ export async function createPost(data: {
                 title: data.title,
                 content: data.content,
                 community: data.community as mongoose.Schema.Types.ObjectId,
+                coverImage: data.coverImage,
             });
         }
         await Promise.all(data.tags?.forEach(async (tag) => {
