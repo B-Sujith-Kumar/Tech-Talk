@@ -3,7 +3,7 @@
 import User, { IUser } from "../database/models/user.model";
 import Community, { ICommunity } from "../database/models/community.model";
 import Tag from "../database/models/tag.model";
-import { createCommunityType } from "@/types";
+import { createCommunityType, IPostPopulated } from "@/types";
 import { connectToDatabase } from "../database";
 import { revalidatePath } from "next/cache";
 import mongoose from "mongoose";
@@ -129,7 +129,7 @@ export const getCommunityPosts = async (communityId: string) => {
         JSON.stringify({ error: "Community not found", success: false })
       );
     }
-    const posts = await Post.find({ community: community._id })
+    const posts: IPostPopulated[] = await Post.find({ community: community._id })
       .populate(["author", "tags"])
       .sort({ createdAt: -1 });
     return JSON.parse(JSON.stringify({ posts, success: true }));

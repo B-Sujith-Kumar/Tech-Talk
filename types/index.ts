@@ -1,3 +1,8 @@
+import { IEngagement, IPost } from "@/lib/database/models/post.model";
+import { ITag } from "@/lib/database/models/tag.model";
+import { IUser } from "@/lib/database/models/user.model";
+import mongoose from "mongoose";
+
 export type createUserType = {
   clerkId: string;
   username?: string | null;
@@ -28,3 +33,19 @@ export type SearchParamProps = {
   params: { id: string; name?: string };
   searchParams: { [key: string]: string | string[] | undefined };
 };
+
+export type IPostPopulated = {
+    _id?: mongoose.Schema.Types.ObjectId;
+    author: IUser
+    title: string;
+    coverImage: string;
+    content: string;
+    tags: ITag[];
+    community?: mongoose.Schema.Types.ObjectId;
+    upvotes: IEngagement[];
+    downvotes: IEngagement[];
+    comments: mongoose.Schema.Types.ObjectId[];
+    views: number;
+    createdAt: Date;
+    getEngagementScore: () => number;
+}

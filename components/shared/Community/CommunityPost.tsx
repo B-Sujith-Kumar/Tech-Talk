@@ -18,8 +18,9 @@ import Link from "next/link";
 import React from "react";
 import Image from "next/image";
 import RenderPost from "./RenderPost";
+import { IPostPopulated } from "@/types";
 
-const CommunityPost = ({ post }: { post: IPost }) => {
+const CommunityPost = ({ post }: { post: IPostPopulated }) => {
   return (
     <div>
       <div className="bg-white rounded-xl p-4 mt-3">
@@ -55,7 +56,7 @@ const CommunityPost = ({ post }: { post: IPost }) => {
             ))}
           </div>
           <Link
-            className="text-2xl font-semibold max-sm:text-xl"
+            className="text-2xl font-semibold max-sm:text"
             href={`/post/${post._id?.toString()}`}
           >
             {post.title}

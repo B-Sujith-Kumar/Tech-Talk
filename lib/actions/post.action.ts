@@ -50,7 +50,7 @@ export async function createPost(data: {
                 post.tags.push(newTag._id as mongoose.Schema.Types.ObjectId);
             }
             else {
-                existingTag.posts.push(post._id as mongoose.Schema.Types.ObjectId);
+                existingTag?.posts?.push(post._id as mongoose.Schema.Types.ObjectId);
                 post.tags.push(existingTag._id as mongoose.Schema.Types.ObjectId);
                 await existingTag.save();
             }

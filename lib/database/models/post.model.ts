@@ -7,7 +7,7 @@ export interface IPost extends Document {
     title: string;
     coverImage: string;
     content: string;
-    tags: ITag[];
+    tags: mongoose.Schema.Types.ObjectId[];
     community?: mongoose.Schema.Types.ObjectId;
     upvotes: IEngagement[];
     downvotes: IEngagement[];
@@ -17,7 +17,7 @@ export interface IPost extends Document {
     getEngagementScore: () => number;
 }
 
-interface IEngagement extends Document {
+export interface IEngagement extends Document {
     user: mongoose.Schema.Types.ObjectId;
     createdAt: Date;
 }

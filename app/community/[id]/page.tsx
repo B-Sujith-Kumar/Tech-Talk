@@ -32,7 +32,6 @@ const Page = async ({ params: { id } }: SearchParamProps) => {
     .map((member: any) => member._id === userObjectId)
     .includes(true);
   const { posts, success } = await getCommunityPosts(id);
-  console.log(posts, success);
   return (
     <div className="sm:px-6">
       <div className="relative">
