@@ -23,6 +23,7 @@ const config = {
             colors: {
                 background: "#E5E7EB",
                 "btn-primary": "#8655FF",
+                "text-destructive": "#EF4444",
             },
         },
     },

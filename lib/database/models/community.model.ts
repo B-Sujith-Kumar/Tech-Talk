@@ -20,7 +20,8 @@ const communitySchema: Schema<ICommunity> = new Schema({
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     tags: [{ type: mongoose.Schema.ObjectId, ref: 'Tag', required: true }],
     members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    createdAt: { type: Date, default: Date.now }
+}, {
+    timestamps: true
 });
 
 const Community = models.Community || mongoose.model<ICommunity>('Community', communitySchema);

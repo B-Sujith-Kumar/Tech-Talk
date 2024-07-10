@@ -14,7 +14,8 @@ const tagSchema: Schema<ITag> = new Schema({
     posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     communities: [{ type: mongoose.Schema.Types.ObjectId, ref: "Community" }],
-    createdAt: { type: Date, default: Date.now }
+}, {
+    timestamps: true
 });
 
 const Tag = models.Tag || mongoose.model<ITag>("Tag", tagSchema);
