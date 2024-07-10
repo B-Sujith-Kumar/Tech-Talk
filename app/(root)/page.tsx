@@ -1,7 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs";
 import { Stories } from "./stories";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     BookmarkIcon,
@@ -15,7 +14,6 @@ import {
     SelectContent,
     SelectGroup,
     SelectItem,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
@@ -24,7 +22,6 @@ import Link from "next/link";
 import { CreatePost } from "./_components/CreatePost";
 import { getCommunitiesJoinedByUser } from "@/lib/actions/user.actions";
 import { getAllPosts } from "@/lib/actions/post.action";
-import { AwaitedReactNode, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal } from "react";
 import moment from "moment";
 
 export default async function Home() {
@@ -57,8 +54,94 @@ export default async function Home() {
             </div>
             <div id="posts">
                 <div className="flex flex-col gap-3">
-                    {posts?.map(post => (
-                        <div className="bg-white rounded-xl p-2" key={post._id as Key}>
+                    {posts && posts[0] && (
+                        <div className="bg-white rounded-xl p-2">
+                            <div className="flex flex-row gap-2 items-center">
+                                <Avatar>
+                                    <AvatarImage
+                                        src={posts[0].author.profilePicture}
+                                        alt={posts[0].author.firstName + " " + posts[0].author.lastName}
+                                    />
+                                    <AvatarFallback>
+                                        {posts[0].author.firstName[0] + posts[0].author.lastName[0]}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <div className="flex flex-col">
+                                    <span className="text-sm font-medium flex flex-row items-center">
+                                        {posts[0].author.firstName + " " + posts[0].author.lastName}
+                                        <span className="text-xs text-gray-500">
+                                            &nbsp;@{posts[0].author.username} &nbsp;
+                                        </span>
+                                        <span className="text-xs flex flex-row items-center gap-2">
+                                            {posts[0].community && <>in</>}
+                                            {posts[0].community &&
+                                                <Link className={badgeVariants({ variant: "outline" }) + " flex flex-row gap-1 hover:bg-indigo-500 hover:text-white"}
+                                                    href={`/community/${posts[0].community._id}`}
+                                                >
+                                                    <Image
+                                                        src={posts[0].community.icon}
+                                                        width={20}
+                                                        height={20}
+                                                        alt={posts[0].community.name}
+                                                        className="rounded-full"
+                                                    />
+                                                    {posts[0].community.name}
+                                                </Link>
+                                            }
+                                        </span>
+                                    </span>
+                                    <span className="text-xs text-gray-500">
+                                        {moment(posts[0].createdAt).fromNow()}
+                                    </span>
+                                </div>
+                                <EllipsisVerticalIcon className="w-5 h-5 text-gray-500 ml-auto cursor-pointer" />
+                            </div>
+                            <div className="mt-2 p-1">
+                                <Link className="text-sm font-medium" href={`/post/${posts[0]._id}`}>
+                                    <Image
+                                        src={posts[0].coverImage}
+                                        width={500}
+                                        height={300}
+                                        alt="Next.js"
+                                        className="w-full h-60 rounded-md my-2"
+                                    />
+                                    <span className="text-xl font-medium">
+                                        {posts[0].title.length > 80 ? posts[0].title.slice(0, 80) + "..." : posts[0].title}
+                                    </span>
+                                </Link>
+                                <div className="flex mt-1 gap-x-2">
+                                    {posts[0].tags.map((tag: any) => (
+                                        <Link
+                                            className={badgeVariants({ variant: "primary" })}
+                                            href={`/tag/${tag._id}`}
+                                            key={tag._id}
+                                        >
+                                            {tag.name}
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                            <hr className="mt-2 border-gray-200" />
+                            <div className="flex flex-row gap-6 mt-2 p-2 *:flex *:flex-row *:gap-2 *:items-center">
+                                <div>
+                                    <HeartIcon className="w-4 h-4 text-gray-500" />
+                                    <span className="text-xs">10</span>
+                                    <span className="text-xs max-sm:hidden">Likes</span>
+                                </div>
+                                <div>
+                                    <MessageCircleIcon className="w-4 h-4 text-gray-500" />
+                                    <span className="text-xs max-sm:hidden">5 Comments</span>
+                                </div>
+                                <div>
+                                    <Share2Icon className="w-4 h-4 text-gray-500" />
+                                    <span className="text-xs max-sm:hidden">Share</span>
+                                </div>
+                                <BookmarkIcon className="w-4 h-4 text-gray-500 ml-auto" />
+                            </div>
+                        </div>
+                    )}
+                    {posts?.slice(1).map((post: any) => (
+                        <div className="bg-white rounded-xl p-2">
                             <div className="flex flex-row gap-2 items-center">
                                 <Avatar>
                                     <AvatarImage
@@ -71,7 +154,7 @@ export default async function Home() {
                                 </Avatar>
                                 <div className="flex flex-col">
                                     <span className="text-sm font-medium flex flex-row items-center">
-                                        {post.author.firstName + " " + post.author.lastName}
+                                        {posts[0].author.firstName + " " + posts[0].author.lastName}
                                         <span className="text-xs text-gray-500">
                                             &nbsp;@{post.author.username} &nbsp;
                                         </span>
@@ -101,19 +184,12 @@ export default async function Home() {
                             </div>
                             <div className="mt-2 p-1">
                                 <Link className="text-sm font-medium" href={`/post/${post._id}`}>
-                                    <Image
-                                        src={post.coverImage}
-                                        width={500}
-                                        height={300}
-                                        alt="Next.js"
-                                        className="w-full h-60 rounded-md my-2"
-                                    />
                                     <span className="text-xl font-medium">
                                         {post.title.length > 80 ? post.title.slice(0, 80) + "..." : post.title}
                                     </span>
                                 </Link>
                                 <div className="flex mt-1 gap-x-2">
-                                    {post.tags.map((tag: { _id: Key | null | undefined; name: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; }) => (
+                                    {post.tags.map((tag: any) => (
                                         <Link
                                             className={badgeVariants({ variant: "primary" })}
                                             href={`/tag/${tag._id}`}
@@ -143,7 +219,6 @@ export default async function Home() {
                             </div>
                         </div>
                     ))}
-                    {/* for first post only show picture and remaining all as n */}
                     {new Array(5).fill(0).map((_, i) => (
                         <div className="bg-white rounded-xl p-4 mt-3" key={i}>
                             <div className="flex flex-row gap-2 items-center">
