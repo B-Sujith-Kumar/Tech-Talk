@@ -1,0 +1,13 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@layer components {
+    text-base {
+        @apply text-[14px]
+    }
+}
+
+.text-base {
+    font-size: "14px";
+}

@@ -1,3 +1,4 @@
+import { ICommunity } from "@/lib/database/models/community.model";
 import { IEngagement, IPost } from "@/lib/database/models/post.model";
 import { ITag } from "@/lib/database/models/tag.model";
 import { IUser } from "@/lib/database/models/user.model";
@@ -41,7 +42,7 @@ export type IPostPopulated = {
     coverImage: string;
     content: string;
     tags: ITag[];
-    community?: mongoose.Schema.Types.ObjectId;
+    community?: ICommunity;
     upvotes: IEngagement[];
     downvotes: IEngagement[];
     comments: mongoose.Schema.Types.ObjectId[];

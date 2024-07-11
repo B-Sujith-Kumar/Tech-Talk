@@ -9,8 +9,8 @@ export default async function CreatePostPage() {
     if (!userId) return redirectToSignIn();
     const { data } = await getCommunitiesJoinedByUser();
     return (
-        <div className="bg-gray-100 min-h-screen pt-16">
-            <div className="bg-white rounded-md p-4 overflow-y-scroll scrollbar-hidden w-4/5 mx-auto min-h-full max-h-screen">
+        <div className="bg-gray-100 min-h-screen pt-16 py-6 max-sm:px-3 shadow-md">
+            <div className="bg-white rounded-md max-sm:px-0 p-4 overflow-y-scroll scrollbar-hidden w-4/5 sm:mx-auto max-sm:w-full min-h-full max-h-screen mt-4">
                 <CreatePost communities={data} />
             </div>
         </div>

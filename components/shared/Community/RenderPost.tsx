@@ -1,10 +1,9 @@
-import React from 'react'
+import React from "react";
+import "@/app/post/[postID]/post-style.css";
+import "./styles.css"
 
-const RenderPost = ({content}: {content: string}) => {
-  return (
-    <div dangerouslySetInnerHTML={{__html: content}} className=''>
-    </div>
-  )
-}
+const RenderPost = ({ content }: { content: string }) => {
+  return <div dangerouslySetInnerHTML={{ __html: content }} className="text-base"></div>;
+};
 
-export default RenderPost
+export default RenderPost;

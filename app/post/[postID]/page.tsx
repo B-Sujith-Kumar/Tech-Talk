@@ -26,7 +26,7 @@ export default async function PostPage({
 
   return (
     <div className="flex max-lg:flex-col px-10 max-lg:px-3 gap-4 pt-3 justify-between">
-      <div className="bg-white rounded-md rounded-t-xl w-[73%] max-lg:w-full overflow-y-scroll scrollbar-hidden pb-10 shadow-lg flex-shrink">
+      <div className="bg-white  rounded-xl w-[73%] max-lg:w-full overflow-y-scroll scrollbar-hidden pb-10 shadow-lg flex-shrink">
         <div
           style={{
             backgroundImage: `url(${data?.coverImage as string})`,
@@ -41,6 +41,7 @@ export default async function PostPage({
               <AvatarImage
                 src={data.author.profilePicture}
                 alt={data.author.firstName + " " + data.author.lastName}
+                className=""
               />
               <AvatarFallback>
                 {data.author.firstName[0] + data.author.lastName[0]}
@@ -85,12 +86,12 @@ export default async function PostPage({
             </div>
           </div>
 
-          <h1 className="font-bold px-2 my-4">{data?.title}</h1>
+          <h1 className="font-bold px-2 my-4 text-4xl max-sm:text-2xl leading-[45px]">{data?.title}</h1>
 
           <TextBox description={data?.content as string} editable={false} />
         </div>
       </div>
-      <div className="flex-1 bg-white rounded-xl h-fit pb-4 flex-shrink-0">
+      <div className="flex-1 bg-white shadow-xl rounded-xl h-fit pb-4 flex-shrink-0">
         <div className="bg-gray-800 h-9 rounded-t-xl"></div>
         <Link
           href={`/user/${data.author._id}`}
@@ -101,7 +102,7 @@ export default async function PostPage({
             width={50}
             height={50}
             alt="Profile picture"
-            className="rounded-full relative bg-white border"
+            className="rounded-full aspect-square relative bg-white border"
           />
           <p className="font-medium text-gray-800 text-lg">
             {data.author.firstName + " " + data.author.lastName}

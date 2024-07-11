@@ -6,6 +6,10 @@ import { Toolbar } from "./Toolbar";
 import { useEffect, useState } from "react";
 import Link from "@tiptap/extension-link";
 import { Node } from "@tiptap/core";
+import CodeBlock from '@tiptap/extension-code-block'
+import {common, createLowlight} from 'lowlight'
+import "./styles.css"
+
 
 export default function TextBox({
     description,
@@ -23,10 +27,18 @@ export default function TextBox({
             StarterKit.configure({
                 heading: {
                     levels: [1, 2, 3],
+                    HTMLAttributes: {
+                        class: "font-bold my-5",
+                    },
                 },
                 orderedList: {
                     HTMLAttributes: {
                         class: "list-decimal"
+                    }
+                },
+                paragraph: {
+                    HTMLAttributes: {
+                        class: "mb-2 leading-relaxed text-base max-sm:leading-loose"
                     }
                 },
                 bulletList: {
@@ -36,7 +48,7 @@ export default function TextBox({
                 },
                 listItem: {
                     HTMLAttributes: {
-                        class: "ml-4"
+                        class: "ml-4 leading-relaxed"
                     }
                 },
                 code: {

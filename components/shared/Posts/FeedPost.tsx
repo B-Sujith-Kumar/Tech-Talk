@@ -12,11 +12,19 @@ import React from "react";
 import Image from "next/image";
 import RenderPost from "../Community/RenderPost";
 import { IPostPopulated } from "@/types";
+import { badgeVariants } from "@/components/ui/badge";
+import moment from "moment";
 
-const CommunityPost = ({ post }: { post: IPostPopulated }) => {
+const FeedPost = ({
+  post,
+  showBanner,
+}: {
+  post: IPostPopulated;
+  showBanner: boolean;
+}) => {
   return (
     <div>
-      <div className="bg-white rounded-xl p-4 mt-3">
+      <div className="bg-white rounded-xl p-4">
         <div className="flex flex-row gap-2 items-center">
           <Avatar>
             <AvatarImage
@@ -27,15 +35,43 @@ const CommunityPost = ({ post }: { post: IPostPopulated }) => {
             <AvatarFallback>S K</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
-            <span className="text-sm font-medium">
-              {post.author.firstName + " " + post.author.lastName}
+            <span className="text-sm font-medium flex flex-row gap-1 items-center">
+              {post.author.firstName + " " + post.author.lastName}{" "}{" "}
+              {/* <span className="flex flex-row items-center gap-2"> */}
+                {post.community && <>in</>}
+                {post.community && (
+                  <Link
+                    className={
+                      badgeVariants({ variant: "outline" }) +
+                      " flex flex-row gap-1 hover:bg-indigo-500 hover:text-white"
+                    }
+                    href={`/community/${post.community._id}`}
+                  >
+                    <Image
+                      src={post.community.icon || ""}
+                      width={20}
+                      height={20}
+                      alt={post.community.name}
+                      className="rounded-full"
+                    />
+                    {post.community.name}
+                  </Link>
+                )}
+              {/* </span> */}
             </span>
             <span className="text-xs text-gray-500">
-              {getDifferenceInDates(post.createdAt)}
+              {moment(post.createdAt).fromNow()}
             </span>
           </div>
           <EllipsisVerticalIcon className="w-5 h-5 text-gray-500 ml-auto cursor-pointer" />
         </div>
+        {showBanner && <Image
+          src={post.coverImage}
+          width={500}
+          height={300}
+          alt="Next.js"
+          className="w-full h-60 rounded-md my-3"
+        />}
         <div className="mt-2 p-1">
           <div className="flex my-2 gap-x-2">
             {post.tags.map((tag) => (
@@ -49,14 +85,12 @@ const CommunityPost = ({ post }: { post: IPostPopulated }) => {
             ))}
           </div>
           <Link
-            className="text-2xl font-semibold max-sm:text"
+            className="text-2xl font-semibold max-sm:text line-clamp-2"
             href={`/post/${post._id?.toString()}`}
           >
             {post.title}
           </Link>
-          <div
-            className="line-clamp-2 text-sm leading-relaxed mt-3 text-gray-500"
-          >
+          <div className="line-clamp-2 text-sm leading-relaxed mt-3 text-gray-500">
             <RenderPost content={post.content} />
           </div>
         </div>
@@ -69,14 +103,18 @@ const CommunityPost = ({ post }: { post: IPostPopulated }) => {
               alt="upvote"
               className="text-gray-500"
             ></Image>
-            <span  className="text-xs sm:hidden font-medium">{post.upvotes.length}</span>
+            <span className="text-xs sm:hidden font-medium">
+              {post.upvotes.length}
+            </span>
             <span className="text-xs max-sm:hidden font-medium">
               {post.upvotes.length} Upvotes
             </span>
           </div>
           <div>
             <MessageCircleIcon className="w-4 h-4 " />
-            <span  className="text-xs sm:hidden font-medium">{post.comments.length}</span>
+            <span className="text-xs sm:hidden font-medium">
+              {post.comments.length}
+            </span>
             <span className="text-xs max-sm:hidden font-medium">
               {post.comments.length} Comments
             </span>
@@ -95,4 +133,4 @@ const CommunityPost = ({ post }: { post: IPostPopulated }) => {
   );
 };
 
-export default CommunityPost;
+export default FeedPost;
