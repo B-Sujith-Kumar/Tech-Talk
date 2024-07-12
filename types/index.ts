@@ -1,3 +1,4 @@
+import { IComment } from "@/lib/database/models/comment.model";
 import { ICommunity } from "@/lib/database/models/community.model";
 import { IEngagement, IPost } from "@/lib/database/models/post.model";
 import { ITag } from "@/lib/database/models/tag.model";
@@ -45,7 +46,7 @@ export type IPostPopulated = {
     community?: ICommunity;
     upvotes: IEngagement[];
     downvotes: IEngagement[];
-    comments: mongoose.Schema.Types.ObjectId[];
+    comments: IComment[];
     views: number;
     createdAt: Date;
     getEngagementScore: () => number;

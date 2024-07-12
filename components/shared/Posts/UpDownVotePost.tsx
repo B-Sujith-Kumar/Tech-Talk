@@ -6,7 +6,7 @@ import { useUser } from "@clerk/nextjs";
 import { ArrowBigDownIcon, ArrowBigUpIcon } from "lucide-react";
 import mongoose from "mongoose";
 
-export const VotesButtons = ({ post }: { post: any }) => {
+export const UpDownVote = ({ post }: { post: any }) => {
   const { isLoaded, user } = useUser();
   const { toast } = useToast();
   return (
@@ -38,7 +38,7 @@ export const VotesButtons = ({ post }: { post: any }) => {
             : "none"
         }
       />
-      <span className="text-xs  font-medium">
+      <span className="text-xs max-sm:hidden font-medium">
         {post.upvotes.length - post.downvotes.length}
       </span>
       <ArrowBigDownIcon

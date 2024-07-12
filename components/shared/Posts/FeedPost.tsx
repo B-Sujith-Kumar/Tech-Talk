@@ -90,9 +90,9 @@ const FeedPost = ({
                 <div className="flex flex-row gap-6 mt-2 p-2 *:flex *:flex-row *:gap-2 *:items-center">
                     <div>
                         <VotesButtons post={post} />
-                        <span className="text-xs max-sm:hidden font-medium">
+                        {/* <span className="text-xs max-sm:hidden font-medium">
                             {post.upvotes.length - post.downvotes.length}
-                        </span>
+                        </span> */}
                     </div>
                     <div>
                         <MessageCircleIcon className="w-4 h-4 " />

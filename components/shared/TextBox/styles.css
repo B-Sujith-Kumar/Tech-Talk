@@ -8,11 +8,11 @@
     }
 
     h2 {
-        @apply text-3xl leading-relaxed;
+        @apply text-3xl max-sm:text-2xl leading-10;
     }
 
     h3 {
-        @apply text-2xl leading-relaxed;
+        @apply text-2xl max-sm:text-xl leading-relaxed;
     }
 
     h4 {

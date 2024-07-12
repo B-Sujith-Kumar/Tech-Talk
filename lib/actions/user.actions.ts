@@ -52,6 +52,19 @@ export const deleteUser = async (clerkId: string) => {
     }
 }
 
+export const getUser = async (clerkId: string | null) => {
+    try {
+        await connectToDatabase();
+        const user = await User.findOne({ clerkId });
+        if (!user) {
+            throw new Error("User not found");
+        }
+        return JSON.parse(JSON.stringify(user));
+    } catch (error) {
+        handleError(error);
+    }
+}
+
 export const getUserObjectId = async (clerkId: string) => {
     try {
         await connectToDatabase();

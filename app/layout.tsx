@@ -29,7 +29,7 @@ export default async function RootLayout({
     return (
         <ClerkProvider>
             <html lang="en">
-                <body className={inter.className}>
+                <body className="font-sans">
                     <Toaster />
                     <Navbar
                         userId={userId}
