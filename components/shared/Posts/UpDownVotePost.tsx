@@ -34,7 +34,7 @@ export const UpDownVote = ({ post }: { post: any }) => {
             (upvote: { user: mongoose.Schema.Types.ObjectId }) =>
               upvote.user.toString() === user?.publicMetadata?.userId
           ) !== -1
-            ? "blue"
+            ? "#667eea"
             : "none"
         }
       />

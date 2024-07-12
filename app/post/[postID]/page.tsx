@@ -45,7 +45,7 @@ export default async function PostPage({
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
-          className="relative bg-contain rounded-t-xl bg-no-repeat h-96 w-full"
+          className="relative bg-contain rounded-t-xl bg-no-repeat h-96 max-sm:h-48 w-full"
         />
         <div className="px-10 max-lg:px-2 mt-4">
           <div className="px-2 flex flex-row gap-2 items-center">
