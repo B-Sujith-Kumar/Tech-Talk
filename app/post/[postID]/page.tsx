@@ -129,7 +129,7 @@ export default async function PostPage({
 
           <TextBox description={data?.content as string} editable={false} />
           <hr className="mt-8 text-gray-800" id="comments" />
-          <Comments post={post} currentUser={currentUser} />
+          <Comments post={post} currentUser={currentUser}  />
           
         </div>
       </div>

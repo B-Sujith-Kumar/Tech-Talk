@@ -7,6 +7,7 @@ import Tag, { ITag } from "../database/models/tag.model";
 import mongoose from "mongoose";
 import { connectToDatabase } from "../database";
 import Comment from "../database/models/comment.model";
+import { revalidatePath } from "next/cache";
 
 export async function createPost(data: {
   title: string;
@@ -117,10 +118,62 @@ export const addComment = async (
       post: postID,
       content: content,
     });
-    let newComment = await Comment.findOne({ _id: comment._id }).populate("author");
+    let newComment = await Comment.findOne({ _id: comment._id }).populate(
+      "author"
+    );
     post.comments.push(comment._id);
     await post.save();
     return JSON.parse(JSON.stringify({ status: 200, comment: newComment }));
+  } catch (error: any) {
+    return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
+  }
+};
+
+export const upVoteComment = async (
+  commentId: mongoose.Schema.Types.ObjectId,
+  userID: string
+) => {
+  try {
+    await connectToDatabase();
+    let comment = await Comment.findById(commentId);
+    if (!comment)
+      return JSON.parse(
+        JSON.stringify({ status: 404, message: "Comment not found" })
+      );
+    if (comment.upvotes.includes(userID)) {
+      comment.upvotes = comment.upvotes.filter((id: any) => id.toString() !== userID.toString());
+    } else {
+      comment.upvotes.push(userID);
+      comment.downvotes = comment.downvotes.filter((id: any) => id.toString() !== userID.toString());
+    }
+    await comment.save();
+    revalidatePath(`/post/${comment.post}`)
+    return JSON.parse(JSON.stringify({ status: 200, message: "Success" }));
+  } catch (error: any) {
+    return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
+  }
+};
+
+export const downVoteComment = async (
+  commentId: mongoose.Schema.Types.ObjectId,
+  userID: string
+) => {
+  try {
+    await connectToDatabase();
+    let comment = await Comment.findById(commentId);
+    if (!comment)
+      return JSON.parse(
+        JSON.stringify({ status: 404, message: "Comment not found" })
+      );
+    if (comment.downvotes.includes(userID)) {
+      comment.downvotes = comment.downvotes.filter((id: any) => id.toString() !== userID.toString());
+    } else {
+      comment.downvotes.push(userID);
+      comment.upvotes = comment.upvotes.filter((id: any) => id.toString() !== userID.toString());
+    }
+    await comment.save();
+    revalidatePath(`/post/${comment.post}`);
+    return JSON.parse(JSON.stringify({ status: 200, message: "Success" }));
   } catch (error: any) {
     return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
   }
