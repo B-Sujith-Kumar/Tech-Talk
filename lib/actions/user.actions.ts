@@ -1,4 +1,5 @@
-"use server"
+"use server";
+
 import { createUserType, updateUserType } from "@/types";
 import User, { IUser } from "../database/models/user.model";
 import { handleError } from "../utils";
@@ -71,6 +72,29 @@ export async function getCommunitiesJoinedByUser() {
         const user = await currentUser();
         const data = await Community.find({ members: user?.publicMetadata?.userId });
         return { status: 200, data: JSON.parse(JSON.stringify(data)) };
+    }
+    catch (error: any) {
+        return { status: 500, message: error.message };
+    }
+}
+
+export async function followHandler({ userId }: { userId: string }) {
+    try {
+        let auth = await isAuth();
+        if (!auth) return { status: 500, message: "User not authenticated" };
+        const user = await currentUser();
+        await connectToDatabase();
+        const userObjectId = user?.publicMetadata?.userId as string;
+        const userToFollow = await User.findById(userId);
+        if (!userToFollow) return { status: 404, message: "User not found" };
+        if (userToFollow.followers.includes(userObjectId!)) {
+            userToFollow.followers.pull(userObjectId!);
+        } else {
+            userToFollow.followers.push(userObjectId!);
+        }
+        await userToFollow.save();
+        revalidatePath(`/user/${userId}`);
+        return { status: 200, message: "Success!" };
     }
     catch (error: any) {
         return { status: 500, message: error.message };

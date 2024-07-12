@@ -1,12 +1,12 @@
-import { redirectToSignIn } from "@clerk/nextjs/server";
 import { auth } from "@clerk/nextjs";
 import { Metadata } from "next";
 import { CreatePost } from "@/app/(root)/_components/CreatePostComp";
 import { getCommunitiesJoinedByUser } from "@/lib/actions/user.actions";
+import { redirect } from "next/navigation";
 
 export default async function CreatePostPage() {
     const { userId } = auth();
-    if (!userId) return redirectToSignIn();
+    if (!userId) return redirect("/sign-in");
     const { data } = await getCommunitiesJoinedByUser();
     return (
         <div className="bg-gray-100 min-h-screen pt-16 py-6 max-sm:px-3 shadow-md">
