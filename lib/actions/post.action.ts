@@ -67,7 +67,7 @@ export async function getAllPosts() {
     try {
         await connectToDatabase();
         let posts = await Post.find().populate("tags").populate("author").populate("community");
-        return { status: 200, data: posts }
+        return { status: 200, data: JSON.parse(JSON.stringify(posts)) }
     }
     catch (error: any) {
         return { status: 500, message: error.message }

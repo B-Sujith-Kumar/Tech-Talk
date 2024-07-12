@@ -3,13 +3,10 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Toolbar } from "./Toolbar";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "@tiptap/extension-link";
 import { Node } from "@tiptap/core";
-import CodeBlock from '@tiptap/extension-code-block'
-import {common, createLowlight} from 'lowlight'
 import "./styles.css"
-
 
 export default function TextBox({
     description,

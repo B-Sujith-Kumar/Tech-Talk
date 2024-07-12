@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import { isAuth } from "../auth";
 import { currentUser } from "@clerk/nextjs/server";
 import Community from "../database/models/community.model";
+import Post, { IPost } from "../database/models/post.model";
 
 export const createUser = async (user: createUserType) => {
     try {
@@ -94,6 +95,74 @@ export async function followHandler({ userId }: { userId: string }) {
         }
         await userToFollow.save();
         revalidatePath(`/user/${userId}`);
+        return { status: 200, message: "Success!" };
+    }
+    catch (error: any) {
+        return { status: 500, message: error.message };
+    }
+}
+
+export async function upvotePost({
+    postId,
+}: {
+    postId: string;
+}) {
+    try {
+        let auth = await isAuth();
+        if (!auth) return { status: 500, message: "User not authenticated" };
+        const user = await currentUser();
+        await connectToDatabase();
+        const userObjectId = user?.publicMetadata?.userId as string;
+        const post = await Post.findById(postId);
+        if (!post) return { status: 404, message: "Post not found" };
+        if (post.upvotes.findIndex((upvote: any) => upvote.user.toString() === userObjectId) !== -1) {
+            post.upvotes = post.upvotes.filter((upvote: any) => upvote.user.toString() !== userObjectId);
+        }
+        else {
+            post.upvotes.push({
+                user: userObjectId!,
+            });
+            if (post.downvotes.findIndex((downvote: any) => downvote.user.toString() === userObjectId) !== -1) {
+                post.downvotes = post.downvotes.filter((downvote: any) => downvote.user.toString() !== userObjectId);
+            }
+        }
+        await post.save();
+        revalidatePath(`/post/${postId}`);
+        revalidatePath("/");
+        return { status: 200, message: "Success!" };
+    }
+    catch (error: any) {
+        return { status: 500, message: error.message };
+    }
+}
+
+export async function downvotePost({
+    postId,
+}: {
+    postId: string;
+}) {
+    try {
+        let auth = await isAuth();
+        if (!auth) return { status: 500, message: "User not authenticated" };
+        const user = await currentUser();
+        await connectToDatabase();
+        const userObjectId = user?.publicMetadata?.userId as string;
+        const post = await Post.findById(postId);
+        if (!post) return { status: 404, message: "Post not found" };
+        if (post.downvotes.findIndex((downvote: any) => downvote.user.toString() === userObjectId) !== -1) {
+            post.downvotes = post.downvotes.filter((downvote: any) => downvote.user.toString() !== userObjectId);
+        }
+        else {
+            post.downvotes.push({
+                user: userObjectId!,
+            });
+            if (post.upvotes.findIndex((upvote: any) => upvote.user.toString() === userObjectId) !== -1) {
+                post.upvotes = post.upvotes.filter((upvote: any) => upvote.user.toString() !== userObjectId);
+            }
+        }
+        await post.save();
+        revalidatePath(`/post/${postId}`);
+        revalidatePath("/");
         return { status: 200, message: "Success!" };
     }
     catch (error: any) {

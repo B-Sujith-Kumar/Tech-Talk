@@ -1,25 +1,21 @@
-"use client";
 
 import Link from "next/link";
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import Image from "next/image";
 import { Bell, Bookmark, Menu } from "lucide-react";
-import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Sidebar from "@/app/(root)/Sidebar";
-import { useRouter } from "next/navigation";
 import CreateCommunity from "../Community/CreateCommunity";
+import { SignInButton } from "./ClientComponents";
 
 const Navbar = ({ userId, communities }: {
     userId: string | null,
     communities: any[]
 }) => {
-    const router = useRouter();
     return (
         <>
             <nav className="h-[3.35rem] fixed top-0 w-full flex items-center justify-between z-50 bg-white px-4 py-7">
@@ -92,9 +88,7 @@ const Navbar = ({ userId, communities }: {
                         </div>
                     </SignedIn>
                     <SignedOut>
-                        <Button variant="outline" className="hover:bg-indigo-500 hover:text-white" onClick={() => router.push("/sign-in")}>
-                            Sign In
-                        </Button>
+                        <SignInButton />
                     </SignedOut>
                     <Sheet>
                         <SheetTrigger>

@@ -1,18 +1,16 @@
-"use client";
-
-import { useUser } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs";
 import Image from "next/image";
 
-export const Stories = () => {
-    const { user } = useUser();
+export const Stories = async () => {
+    const user = await currentUser();
     return (
         <>
             <div id="stories">
                 <div className="flex flex-row items-center gap-x-4 p-2 px-4 *: overflow-x-scroll scrollbar-hidden bg-white rounded-md">
                     <div className="flex flex-col items-center w-16 relative">
                         <Image
-                            src={user?.imageUrl as string || "/images/1.jpeg"}
-                            alt={user?.fullName as string || "User"}
+                            src={user?.imageUrl as string}
+                            alt={user?.firstName + " " + user?.lastName}
                             width={400}
                             height={400}
                             className="min-w-16 h-16 rounded-full border-2 object-cover cursor-pointer"

@@ -1,38 +1,16 @@
-"use client";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger, DialogHeader } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AtSignIcon, HashIcon, ImageUpIcon, PaperclipIcon, VideoIcon } from "lucide-react";
-import { useUser } from "@clerk/nextjs";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { createPostSchema } from "@/schemas/post.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormField, FormItem, FormLabel, FormMessage, FormControl, FormDescription } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import TextBox from "@/components/shared/TextBox/TextBox";
+import { currentUser } from "@clerk/nextjs";
 import { CreatePost as CreatePostComp } from "../_components/CreatePostComp";
 import { ICommunity } from "@/lib/database/models/community.model";
 
-export const CreatePost = ({ communities }: {
+export const CreatePost = async ({ communities }: {
     communities: ICommunity[];
 }) => {
-    const { user } = useUser();
-
-    const form = useForm<z.infer<typeof createPostSchema>>({
-        resolver: zodResolver(createPostSchema),
-        defaultValues: {
-            title: "",
-            content: "",
-            tags: [],
-            community: "",
-        }
-    });
-    async function onSubmit(data: z.infer<typeof createPostSchema>) {
-        console.log(data);
-    }
+    const user = await currentUser();
 
     return <>
         <div className="bg-white rounded-xl mt-6 p-2 px-4 pt-4">
