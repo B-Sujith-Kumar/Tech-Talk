@@ -41,52 +41,6 @@ const postSchema: Schema<IPost> = new Schema({
     timestamps: true
 });
 
-// Static method to find trending posts based on engagement within the last 24 hours
-postSchema.statics.findTrendingPosts = async function () {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    return this.aggregate([
-        {
-            $addFields: {
-                recentUpvotes: {
-                    $filter: {
-                        input: "$upvotes",
-                        as: "upvote",
-                        cond: { $gte: ["$$upvote.createdAt", yesterday] }
-                    }
-                },
-                recentDownvotes: {
-                    $filter: {
-                        input: "$downvotes",
-                        as: "downvote",
-                        cond: { $gte: ["$$downvote.createdAt", yesterday] }
-                    }
-                },
-                recentComments: {
-                    $filter: {
-                        input: "$comments",
-                        as: "comment",
-                        cond: { $gte: ["$$comment.createdAt", yesterday] }
-                    }
-                }
-            }
-        },
-        {
-            $addFields: {
-                engagementScore: {
-                    $subtract: [
-                        { $add: [{ $size: "$recentUpvotes" }, { $size: "$recentComments" }] },
-                        { $size: "$recentDownvotes" }
-                    ]
-                }
-            }
-        },
-        { $sort: { engagementScore: -1 } },
-        { $limit: 10 }
-    ]);
-};
-
 const Post = models.Post || mongoose.model<IPost>("Post", postSchema);
 
 export default Post;

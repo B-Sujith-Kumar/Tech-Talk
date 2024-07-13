@@ -120,7 +120,6 @@ export async function upvotePost({ postId }: { postId: string }) {
     let auth = await isAuth();
     if (!auth) return { status: 500, message: "User not authenticated" };
     const user: any = await currentUser();
-    console.log(user);
     await connectToDatabase();
     const userObjectId = await getUserObjectId(user?.id);
     const post = await Post.findById(postId);

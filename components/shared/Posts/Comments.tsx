@@ -3,11 +3,11 @@
 import { IPostPopulated } from "@/types";
 import React, { useEffect, useState } from "react";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import Image from "next/image";
 import { IUser } from "@/lib/database/models/user.model";
@@ -18,13 +18,14 @@ import { Dot, MessageCircle } from "lucide-react";
 import moment from "moment";
 import Link from "next/link";
 import { UpDownVoteComment } from "./UpDownVoteComment";
+import { useUser } from "@clerk/nextjs";
 
 const Comments = ({
-  post,
-  currentUser,
+    post,
+    currentUser,
 }: {
-  post: IPostPopulated;
-  currentUser: IUser;
+    post: IPostPopulated;
+    currentUser: IUser;
 }) => {
   const [sort, setSort] = useState<"Top" | "Latest" | "Oldest">("Top");
   const [content, setContent] = useState("");
@@ -34,13 +35,13 @@ const Comments = ({
   const [activeReply, setActiveReply] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleChange = (value: string) => {
-    setSort(value as "Top" | "Latest" | "Oldest");
-  };
+    const handleChange = (value: string) => {
+        setSort(value as "Top" | "Latest" | "Oldest");
+    };
 
-  useEffect(() => {
-    setComments(post.comments);
-  }, [post.comments]);
+    useEffect(() => {
+        setComments(post.comments);
+    }, [post.comments]);
 
   const handleSubmitComment = async () => {
     setLoading(true);
