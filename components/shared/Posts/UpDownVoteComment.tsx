@@ -40,7 +40,7 @@ export const UpDownVoteComment = ({ comment, currentUser }: { comment: any, curr
         onClick={handleUpvote}
         fill={comment?.upvotes?.includes(currentUser?._id) ? "#667eea" : "none"}
       />
-      <span className="text-xs max-sm:hidden font-medium">
+      <span className="text-xs  font-medium">
         {comment?.upvotes?.length! - comment?.downvotes?.length!}
       </span>
       <ArrowBigDownIcon
