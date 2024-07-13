@@ -91,9 +91,19 @@ export async function getPostById(postID: mongoose.Schema.Types.ObjectId) {
       .populate("community")
       .populate({
         path: "comments",
-        populate: {
-          path: "author",
-        },
+        populate: [
+          {
+            path: "author",
+            model: "User",
+          },
+          {
+            path: "replies",
+            populate: {
+              path: "author",
+              model: "User",
+            },
+          },
+        ],
       });
     return JSON.parse(JSON.stringify({ status: 200, data: post }));
   } catch (error: any) {
@@ -141,13 +151,17 @@ export const upVoteComment = async (
         JSON.stringify({ status: 404, message: "Comment not found" })
       );
     if (comment.upvotes.includes(userID)) {
-      comment.upvotes = comment.upvotes.filter((id: any) => id.toString() !== userID.toString());
+      comment.upvotes = comment.upvotes.filter(
+        (id: any) => id.toString() !== userID.toString()
+      );
     } else {
       comment.upvotes.push(userID);
-      comment.downvotes = comment.downvotes.filter((id: any) => id.toString() !== userID.toString());
+      comment.downvotes = comment.downvotes.filter(
+        (id: any) => id.toString() !== userID.toString()
+      );
     }
     await comment.save();
-    revalidatePath(`/post/${comment.post}`)
+    revalidatePath(`/post/${comment.post}`);
     return JSON.parse(JSON.stringify({ status: 200, message: "Success" }));
   } catch (error: any) {
     return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
@@ -166,15 +180,48 @@ export const downVoteComment = async (
         JSON.stringify({ status: 404, message: "Comment not found" })
       );
     if (comment.downvotes.includes(userID)) {
-      comment.downvotes = comment.downvotes.filter((id: any) => id.toString() !== userID.toString());
+      comment.downvotes = comment.downvotes.filter(
+        (id: any) => id.toString() !== userID.toString()
+      );
     } else {
       comment.downvotes.push(userID);
-      comment.upvotes = comment.upvotes.filter((id: any) => id.toString() !== userID.toString());
+      comment.upvotes = comment.upvotes.filter(
+        (id: any) => id.toString() !== userID.toString()
+      );
     }
     await comment.save();
     revalidatePath(`/post/${comment.post}`);
     return JSON.parse(JSON.stringify({ status: 200, message: "Success" }));
   } catch (error: any) {
+    return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
+  }
+};
+
+export const addReply = async (
+  commentId: string,
+  content: string,
+  userID: string
+) => {
+  try {
+    await connectToDatabase();
+    let comment = await Comment.findById(commentId);
+    if (!comment)
+      return JSON.parse(
+        JSON.stringify({ status: 404, message: "Comment not found" })
+      );
+    let reply = await Comment.create({
+      author: userID,
+      content: content,
+      post: null,
+    });
+    let replyComment = await Comment.findOne({ _id: reply._id }).populate(
+      "author"
+    );
+    comment.replies.push(reply._id);
+    await comment.save();
+    return JSON.parse(JSON.stringify({ status: 200, replyComment: replyComment }));
+  } catch (error: any) {
+    console.log(error);
     return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
   }
 };
