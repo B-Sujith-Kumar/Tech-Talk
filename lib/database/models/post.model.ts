@@ -62,14 +62,18 @@ postSchema.statics.findTrendingPosts = async function () {
                         as: "downvote",
                         cond: { $gte: ["$$downvote.createdAt", yesterday] }
                     }
-                },
-                recentComments: {
-                    $filter: {
-                        input: "$comments",
-                        as: "comment",
-                        cond: { $gte: ["$$comment.createdAt", yesterday] }
-                    }
                 }
+            }
+        },
+        // Lookup recent comments by joining with the Comment collection
+        {
+            $lookup: {
+                from: "comments",
+                let: { commentIds: "$comments" },
+                pipeline: [
+                    { $match: { $expr: { $and: [{ $in: ["$_id", "$$commentIds"] }, { $gte: ["$createdAt", yesterday] }] } } }
+                ],
+                as: "recentComments"
             }
         },
         {
@@ -80,6 +84,16 @@ postSchema.statics.findTrendingPosts = async function () {
                         { $size: "$recentDownvotes" }
                     ]
                 }
+            }
+        },
+        // Filter out posts with no recent engagement
+        {
+            $match: {
+                $or: [
+                    { "recentUpvotes.0": { $exists: true } },
+                    { "recentDownvotes.0": { $exists: true } },
+                    { "recentComments.0": { $exists: true } }
+                ]
             }
         },
         { $sort: { engagementScore: -1 } },

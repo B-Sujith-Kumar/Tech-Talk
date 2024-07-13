@@ -54,10 +54,11 @@ export async function createPost(data: {
                         name: tag,
                         posts: [post._id],
                     });
-                    post.tags.push(newTag._id as mongoose.Schema.Types.ObjectId);
-                } else {
+                    await Post.updateOne({ _id: post._id }, { $push: { tags: newTag._id } });
+                }
+                else {
                     existingTag?.posts?.push(post._id as mongoose.Schema.Types.ObjectId);
-                    post.tags.push(existingTag._id as mongoose.Schema.Types.ObjectId);
+                    await Post.updateOne({ _id: post._id }, { $push: { tags: existingTag._id } });
                     await existingTag.save();
                 }
             }) ?? []
@@ -70,12 +71,7 @@ export async function createPost(data: {
 }
 
 export async function getAllPosts(options:
-    { limit: number; skip: number; sort: string; order: string; } = {
-        limit: 10,
-        skip: 0,
-        sort: "createdAt",
-        order: "desc",
-    }
+    { limit?: number; skip?: number; sort?: string; order?: string; }
 ) {
     try {
         await connectToDatabase();
@@ -83,11 +79,8 @@ export async function getAllPosts(options:
             .populate("tags")
             .populate("author")
             .populate("community")
-            .limit(options.limit)
-            .skip(options.skip)
-            .sort({
-                createdAt: options.order === "desc" ? -1 : 1,
-            })
+            .limit(options?.limit ?? 10)
+            .skip(options?.skip ?? 0);
         return { status: 200, data: JSON.parse(JSON.stringify(posts)) };
     }
     catch (error: any) {

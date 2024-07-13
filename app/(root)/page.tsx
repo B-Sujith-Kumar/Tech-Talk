@@ -19,7 +19,9 @@ export default async function Home() {
     const { userId } = auth();
     const user = await currentUser();
     const { data } = await getCommunitiesJoinedByUser();
-    const postsData = await getAllPosts();
+    const postsData = await getAllPosts({
+        order: "latest",
+    });
     return (
         <>
             {userId && <Stories />}
