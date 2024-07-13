@@ -476,3 +476,22 @@ export const editComment = async (commentId: string | unknown, content: string) 
         return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
     }
 }
+
+export const deleteComment = async (commentId: string | unknown) => {
+    try {
+        await connectToDatabase();
+        let comment = await Comment.findById(commentId);
+        if (!comment)
+        return JSON.parse(
+            JSON.stringify({ status: 404, message: "Comment not found" })
+        );
+        for (let reply of comment.replies) {
+            await Comment.deleteOne({ _id: reply });
+        }
+        await Comment.deleteOne({ _id: commentId });
+        revalidatePath(`/post/${comment.post}`);
+        return JSON.parse(JSON.stringify({ status: 200, message: "Success" }));
+    } catch (error: any) {
+        return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
+    }
+}
