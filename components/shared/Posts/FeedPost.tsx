@@ -12,9 +12,11 @@ import { VotesButtons } from "./ClientComponents";
 const FeedPost = ({
     post,
     showBanner,
+    isInCommunity,
 }: {
     post: IPostPopulated;
     showBanner: boolean;
+    isInCommunity?: boolean;
 }) => {
     return (
         <div>
@@ -33,8 +35,7 @@ const FeedPost = ({
                             <Link href={`/user/${post.author._id}`}>
                                 {post.author.firstName + " " + post.author.lastName}{" "}{" "}
                             </Link>
-                            {post.community && <>in</>}
-                            {post.community && (
+                            {!isInCommunity && post.community && <>in
                                 <Link
                                     className={
                                         badgeVariants({ variant: "outline" }) +
@@ -51,7 +52,7 @@ const FeedPost = ({
                                     />
                                     {post.community.name}
                                 </Link>
-                            )}
+                            </>}
                         </span>
                         <span className="text-xs text-gray-500">
                             {moment(post.createdAt).fromNow()}
