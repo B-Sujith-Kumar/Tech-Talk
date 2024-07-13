@@ -459,3 +459,20 @@ export const addReply = async (
     return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
   }
 };
+
+export const editComment = async (commentId: string | unknown, content: string) => {
+    try {
+        await connectToDatabase();
+        let comment = await Comment.findById(commentId);
+        if (!comment)
+        return JSON.parse(
+            JSON.stringify({ status: 404, message: "Comment not found" })
+        );
+        comment.content = content;
+        await comment.save();
+        revalidatePath(`/post/${comment.post}`);
+        return JSON.parse(JSON.stringify({ status: 200, message: "Success" }));
+    } catch (error: any) {
+        return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
+    }
+}
