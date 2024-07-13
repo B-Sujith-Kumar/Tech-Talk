@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import upvote from "@/public/icons/upvote.svg";
 import {
   BookmarkIcon,
+  Dot,
   EllipsisVerticalIcon,
   MessageCircleIcon,
   Share2Icon,
@@ -24,7 +25,9 @@ const CommunityPost = ({ post }: { post: IPostPopulated }) => {
               alt={post.author.username}
               className="h-10 w-10 rounded-full"
             />
-            <AvatarFallback>S K</AvatarFallback>
+            <AvatarFallback>
+                <Dot className="w-10 h-10 rounded-full bg-gray-200" />
+            </AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
             <span className="text-sm font-medium">

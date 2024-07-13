@@ -36,6 +36,11 @@ export default async function HomePage({ searchParams }: SearchParamProps) {
             <div id="posts">
                 <Suspense fallback={<Loading />}>
                     <div className="flex flex-col gap-3">
+                        {posts.length === 0 && (
+                            <div className="flex items-center justify-center h-40">
+                                <p className="text-gray-500">No posts found</p>
+                            </div>
+                        )}
                         {posts?.slice(0, 1).map((post: any) => (
                             <FeedPost key={post._id} post={post} showBanner={true} />
                         ))}
