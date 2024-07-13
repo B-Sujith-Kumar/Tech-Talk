@@ -2,7 +2,7 @@ import mongoose, { Document, models, Schema } from 'mongoose';
 
 export interface IComment extends Document {
     author: mongoose.Schema.Types.ObjectId;
-    post: mongoose.Schema.Types.ObjectId;
+    post?: mongoose.Schema.Types.ObjectId;
     content: string;
     replies?: mongoose.Schema.Types.ObjectId[];
     upvotes?: mongoose.Schema.Types.ObjectId[];
@@ -12,7 +12,7 @@ export interface IComment extends Document {
 
 const commentSchema: Schema<IComment> = new Schema({
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    post: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', required: true },
+    post: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', required: false },
     content: { type: String, required: true },
     replies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment', default: []}],
     upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],

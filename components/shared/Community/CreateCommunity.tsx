@@ -88,7 +88,6 @@ const CreateCommunity = ({ userId }: { userId: string | null }) => {
                     title: "Community created",
                     description: "Congratulations! Your community has been created successfully.",
                 });
-                console.log("Community created");
             } else {
                 console.log("Failed to create community");
             }
