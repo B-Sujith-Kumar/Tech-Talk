@@ -41,66 +41,6 @@ const postSchema: Schema<IPost> = new Schema({
     timestamps: true
 });
 
-// Static method to find trending posts based on engagement within the last 24 hours
-postSchema.statics.findTrendingPosts = async function () {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    return this.aggregate([
-        {
-            $addFields: {
-                recentUpvotes: {
-                    $filter: {
-                        input: "$upvotes",
-                        as: "upvote",
-                        cond: { $gte: ["$$upvote.createdAt", yesterday] }
-                    }
-                },
-                recentDownvotes: {
-                    $filter: {
-                        input: "$downvotes",
-                        as: "downvote",
-                        cond: { $gte: ["$$downvote.createdAt", yesterday] }
-                    }
-                }
-            }
-        },
-        // Lookup recent comments by joining with the Comment collection
-        {
-            $lookup: {
-                from: "comments",
-                let: { commentIds: "$comments" },
-                pipeline: [
-                    { $match: { $expr: { $and: [{ $in: ["$_id", "$$commentIds"] }, { $gte: ["$createdAt", yesterday] }] } } }
-                ],
-                as: "recentComments"
-            }
-        },
-        {
-            $addFields: {
-                engagementScore: {
-                    $subtract: [
-                        { $add: [{ $size: "$recentUpvotes" }, { $size: "$recentComments" }] },
-                        { $size: "$recentDownvotes" }
-                    ]
-                }
-            }
-        },
-        // Filter out posts with no recent engagement
-        {
-            $match: {
-                $or: [
-                    { "recentUpvotes.0": { $exists: true } },
-                    { "recentDownvotes.0": { $exists: true } },
-                    { "recentComments.0": { $exists: true } }
-                ]
-            }
-        },
-        { $sort: { engagementScore: -1 } },
-        { $limit: 10 }
-    ]);
-};
-
 const Post = models.Post || mongoose.model<IPost>("Post", postSchema);
 
 export default Post;

@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import { connectToDatabase } from "../database";
 import Comment from "../database/models/comment.model";
 import { revalidatePath } from "next/cache";
+import { IFeedPost } from "@/types/posts";
 
 export async function createPost(data: {
     title: string;
@@ -70,18 +71,245 @@ export async function createPost(data: {
     }
 }
 
-export async function getAllPosts(options:
+export async function getAllPosts(options?:
     { limit?: number; skip?: number; sort?: string; order?: string; }
 ) {
     try {
         await connectToDatabase();
-        let posts = await Post.find()
+        let posts: IFeedPost[] = await Post.find()
             .populate("tags")
             .populate("author")
             .populate("community")
             .limit(options?.limit ?? 10)
-            .skip(options?.skip ?? 0);
+            .skip(options?.skip ?? 0)
+            .sort({
+                createdAt: -1
+            });
         return { status: 200, data: JSON.parse(JSON.stringify(posts)) };
+    }
+    catch (error: any) {
+        return { status: 500, message: error.message };
+    }
+}
+
+export async function getTrendingPosts() {
+    try {
+        await connectToDatabase();
+        let data: IFeedPost[] = await Post.aggregate([
+            {
+                $match: {
+                    $or: [
+                        {
+                            "upvotes.createdAt": {
+                                $gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+                            }
+                        },
+                        {
+                            "downvotes.createdAt": {
+                                $gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+                            }
+                        },
+                        {
+                            "comments.createdAt": {
+                                $gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $lookup: {
+                    from: "tags",
+                    as: "tags",
+                    localField: "tags",
+                    foreignField: "_id",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id: 1,
+                                name: 1
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $lookup: {
+                    from: "communities",
+                    as: "community",
+                    localField: "community",
+                    foreignField: "_id",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id: 1,
+                                name: 1,
+                                icon: 1
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $addFields: {
+                    community: {
+                        $arrayElemAt: ["$community", 0]
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    engagementScore: {
+                        $subtract: [
+                            {
+                                $add: [
+                                    { $size: "$upvotes" },
+                                    { $size: "$comments" }
+                                ]
+                            },
+                            { $size: "$downvotes" }
+                        ]
+                    }
+                }
+            },
+            {
+                $sort: {
+                    engagementScore: -1
+                }
+            },
+            {
+                $limit: 10
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "author",
+                    foreignField: "_id",
+                    as: "author",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id: 1,
+                                name: 1,
+                                firstName: 1,
+                                lastName: 1,
+                                profilePicture: 1
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $addFields: {
+                    author: {
+                        $arrayElemAt: ["$author", 0]
+                    }
+                }
+            }
+        ]);
+        return { status: 200, data: JSON.parse(JSON.stringify(data)) };
+    }
+    catch (error: any) {
+        return { status: 500, message: error.message };
+
+    }
+}
+
+export async function getPopularPosts() {
+    try {
+        await connectToDatabase();
+        let data: IFeedPost[] = await Post.aggregate([
+            {
+                $lookup: {
+                    from: "tags",
+                    as: "tags",
+                    localField: "tags",
+                    foreignField: "_id",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id: 1,
+                                name: 1
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $lookup: {
+                    from: "communities",
+                    as: "community",
+                    localField: "community",
+                    foreignField: "_id",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id: 1,
+                                name: 1,
+                                icon: 1
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $addFields: {
+                    community: {
+                        $arrayElemAt: ["$community", 0]
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    popularityScore: {
+                        $subtract: [
+                            {
+                                $add: [
+                                    { $size: "$upvotes" },
+                                    { $size: "$comments" }
+                                ]
+                            },
+                            { $size: "$downvotes" }
+                        ]
+                    }
+                }
+            },
+            {
+                $sort: {
+                    popularityScore: -1
+                }
+            },
+            {
+                $limit: 10
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "author",
+                    foreignField: "_id",
+                    as: "author",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id: 1,
+                                name: 1,
+                                firstName: 1,
+                                lastName: 1,
+                                profilePicture: 1
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $addFields: {
+                    author: {
+                        $arrayElemAt: ["$author", 0]
+                    }
+                }
+            },
+        ]);
+        return { status: 200, data: JSON.parse(JSON.stringify(data)) };
     }
     catch (error: any) {
         return { status: 500, message: error.message };

@@ -30,7 +30,9 @@ const FeedPost = ({
                     </Avatar>
                     <div className="flex flex-col">
                         <span className="text-sm font-medium flex flex-row gap-1 items-center">
-                            {post.author.firstName + " " + post.author.lastName}{" "}{" "}
+                            <Link href={`/user/${post.author._id}`}>
+                                {post.author.firstName + " " + post.author.lastName}{" "}{" "}
+                            </Link>
                             {post.community && <>in</>}
                             {post.community && (
                                 <Link
@@ -90,9 +92,6 @@ const FeedPost = ({
                 <div className="flex flex-row gap-6 mt-2 p-2 *:flex *:flex-row *:gap-2 *:items-center">
                     <div>
                         <VotesButtons post={post} />
-                        {/* <span className="text-xs max-sm:hidden font-medium">
-                            {post.upvotes.length - post.downvotes.length}
-                        </span> */}
                     </div>
                     <div>
                         <MessageCircleIcon className="w-4 h-4 " />
