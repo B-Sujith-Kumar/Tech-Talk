@@ -8,9 +8,19 @@ import { IUser } from "@/lib/database/models/user.model";
 import { useUser } from "@clerk/nextjs";
 import { ArrowBigDownIcon, ArrowBigUpIcon } from "lucide-react";
 import mongoose from "mongoose";
+import { useState } from "react";
 
-export const UpDownVoteComment = ({ comment, currentUser }: { comment: any, currentUser: IUser }) => {
+export const UpDownVoteComment = ({
+  comment,
+  currentUser,
+}: {
+  comment: any;
+  currentUser: IUser;
+}) => {
   const { isLoaded, user } = useUser();
+  const [upVotes, setUpVotes] = useState(comment.upvotes);
+  const [downVotes, setDownVotes] = useState(comment.downvotes);
+
   const { toast } = useToast();
   const handleUpvote = async () => {
     if (!currentUser) {
@@ -20,8 +30,15 @@ export const UpDownVoteComment = ({ comment, currentUser }: { comment: any, curr
       });
       return;
     }
-    await upVoteComment(comment._id, currentUser._id?.toString()!);
-  }
+    const { status, responseComment } = await upVoteComment(
+      comment._id,
+      currentUser._id?.toString()!
+    );
+    if (status === 200) {
+      setUpVotes(responseComment.upvotes);
+      setDownVotes(responseComment.downvotes);
+    }
+  };
   const handleDownvote = async () => {
     if (!currentUser) {
       toast({
@@ -30,24 +47,31 @@ export const UpDownVoteComment = ({ comment, currentUser }: { comment: any, curr
       });
       return;
     }
-    await downVoteComment(comment._id, currentUser._id?.toString()!);
-  }
+    const { status, responseComment } = await downVoteComment(
+      comment._id,
+      currentUser._id?.toString()!
+    );
+    if (status === 200) {
+      setUpVotes(responseComment.upvotes);
+      setDownVotes(responseComment.downvotes);
+    }
+  };
   return (
     <div className="flex items-center gap-1">
       <ArrowBigUpIcon
         className="w-6 h-6 cursor-pointer text-indigo-500"
         strokeWidth={1.1}
         onClick={handleUpvote}
-        fill={comment?.upvotes?.includes(currentUser?._id) ? "#667eea" : "none"}
+        fill={upVotes?.includes(currentUser?._id) ? "#667eea" : "none"}
       />
       <span className="text-xs  font-medium">
-        {comment?.upvotes?.length! - comment?.downvotes?.length!}
+        {upVotes.length - downVotes.length}
       </span>
       <ArrowBigDownIcon
         className="w-6 h-6 cursor-pointer text-red-500"
         strokeWidth={1.1}
         onClick={handleDownvote}
-        fill={comment?.downvotes?.includes(currentUser?._id) ? "red" : "none"}
+        fill={downVotes?.includes(currentUser?._id) ? "red" : "none"}
       />
     </div>
   );

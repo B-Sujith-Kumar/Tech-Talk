@@ -51,3 +51,12 @@ export type IPostPopulated = {
     createdAt: Date;
     getEngagementScore: () => number;
 }
+
+export type ICollectionPopualted = {
+    _id?: mongoose.Schema.Types.ObjectId;
+    name: string;
+    description: string;
+    creator: IUser;
+    posts: IPostPopulated[];
+    createdAt: Date;
+}
