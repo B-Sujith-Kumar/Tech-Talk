@@ -28,18 +28,15 @@ export async function createPost(data: {
         const user = await currentUser();
         await connectToDatabase();
         let post: IPost;
-        if (
-            data.community === "public" ||
-            !data.community ||
-            data.community === ""
-        ) {
+        if (data.community === "public" || !data.community || data.community === "") {
             post = await Post.create({
                 author: user?.publicMetadata.userId,
                 title: data.title,
                 content: data.content,
                 coverImage: data.coverImage,
             });
-        } else {
+        }
+        else {
             post = await Post.create({
                 author: user?.publicMetadata.userId,
                 title: data.title,
@@ -56,16 +53,10 @@ export async function createPost(data: {
                         name: tag,
                         posts: [post._id],
                     });
-                    await Post.updateOne(
-                        { _id: post._id },
-                        { $push: { tags: newTag._id } }
-                    );
+                    await Post.updateOne({ _id: post._id }, { $push: { tags: newTag._id } });
                 } else {
                     existingTag?.posts?.push(post._id as mongoose.Schema.Types.ObjectId);
-                    await Post.updateOne(
-                        { _id: post._id },
-                        { $push: { tags: existingTag._id } }
-                    );
+                    await Post.updateOne({ _id: post._id }, { $push: { tags: existingTag._id } });
                     await existingTag.save();
                 }
             }) ?? []
@@ -77,7 +68,59 @@ export async function createPost(data: {
     }
 }
 
-export async function editPost() { }
+export async function editPost(data: {
+    postID: mongoose.Schema.Types.ObjectId;
+    title: string;
+    content: string;
+    tags?: string[];
+    community?: mongoose.Schema.Types.ObjectId | string;
+    coverImage?: string;
+}) {
+    try {
+        let auth = isAuth();
+        if (!auth) return { status: 401, message: "Unauthorized" };
+        const user = await currentUser();
+        await connectToDatabase();
+        let post: IPost = await Post.findById(data.postID) as IPost;
+        if (!post) return { status: 404, message: "Post not found" };
+        const loggedInUser: IUser = await User.findOne({ clerkId: user?.id }) as IUser;
+        if (post.author.toString() !== loggedInUser?._id?.toString()) return { status: 401, message: "Unauthorized" };
+        post.title = data.title;
+        post.content = data.content;
+        post.coverImage = data.coverImage ?? post.coverImage;
+        if (!(data.community === "public" || !data.community || data.community === "")) {
+            post.community = data.community as mongoose.Schema.Types.ObjectId;
+        }
+        else {
+            await post.updateOne({ $unset: { community: 1 } });
+        }
+        await Promise.all(post?.tags?.map(async (tag) => {
+            await Tag.updateOne({ _id: tag }, { $pull: { posts: post._id } });
+        }));
+        post.tags = [];
+        await Promise.all(
+            data.tags?.forEach(async (tag) => {
+                let existingTag: ITag | null = await Tag.findOne({ name: tag });
+                if (!existingTag) {
+                    let newTag: ITag = await Tag.create({
+                        name: tag,
+                        posts: [post._id],
+                    });
+                    await Post.updateOne({ _id: post._id }, { $push: { tags: newTag._id } });
+                } else {
+                    existingTag?.posts?.push(post._id as mongoose.Schema.Types.ObjectId);
+                    await Post.updateOne({ _id: post._id }, { $push: { tags: existingTag._id } });
+                    await existingTag.save();
+                }
+            }) ?? []
+        );
+        await post.save();
+        revalidatePath(`/post/${data.postID}`);
+        return { status: 200, message: "Post updated successfully" };
+    } catch (error: any) {
+        return { status: 500, message: error.message };
+    }
+}
 
 export async function deletePost(postID: mongoose.Schema.Types.ObjectId) {
     try {
