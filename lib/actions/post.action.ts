@@ -9,6 +9,7 @@ import { connectToDatabase } from "../database";
 import Comment, { IComment } from "../database/models/comment.model";
 import { revalidatePath } from "next/cache";
 import { IFeedPost } from "@/types/posts";
+import User, { IUser } from "../database/models/user.model";
 
 export async function createPost(data: {
     title: string;
@@ -81,18 +82,14 @@ export async function editPost() { }
 export async function deletePost(postID: mongoose.Schema.Types.ObjectId) {
     try {
         let auth = isAuth();
-        if (!auth)
-            return {
-                status: 401,
-                message: "Unauthorized",
-            };
+        if (!auth) return { status: 401, message: "Unauthorized" };
+        const user = await currentUser();
         await connectToDatabase();
         let post: IPost = await Post.findById(postID) as IPost;
-        if (!post)
-            return {
-                status: 404,
-                message: "Post not found",
-            };
+        if (!post) return { status: 404, message: "Post not found" };
+        const loggedInUser: IUser = await User.findOne({ clerkId: user?.id }) as IUser;
+        if (post.author.toString() !== loggedInUser?._id?.toString()) return { status: 401, message: "Unauthorized" };
+
         await Promise.all(post.tags.map(async (tag) => {
             await Tag.updateOne({ _id: tag }, { $pull: { posts: post._id } });
         }));
@@ -103,14 +100,13 @@ export async function deletePost(postID: mongoose.Schema.Types.ObjectId) {
             }));
             await Comment.deleteOne({ _id: comment });
         }));
+        revalidatePath(`/community/${post.community}`);
+        await post.deleteOne({ _id: postID });
         revalidatePath("/");
         revalidatePath(`/post/${postID}`);
-        revalidatePath(`/community/${post.community}`);
-        await post.deleteOne({
-            _id: postID,
-        });
         return { status: 200, message: "Post deleted successfully" };
-    } catch (error: any) {
+    }
+    catch (error: any) {
         return { status: 500, message: error.message };
     }
 
@@ -355,32 +351,32 @@ export async function getPopularPosts() {
 }
 
 export async function getPostById(postID: mongoose.Schema.Types.ObjectId) {
-  try {
-    await connectToDatabase();
-    let post = await Post.findById(postID)
-      .populate("tags")
-      .populate("author")
-      .populate("community")
-      .populate({
-        path: "comments",
-        populate: [
-          {
-            path: "author",
-            model: "User",
-          },
-          {
-            path: "replies",
-            populate: {
-              path: "author",
-              model: "User",
-            },
-          },
-        ],
-      });
-    return JSON.parse(JSON.stringify({ status: 200, data: post }));
-  } catch (error: any) {
-    return { status: 500, message: error.message };
-  }
+    try {
+        await connectToDatabase();
+        let post = await Post.findById(postID)
+            .populate("tags")
+            .populate("author")
+            .populate("community")
+            .populate({
+                path: "comments",
+                populate: [
+                    {
+                        path: "author",
+                        model: "User",
+                    },
+                    {
+                        path: "replies",
+                        populate: {
+                            path: "author",
+                            model: "User",
+                        },
+                    },
+                ],
+            });
+        return JSON.parse(JSON.stringify({ status: 200, data: post }));
+    } catch (error: any) {
+        return { status: 500, message: error.message };
+    }
 }
 
 export const addComment = async (
@@ -412,61 +408,61 @@ export const addComment = async (
 };
 
 export const upVoteComment = async (
-  commentId: mongoose.Schema.Types.ObjectId | unknown,
-  userID: string
+    commentId: mongoose.Schema.Types.ObjectId | unknown,
+    userID: string
 ) => {
-  try {
-    await connectToDatabase();
-    let comment = await Comment.findById(commentId);
-    if (!comment)
-      return JSON.parse(
-        JSON.stringify({ status: 404, message: "Comment not found" })
-      );
-    if (comment.upvotes.includes(userID)) {
-      comment.upvotes = comment.upvotes.filter(
-        (id: any) => id.toString() !== userID.toString()
-      );
-    } else {
-      comment.upvotes.push(userID);
-      comment.downvotes = comment.downvotes.filter(
-        (id: any) => id.toString() !== userID.toString()
-      );
+    try {
+        await connectToDatabase();
+        let comment = await Comment.findById(commentId);
+        if (!comment)
+            return JSON.parse(
+                JSON.stringify({ status: 404, message: "Comment not found" })
+            );
+        if (comment.upvotes.includes(userID)) {
+            comment.upvotes = comment.upvotes.filter(
+                (id: any) => id.toString() !== userID.toString()
+            );
+        } else {
+            comment.upvotes.push(userID);
+            comment.downvotes = comment.downvotes.filter(
+                (id: any) => id.toString() !== userID.toString()
+            );
+        }
+        await comment.save();
+        revalidatePath(`/post/${comment.post.toString()}`);
+        return JSON.parse(JSON.stringify({ status: 200, message: "Success", responseComment: comment }));
+    } catch (error: any) {
+        return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
     }
-    await comment.save();
-    revalidatePath(`/post/${comment.post.toString()}`);
-    return JSON.parse(JSON.stringify({ status: 200, message: "Success", responseComment: comment }));
-  } catch (error: any) {
-    return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
-  }
 };
 
 export const downVoteComment = async (
-  commentId: mongoose.Schema.Types.ObjectId | unknown,
-  userID: string
+    commentId: mongoose.Schema.Types.ObjectId | unknown,
+    userID: string
 ) => {
-  try {
-    await connectToDatabase();
-    let comment = await Comment.findById(commentId);
-    if (!comment)
-      return JSON.parse(
-        JSON.stringify({ status: 404, message: "Comment not found" })
-      );
-    if (comment.downvotes.includes(userID)) {
-      comment.downvotes = comment.downvotes.filter(
-        (id: any) => id.toString() !== userID.toString()
-      );
-    } else {
-      comment.downvotes.push(userID);
-      comment.upvotes = comment.upvotes.filter(
-        (id: any) => id.toString() !== userID.toString()
-      );
+    try {
+        await connectToDatabase();
+        let comment = await Comment.findById(commentId);
+        if (!comment)
+            return JSON.parse(
+                JSON.stringify({ status: 404, message: "Comment not found" })
+            );
+        if (comment.downvotes.includes(userID)) {
+            comment.downvotes = comment.downvotes.filter(
+                (id: any) => id.toString() !== userID.toString()
+            );
+        } else {
+            comment.downvotes.push(userID);
+            comment.upvotes = comment.upvotes.filter(
+                (id: any) => id.toString() !== userID.toString()
+            );
+        }
+        await comment.save();
+        revalidatePath(`/post/${comment.post.toString()}`);
+        return JSON.parse(JSON.stringify({ status: 200, message: "Success", responseComment: comment }));
+    } catch (error: any) {
+        return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
     }
-    await comment.save();
-    revalidatePath(`/post/${comment.post.toString()}`);
-    return JSON.parse(JSON.stringify({ status: 200, message: "Success", responseComment: comment  }));
-  } catch (error: any) {
-    return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
-  }
 };
 
 export const addReply = async (
@@ -501,40 +497,40 @@ export const addReply = async (
 };
 
 export const editComment = async (
-  commentId: string | unknown,
-  content: string
+    commentId: string | unknown,
+    content: string
 ) => {
-  try {
-    await connectToDatabase();
-    let comment = await Comment.findById(commentId);
-    if (!comment)
-      return JSON.parse(
-        JSON.stringify({ status: 404, message: "Comment not found" })
-      );
-    comment.content = content;
-    await comment.save();
-    revalidatePath(`/post/${comment.post.toString()}`);
-    return JSON.parse(JSON.stringify({ status: 200, message: "Success" }));
-  } catch (error: any) {
-    return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
-  }
+    try {
+        await connectToDatabase();
+        let comment = await Comment.findById(commentId);
+        if (!comment)
+            return JSON.parse(
+                JSON.stringify({ status: 404, message: "Comment not found" })
+            );
+        comment.content = content;
+        await comment.save();
+        revalidatePath(`/post/${comment.post.toString()}`);
+        return JSON.parse(JSON.stringify({ status: 200, message: "Success" }));
+    } catch (error: any) {
+        return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
+    }
 };
 
 export const deleteComment = async (commentId: string | unknown) => {
-  try {
-    await connectToDatabase();
-    let comment = await Comment.findById(commentId);
-    if (!comment)
-      return JSON.parse(
-        JSON.stringify({ status: 404, message: "Comment not found" })
-      );
-    for (let reply of comment.replies) {
-      await Comment.deleteOne({ _id: reply });
+    try {
+        await connectToDatabase();
+        let comment = await Comment.findById(commentId);
+        if (!comment)
+            return JSON.parse(
+                JSON.stringify({ status: 404, message: "Comment not found" })
+            );
+        for (let reply of comment.replies) {
+            await Comment.deleteOne({ _id: reply });
+        }
+        await Comment.deleteOne({ _id: commentId });
+        revalidatePath(`/post/${comment.post.toString()}`);
+        return JSON.parse(JSON.stringify({ status: 200, message: "Success" }));
+    } catch (error: any) {
+        return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
     }
-    await Comment.deleteOne({ _id: commentId });
-    revalidatePath(`/post/${comment.post.toString()}`);
-    return JSON.parse(JSON.stringify({ status: 200, message: "Success" }));
-  } catch (error: any) {
-    return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
-  }
 };
