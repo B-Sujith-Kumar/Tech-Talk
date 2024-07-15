@@ -100,12 +100,10 @@ export async function deletePost(postID: mongoose.Schema.Types.ObjectId) {
             }));
             await Comment.deleteOne({ _id: comment });
         }));
+        revalidatePath(`/community/${post.community}`);
+        await post.deleteOne({ _id: postID });
         revalidatePath("/");
         revalidatePath(`/post/${postID}`);
-        revalidatePath(`/community/${post.community}`);
-        await post.deleteOne({
-            _id: postID,
-        });
         return { status: 200, message: "Post deleted successfully" };
     }
     catch (error: any) {

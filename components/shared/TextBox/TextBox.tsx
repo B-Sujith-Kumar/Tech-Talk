@@ -98,9 +98,10 @@ export default function TextBox({
     }, [clearText]);
 
     return <>
-        <div className="flex flex-col justify-stretch min-h-[250px]">
+        <div className="flex flex-col">
             <Toolbar editor={editor} render={editable as boolean} />
             <EditorContent editor={editor}
+                className="max-sm:max-w-2xl h-40 max-h-full overflow-y-auto"
                 placeholder="Write your post content here..."
             />
         </div>

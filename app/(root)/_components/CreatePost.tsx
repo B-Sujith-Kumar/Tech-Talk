@@ -6,6 +6,7 @@ import { AtSignIcon, HashIcon, ImageUpIcon, PaperclipIcon, VideoIcon } from "luc
 import { currentUser } from "@clerk/nextjs";
 import { CreatePost as CreatePostComp } from "../_components/CreatePostComp";
 import { ICommunity } from "@/lib/database/models/community.model";
+import Link from "next/link";
 
 export const CreatePost = async ({ communities }: {
     communities: ICommunity[];
@@ -24,8 +25,17 @@ export const CreatePost = async ({ communities }: {
                         {user?.firstName && user?.lastName}
                     </AvatarFallback>
                 </Avatar>
+                <Link className="sm:hidden" href="/post/create">
+                    <textarea
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:opacity-50 peer placeholder-transparent h-10 scrollbar-hidden bg-gray-100 max-sm:placeholder:text-xs"
+                        placeholder="What's on your mind?"
+                        name="comment"
+                        required
+                        minLength={5}
+                    />
+                </Link>
                 <Dialog>
-                    <DialogTrigger className="w-full">
+                    <DialogTrigger className="w-full max-sm:hidden">
                         <textarea
                             className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:opacity-50 peer placeholder-transparent h-10 scrollbar-hidden bg-gray-100 max-sm:placeholder:text-xs"
                             placeholder="What's on your mind?"
@@ -35,7 +45,7 @@ export const CreatePost = async ({ communities }: {
                         />
                     </DialogTrigger>
                     <DialogContent
-                        className="bg-white rounded-md overflow-auto scrollbar-hidden max-w-3xl max-md:max-w-2xl max-sm:max-w-[90%] max-md:rounded-lg"
+                        className="bg-white rounded-md overflow-auto scrollbar-hidden max-w-3xl max-md:max-w-2xl max-sm:max-w-[90%] max-md:rounded-lg max-h-[90vh]"
                         aria-describedby="modal-description"
                     >
                         <DialogHeader>

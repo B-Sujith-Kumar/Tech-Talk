@@ -33,7 +33,7 @@ export function Toolbar({ editor, render }: Props) {
             .run()
     }, [editor])
     return <>
-        <div className="flex gap-1 my-2">
+        <div className="flex gap-1 my-2 overflow-x-auto">
             <Toggle
                 size="sm"
                 pressed={editor.isActive("heading", { level: 1 })}
