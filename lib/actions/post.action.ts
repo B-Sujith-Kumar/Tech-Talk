@@ -248,7 +248,7 @@ export async function getTrendingPosts() {
                     engagementScore: {
                         $subtract: [
                             {
-                                $add: [{ $size: "$upvotes" }, { $size: "$comments" }],
+                                $add: [{ $size: "$upvotes" }, { $size: "$comments" }, "$views"],
                             },
                             { $size: "$downvotes" },
                         ],
@@ -345,7 +345,7 @@ export async function getPopularPosts() {
                     popularityScore: {
                         $subtract: [
                             {
-                                $add: [{ $size: "$upvotes" }, { $size: "$comments" }],
+                                $add: [{ $size: "$upvotes" }, { $size: "$comments" }, "$views"],
                             },
                             { $size: "$downvotes" },
                         ],
