@@ -125,7 +125,7 @@ export default async function PostPage({
                   {post.comments.length} Comments
                 </span>
               </Link>
-              <BookmarkPost collectionList={collectionList}/>
+              <BookmarkPost collectionList={collectionList} postId={post._id} userId={userObjectId?.toString()!}/>
             </div>
           </div>
 
