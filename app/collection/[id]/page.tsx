@@ -1,4 +1,5 @@
 import DeleteCollection from "@/components/shared/Bookmarks/DeleteCollection";
+import UpdateCollection from "@/components/shared/Bookmarks/UpdateCollection";
 import CommunityPost from "@/components/shared/Community/CommunityPost";
 import FeedPost from "@/components/shared/Posts/FeedPost";
 import { getCollection } from "@/lib/actions/collection.actions";
@@ -16,7 +17,10 @@ const CollectionPage = async ({ params: { id } }: SearchParamProps) => {
           </h1>
           <p className="mt-1 text-gray-600 mb-4">{collection.description}</p>
         </div>
-        <DeleteCollection collectionId={id} />
+        <div className="flex gap-2">
+          <UpdateCollection collection={collection} />
+          <DeleteCollection collectionId={id} />
+        </div>
       </div>
       {collection.posts.map((post: IPostPopulated, id: number) => (
         <div className="mt-4">
