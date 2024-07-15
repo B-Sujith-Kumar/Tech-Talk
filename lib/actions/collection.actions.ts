@@ -105,3 +105,31 @@ export const getCollectionsOfPost = async (postId: string, userId: string) => {
     return JSON.parse(JSON.stringify({ error, status: 500 }));
   }
 };
+
+export const deleteCollection = async (collectionId: string) => {
+    try {
+        await connectToDatabase();
+        await Collection.findByIdAndDelete(collectionId);
+        revalidatePath("/bookmarks");
+        return JSON.parse(JSON.stringify({ status: 200 }));
+    } catch (error) {
+        console.log(error);
+        return JSON.parse(JSON.stringify({ error, status: 500 }));
+    }
+}
+
+export const updateCollection = async (
+    collectionId: string,
+    name: string,
+    description: string
+) => {
+    try {
+        await connectToDatabase();
+        await Collection.findByIdAndUpdate(collectionId, { name, description });
+        revalidatePath(`/collection/${collectionId}`);
+        return JSON.parse(JSON.stringify({ status: 200 }));
+    } catch (error) {
+        console.log(error);
+        return JSON.parse(JSON.stringify({ error, status: 500 }));
+    }
+}
