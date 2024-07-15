@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { BookmarkIcon, MessageCircleIcon, Share2Icon } from "lucide-react";
+import { BookmarkIcon, EyeIcon, MessageCircleIcon, Share2Icon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import Image from "next/image";
@@ -97,6 +97,9 @@ const FeedPost = async ({
                 </div>
                 <hr className="mt-2 border-gray-200" />
                 <div className="flex flex-row gap-6 mt-2 p-2 *:flex *:flex-row *:gap-2 *:items-center">
+                    <div>
+                        <EyeIcon className="w-4 h-4" /> <span className="text-xs font-medium">{post.views}</span>
+                    </div>
                     <div>
                         <VotesButtons post={post} />
                     </div>

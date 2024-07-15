@@ -18,6 +18,7 @@ import Comments from "@/components/shared/Posts/Comments";
 import BookmarkPost from "@/components/shared/Bookmarks/BookmarkPost";
 import { getCollections } from "@/lib/actions/collection.actions";
 import { PostActions } from "@/components/shared/Posts/PostActions";
+import ViewCounter from "@/components/shared/ViewCounter";
 
 export default async function PostPage({
     params,
@@ -104,7 +105,7 @@ export default async function PostPage({
                             </span>
                         </div>
                     </div>
-                    <div className="flex max-sm:flex-col max-sm:gap-y-2  sm:items-center mt-4 justify-between">
+                    <div className="flex max-sm:flex-col max-sm:gap-y-2 sm:items-center mt-4 justify-between">
                         <div className="flex gap-x-2 px-2">
                             {data.tags.map((tag: ITag) => (
                                 <Link
@@ -118,6 +119,9 @@ export default async function PostPage({
                         </div>
                         <div className="flex items-center gap-2 px-3">
                             <VotesButtons post={post} />
+                            <ViewCounter
+                                post={post}
+                            />
                             <Link href="#comments" className="flex gap-2 items-center">
                                 <MessageCircleIcon className="w-4 h-4 " />
                                 <span className="text-xs sm:hidden font-medium">

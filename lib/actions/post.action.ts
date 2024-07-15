@@ -577,3 +577,21 @@ export const deleteComment = async (commentId: string | unknown) => {
         return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
     }
 };
+
+export async function updateView(postID: mongoose.Schema.Types.ObjectId) {
+    try {
+        await connectToDatabase();
+        let post = await Post.findById(postID);
+        if (!post)
+            return { status: 404, message: "Post not found" };
+        post.views = post.views + 1;
+        await post.save();
+        revalidatePath(`/post/${postID}`);
+        revalidatePath(`/community/${post.community}`);
+        revalidatePath("/");
+        return { status: 200, message: "Success" };
+    }
+    catch (error: any) {
+        return { status: 500, message: error.message };
+    }
+}
