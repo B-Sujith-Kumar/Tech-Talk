@@ -304,7 +304,7 @@ export const EditPost = ({ communities, post, onClose }:
                         control={form.control}
                         name="content"
                         render={({ field }) => (
-                            <FormItem className="max-h-60 overflow-y-auto">
+                            <FormItem>
                                 <FormControl>
                                     <TextBox
                                         description={field.value}
