@@ -7,17 +7,20 @@ import { useEffect } from "react";
 import Link from "@tiptap/extension-link";
 import { Node } from "@tiptap/core";
 import "./styles.css"
+import { usePathname } from "next/navigation";
 
 export default function TextBox({
     description,
     onValueChange,
     clearText,
-    editable
+    editable,
+    heightScroll
 }: {
     description?: string,
     onValueChange?: (richText: string) => void,
     clearText?: boolean,
-    editable?: boolean
+    editable?: boolean,
+    heightScroll?: boolean
 }) {
     const editor = useEditor({
         extensions: [
@@ -97,11 +100,16 @@ export default function TextBox({
         }
     }, [clearText]);
 
+    const pathname = usePathname();
+
     return <>
         <div className="flex flex-col">
             <Toolbar editor={editor} render={editable as boolean} />
             <EditorContent editor={editor}
-                className=""
+                className={`
+                    ${(pathname.includes("/post/") && pathname !== "/post/create") ? "" : "max-h-96 overflow-y-auto"}
+                    ${heightScroll ? "max-h-96 overflow-y-auto" : ""}
+                    `}
                 placeholder="Write your post content here..."
             />
         </div>

@@ -10,12 +10,12 @@ import {
 import { IPostPopulated } from "@/types";
 import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
-import { CreatePost } from "@/app/(root)/_components/CreatePostComp";
 import { AlertDialog, AlertDialogContent, AlertDialogTrigger, AlertDialogCancel, AlertDialogAction, AlertDialogTitle, AlertDialogDescription } from "@/components/ui/alert-dialog";
 import { ICommunity } from "@/lib/database/models/community.model";
 import { deletePost } from "@/lib/actions/post.action";
 import { toast } from "@/components/ui/use-toast";
 import mongoose from "mongoose";
+import { EditPost } from "@/app/(root)/_components/EditPostComp";
 
 
 export function PostActions({ post, communities }: {
@@ -56,8 +56,10 @@ export function PostActions({ post, communities }: {
                 </DropdownMenuContent>
             </DropdownMenu>
             <AlertDialogContent className="max-sm:max-w-[95%] max-w-[50%] rounded-xl">
-                {showEditModal && <CreatePost
+                {showEditModal && <EditPost
                     communities={communities}
+                    post={post}
+                    onClose={() => setOpen(false)}
                 />
                 }
                 {showDeleteModal && <div className="p-4">

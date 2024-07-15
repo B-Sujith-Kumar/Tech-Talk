@@ -39,7 +39,7 @@ export const VotesButtons = ({ post }: { post: any }) => {
             : "none"
         }
       />
-      <span className="text-xs  font-medium">
+      <span className="text-xs font-medium">
         {post.upvotes.length - post.downvotes.length}
       </span>
       <ArrowBigDownIcon
