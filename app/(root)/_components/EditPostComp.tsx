@@ -310,6 +310,7 @@ export const EditPost = ({ communities, post, onClose }:
                                         description={field.value}
                                         onValueChange={field.onChange}
                                         clearText={clearForm}
+                                        heightScroll={true}
                                         {...field}
                                     />
                                 </FormControl>

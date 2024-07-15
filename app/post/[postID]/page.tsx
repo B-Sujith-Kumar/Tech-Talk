@@ -8,7 +8,7 @@ import { badgeVariants } from "@/components/ui/badge";
 import Link from "next/link";
 import moment from "moment";
 import { auth, SignInButton } from "@clerk/nextjs";
-import { getUser, getUserObjectId } from "@/lib/actions/user.actions";
+import { getCommunitiesJoinedByUser, getUser, getUserObjectId } from "@/lib/actions/user.actions";
 import { Button } from "@/components/ui/button";
 import { FollowButton, NoAuthFollowButton } from "./PostButton";
 import { ITag } from "@/lib/database/models/tag.model";
@@ -17,6 +17,7 @@ import { BookmarkIcon, MessageCircleIcon } from "lucide-react";
 import Comments from "@/components/shared/Posts/Comments";
 import BookmarkPost from "@/components/shared/Bookmarks/BookmarkPost";
 import { getCollections } from "@/lib/actions/collection.actions";
+import { PostActions } from "@/components/shared/Posts/PostActions";
 
 export default async function PostPage({
     params,
@@ -40,6 +41,7 @@ export default async function PostPage({
             data.author.followers && data.author.followers.includes(userObjectId!);
     }
     const post = data;
+    const { data: communities } = await getCommunitiesJoinedByUser();
 
     return (
         <div className="flex max-lg:flex-col px-10 max-lg:px-3 gap-4 pt-3 justify-between">
@@ -126,9 +128,14 @@ export default async function PostPage({
                                 </span>
                             </Link>
                             <BookmarkPost collectionList={collectionList} postId={post._id} userId={userObjectId?.toString()!} />
+                            <div className="max-sm:ml-auto w-fit">
+                                <PostActions
+                                    post={post}
+                                    communities={communities}
+                                />
+                            </div>
                         </div>
                     </div>
-
                     <h1 className="font-bold px-2 my-4 text-4xl font-sans max-sm:text-2xl leading-[45px]">
                         {data?.title}
                     </h1>

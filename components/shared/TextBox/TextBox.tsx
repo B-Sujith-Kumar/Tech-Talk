@@ -13,12 +13,14 @@ export default function TextBox({
     description,
     onValueChange,
     clearText,
-    editable
+    editable,
+    heightScroll
 }: {
     description?: string,
     onValueChange?: (richText: string) => void,
     clearText?: boolean,
-    editable?: boolean
+    editable?: boolean,
+    heightScroll?: boolean
 }) {
     const editor = useEditor({
         extensions: [
@@ -106,6 +108,7 @@ export default function TextBox({
             <EditorContent editor={editor}
                 className={`
                     ${(pathname.includes("/post/") && pathname !== "/post/create") ? "" : "max-h-96 overflow-y-auto"}
+                    ${heightScroll ? "max-h-96 overflow-y-auto" : ""}
                     `}
                 placeholder="Write your post content here..."
             />
