@@ -20,7 +20,7 @@ const Bookmarks = async () => {
           See all your bookmarks here organized into collections. You can
           bookmark any post by clicking on the bookmark icon.
         </p>
-        <div className="grid grid-cols-4 max-xl:grid-cols-3 max-md:grid-cols-2  mt-4 gap-3">
+        <div className="grid grid-cols-4 max-xl:grid-cols-3  max-md:grid-cols-2  mt-4 gap-3">
           {collections &&
             collections.map((item: ICollectionPopualted) => (
               <Link
@@ -33,11 +33,11 @@ const Bookmarks = async () => {
                     alt={item.posts[0].title}
                     width={200}
                     height={200}
-                    className="w-full rounded-t-lg h-[53%]"
+                    className="w-full rounded-t-lg h-[110px]"
                   />
                 )}
                 {!(item?.posts?.length! > 0) && (
-                  <div className="w-full h-[53%] bg-gray-300 rounded-t-lg">
+                  <div className="w-full h-[110px]  bg-gray-300 rounded-t-lg">
                     <div className="flex justify-center items-center h-full">
                       <p className="text-gray-500 text-sm">
                         No posts in this collection

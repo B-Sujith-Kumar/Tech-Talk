@@ -1,7 +1,7 @@
 "use client";
 
 import { BookmarkIcon } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,16 +13,47 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { ICollection } from "@/lib/database/models/collection.model";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  getCollectionsOfPost,
+  savePostToCollections,
+} from "@/lib/actions/collection.actions";
+import mongoose from "mongoose";
 
 const BookmarkPost = ({
   collectionList,
+  postId,
+  userId,
 }: {
   collectionList: ICollection[];
+  postId: string;
+  userId: string;
 }) => {
-  console.log(collectionList);
   const [collections, setCollections] = useState<ICollection[]>(collectionList);
   const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
-  const {toast} = useToast();
+  const [open, setOpen] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchCollectionsForPost = async () => {
+      try {
+        const { collections: existingCollections } = await getCollectionsOfPost(
+          postId,
+          userId
+        );
+        const selectedIds = existingCollections.map((collection: ICollection) =>
+          collection?._id?.toString()
+        );
+        setSelectedCollections(selectedIds);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch the collections for the post.",
+        });
+      }
+    };
+    fetchCollectionsForPost();
+  }, [open]);
+
   const handleCheckboxChange = (collectionId: string) => {
     setSelectedCollections((prev) =>
       prev.includes(collectionId)
@@ -32,35 +63,49 @@ const BookmarkPost = ({
   };
   const handleSave = async () => {
     try {
-        // await savePostToCollections(postId, selectedCollections);
+      const { status } = await savePostToCollections(
+        postId,
+        selectedCollections,
+        userId
+      );
+      if (status === 200) {
         toast({
-            title: "Post saved",
-            description: "The post has been saved to the selected collections.",
+          title: "Post saved",
+          description: "The post has been saved to the selected collections.",
         });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to save the post to the collections.",
+        });
+      }
     } catch (error) {
-        toast({
-            title: "Error",
-            description: "Failed to save the post to the collections.",
-        });
+      toast({
+        title: "Error",
+        description: "Failed to save the post to the collections.",
+      });
+    } finally {
+      setOpen(false);
+      setSelectedCollections([]);
     }
-};
+  };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
         <div className="flex items-center gap-1">
           <BookmarkIcon className="w-4 h-4 " />
           <span className="text-xs max-sm:hidden font-medium">Save</span>
         </div>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-sm:max-w-sm rounded-lg">
         <DialogHeader>
           <DialogTitle>Select a collection</DialogTitle>
           <DialogDescription>
             You can save this post to a collection you have created.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-3 gap-y-2">
           {collections.map((collection: ICollection, id: number) => (
             <div key={id} className="flex items-center">
               <Checkbox
@@ -75,6 +120,12 @@ const BookmarkPost = ({
             </div>
           ))}
         </div>
+        <button
+          onClick={handleSave}
+          className="bg-indigo-500 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-md mt-4"
+        >
+          Save
+        </button>
       </DialogContent>
     </Dialog>
   );

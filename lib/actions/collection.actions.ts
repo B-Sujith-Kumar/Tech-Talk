@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { connectToDatabase } from "../database";
 import Collection from "../database/models/collection.model";
+import mongoose from "mongoose";
 
 export const createCollection = async (
   name: string,
@@ -54,6 +55,51 @@ export const getCollection = async (id: string) => {
       ],
     });
     return JSON.parse(JSON.stringify(collection));
+  } catch (error) {
+    console.log(error);
+    return JSON.parse(JSON.stringify({ error, status: 500 }));
+  }
+};
+
+export const savePostToCollections = async (
+  postId: string,
+  collectionIds: string[],
+  userId: string
+) => {
+  try {
+    await connectToDatabase();
+    const userCollections = await Collection.find({ creator: userId });
+    for (const collection of userCollections) {
+      if (collection.posts.includes(postId)) {
+        collection.posts = collection.posts.filter(
+          (id: mongoose.Schema.Types.ObjectId) => id.toString() !== postId
+        );
+        await collection.save();
+      }
+    }
+    for (const collectionId of collectionIds) {
+      const collection = await Collection.findById(collectionId);
+      if (collection && !collection.posts.includes(postId)) {
+        collection.posts.push(postId);
+        await collection.save();
+      }
+    }
+    revalidatePath("/bookmarks");
+    return JSON.parse(JSON.stringify({ status: 200 }));
+  } catch (error) {
+    console.log(error);
+    return JSON.parse(JSON.stringify({ error, status: 500 }));
+  }
+};
+
+export const getCollectionsOfPost = async (postId: string, userId: string) => {
+  try {
+    await connectToDatabase();
+    const collections = await Collection.find({
+      creator: userId,
+      posts: postId,
+    });
+    return JSON.parse(JSON.stringify({ collections }));
   } catch (error) {
     console.log(error);
     return JSON.parse(JSON.stringify({ error, status: 500 }));
