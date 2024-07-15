@@ -60,3 +60,15 @@ export type ICollectionPopualted = {
     posts: IPostPopulated[];
     createdAt: Date;
 }
+
+export type ICommentPopulated = {
+    _id?: mongoose.Schema.Types.ObjectId;
+    author: IUser;
+    content: string;
+    post: IPost;
+    upvotes: IEngagement[];
+    downvotes: IEngagement[];
+    replies: ICommentPopulated[];
+    createdAt: Date;
+    
+}

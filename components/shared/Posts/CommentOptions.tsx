@@ -21,28 +21,33 @@ import { Ellipsis, Pencil } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { deleteComment, editComment } from "@/lib/actions/post.action";
 import { useToast } from "@/components/ui/use-toast";
+import { IPostPopulated } from "@/types";
 
 const CommentOptions = ({
   comment,
   user,
+  post
 }: {
   comment: IComment;
   user: IUser;
+  post: IPostPopulated;
 }) => {
   const [content, setContent] = useState(comment.content);
   const [isOpen, setIsOpen] = useState(false);
+  const [popOpen, setPopOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const { toast } = useToast();
   const edit = async () => {
     try {
-      const { status } = await editComment(comment._id, content);
+      const { status } = await editComment(comment._id, content, post?._id?.toString()!);
       if (status === 200) {
         toast({
           title: "Comment edited successfully",
           description:
-            "Your comment has been edited successfully. Refresh the page to see the changes.",
+            "Your comment has been edited successfully.",
         });
       }
+      setPopOpen(false);
     } catch (error) {
       toast({
         title: "Error",
@@ -53,13 +58,15 @@ const CommentOptions = ({
   };
   const handleDelete = async () => {
     try {
-      const { status } = await deleteComment(comment._id);
+      const { status } = await deleteComment(comment._id, post?._id?.toString()!);
       if (status === 200) {
         toast({
           title: "Comment deleted",
           description: "The comment has been deleted successfully.",
         });
       }
+      setDeleteOpen(false);
+      setPopOpen(false);
     } catch (error) {
       toast({
         title: "Error",
@@ -70,7 +77,7 @@ const CommentOptions = ({
   };
   return (
     <div>
-      <Popover>
+      <Popover open={popOpen} onOpenChange={setPopOpen}>
         <PopoverTrigger>
           <Ellipsis className="text-gray-600" />
         </PopoverTrigger>

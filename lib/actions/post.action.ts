@@ -401,6 +401,7 @@ export const addComment = async (
         );
         post.comments.push(comment._id);
         await post.save();
+        revalidatePath(`/post/${postID.toString()}`);
         return JSON.parse(JSON.stringify({ status: 200, comment: newComment }));
     } catch (error: any) {
         return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
@@ -409,7 +410,8 @@ export const addComment = async (
 
 export const upVoteComment = async (
     commentId: mongoose.Schema.Types.ObjectId | unknown,
-    userID: string
+    userID: string,
+    postId: string | undefined
 ) => {
     try {
         await connectToDatabase();
@@ -429,7 +431,7 @@ export const upVoteComment = async (
             );
         }
         await comment.save();
-        revalidatePath(`/post/${comment.post.toString()}`);
+        revalidatePath(`/post/${comment.post === null ? postId : comment.post.toString()}`);
         return JSON.parse(JSON.stringify({ status: 200, message: "Success", responseComment: comment }));
     } catch (error: any) {
         return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
@@ -438,7 +440,8 @@ export const upVoteComment = async (
 
 export const downVoteComment = async (
     commentId: mongoose.Schema.Types.ObjectId | unknown,
-    userID: string
+    userID: string,
+    postId: string | undefined
 ) => {
     try {
         await connectToDatabase();
@@ -458,7 +461,7 @@ export const downVoteComment = async (
             );
         }
         await comment.save();
-        revalidatePath(`/post/${comment.post.toString()}`);
+        revalidatePath(`/post/${comment.post === null ? postId : comment.post.toString()}`);
         return JSON.parse(JSON.stringify({ status: 200, message: "Success", responseComment: comment }));
     } catch (error: any) {
         return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
@@ -487,6 +490,7 @@ export const addReply = async (
         );
         comment.replies.push(reply._id);
         await comment.save();
+        revalidatePath(`/post/${comment.post.toString()}`);
         return JSON.parse(
             JSON.stringify({ status: 200, replyComment: replyComment })
         );
@@ -498,7 +502,8 @@ export const addReply = async (
 
 export const editComment = async (
     commentId: string | unknown,
-    content: string
+    content: string,
+    postId: string
 ) => {
     try {
         await connectToDatabase();
@@ -509,14 +514,14 @@ export const editComment = async (
             );
         comment.content = content;
         await comment.save();
-        revalidatePath(`/post/${comment.post.toString()}`);
+        revalidatePath(`/post/${postId}`);
         return JSON.parse(JSON.stringify({ status: 200, message: "Success" }));
     } catch (error: any) {
         return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
     }
 };
 
-export const deleteComment = async (commentId: string | unknown) => {
+export const deleteComment = async (commentId: string | unknown, postId: string) => {
     try {
         await connectToDatabase();
         let comment = await Comment.findById(commentId);
@@ -528,7 +533,7 @@ export const deleteComment = async (commentId: string | unknown) => {
             await Comment.deleteOne({ _id: reply });
         }
         await Comment.deleteOne({ _id: commentId });
-        revalidatePath(`/post/${comment.post.toString()}`);
+        revalidatePath(`/post/${postId}`);
         return JSON.parse(JSON.stringify({ status: 200, message: "Success" }));
     } catch (error: any) {
         return JSON.parse(JSON.stringify({ status: 500, message: error.message }));

@@ -13,14 +13,15 @@ import { useState } from "react";
 export const UpDownVoteComment = ({
   comment,
   currentUser,
+  reply,
+  postId,
 }: {
   comment: any;
   currentUser: IUser;
+  reply?: boolean;
+  postId?: string;
 }) => {
   const { isLoaded, user } = useUser();
-  const [upVotes, setUpVotes] = useState(comment.upvotes);
-  const [downVotes, setDownVotes] = useState(comment.downvotes);
-
   const { toast } = useToast();
   const handleUpvote = async () => {
     if (!currentUser) {
@@ -32,11 +33,10 @@ export const UpDownVoteComment = ({
     }
     const { status, responseComment } = await upVoteComment(
       comment._id,
-      currentUser._id?.toString()!
+      currentUser._id?.toString()!,
+      postId
     );
     if (status === 200) {
-      setUpVotes(responseComment.upvotes);
-      setDownVotes(responseComment.downvotes);
     }
   };
   const handleDownvote = async () => {
@@ -49,11 +49,10 @@ export const UpDownVoteComment = ({
     }
     const { status, responseComment } = await downVoteComment(
       comment._id,
-      currentUser._id?.toString()!
+      currentUser._id?.toString()!,
+      postId
     );
     if (status === 200) {
-      setUpVotes(responseComment.upvotes);
-      setDownVotes(responseComment.downvotes);
     }
   };
   return (
@@ -62,16 +61,16 @@ export const UpDownVoteComment = ({
         className="w-6 h-6 cursor-pointer text-indigo-500"
         strokeWidth={1.1}
         onClick={handleUpvote}
-        fill={upVotes?.includes(currentUser?._id) ? "#667eea" : "none"}
+        fill={comment.upvotes?.includes(currentUser?._id) ? "#667eea" : "none"}
       />
       <span className="text-xs  font-medium">
-        {upVotes.length - downVotes.length}
+        {comment.upvotes.length - comment.downvotes.length}
       </span>
       <ArrowBigDownIcon
         className="w-6 h-6 cursor-pointer text-red-500"
         strokeWidth={1.1}
         onClick={handleDownvote}
-        fill={downVotes?.includes(currentUser?._id) ? "red" : "none"}
+        fill={comment.downvotes?.includes(currentUser?._id) ? "red" : "none"}
       />
     </div>
   );
