@@ -5,6 +5,7 @@ import { downvotePost, upvotePost } from "@/lib/actions/user.actions";
 import { useUser } from "@clerk/nextjs";
 import { ArrowBigDownIcon, ArrowBigUpIcon } from "lucide-react";
 import mongoose from "mongoose";
+import { useState } from "react";
 
 export const VotesButtons = ({ post }: { post: any }) => {
   const { isLoaded, user } = useUser();
