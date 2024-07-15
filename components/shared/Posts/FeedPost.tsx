@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { BookmarkIcon, EllipsisVerticalIcon, MessageCircleIcon, Share2Icon } from "lucide-react";
+import { BookmarkIcon, MessageCircleIcon, Share2Icon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import Image from "next/image";
@@ -8,8 +8,10 @@ import { IPostPopulated } from "@/types";
 import { badgeVariants } from "@/components/ui/badge";
 import moment from "moment";
 import { VotesButtons } from "./ClientComponents";
+import { PostActions } from "./PostActions";
+import { getCommunitiesJoinedByUser } from "@/lib/actions/user.actions";
 
-const FeedPost = ({
+const FeedPost = async ({
     post,
     showBanner,
     isInCommunity,
@@ -18,6 +20,7 @@ const FeedPost = ({
     showBanner: boolean;
     isInCommunity?: boolean;
 }) => {
+    const { data } = await getCommunitiesJoinedByUser();
     return (
         <div>
             <div className="bg-white rounded-xl p-4">
@@ -58,7 +61,10 @@ const FeedPost = ({
                             {moment(post.createdAt).fromNow()}
                         </span>
                     </div>
-                    <EllipsisVerticalIcon className="w-5 h-5 text-gray-500 ml-auto cursor-pointer" />
+                    <PostActions
+                        post={post}
+                        communities={data}
+                    />
                 </div>
                 {showBanner && <Image
                     src={post.coverImage}
