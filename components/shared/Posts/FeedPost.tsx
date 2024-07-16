@@ -10,6 +10,8 @@ import moment from "moment";
 import { VotesButtons } from "./ClientComponents";
 import { PostActions } from "./PostActions";
 import { getCommunitiesJoinedByUser } from "@/lib/actions/user.actions";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye } from "@fortawesome/free-solid-svg-icons";
 
 const FeedPost = async ({
   post,
@@ -96,9 +98,11 @@ const FeedPost = async ({
                     </div>
                 </div>
                 <hr className="mt-2 border-gray-200" />
-                <div className="flex flex-row gap-6 mt-2 p-2 *:flex *:flex-row *:gap-2 *:items-center">
+                <div className="flex flex-row gap-4 mt-2 p-2 *:flex *:flex-row *:gap-2 *:items-center">
                     <div>
-                        <EyeIcon className="w-4 h-4" /> <span className="text-xs font-medium">{post.views}</span>
+                        {/* <EyeIcon className="w-4 h-4" />  */}
+                        <FontAwesomeIcon icon={faEye} className="text-gray-500" size="sm" />
+                        <span className="text-xs font-medium">{post.views}</span>
                     </div>
                     <div>
                         <VotesButtons post={post} />

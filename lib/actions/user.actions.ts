@@ -159,7 +159,7 @@ export async function downvotePost({ postId }: { postId: string }) {
   try {
     let auth = await isAuth();
     if (!auth) return { status: 500, message: "User not authenticated" };
-    const user:any = await currentUser();
+    const user: any = await currentUser();
     await connectToDatabase();
     const userObjectId = await getUserObjectId(user?.id);
     const post = await Post.findById(postId);
@@ -194,3 +194,45 @@ export async function downvotePost({ postId }: { postId: string }) {
     return { status: 500, message: error.message };
   }
 }
+
+export const getStats = async (clerkId: string) => {
+  try {
+    await connectToDatabase();
+    const user = await User.findOne({ clerkId: clerkId });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const posts = await Post.find({ author: user._id });
+    const followers = user.followers.length;
+    const following = user.following.length;
+    const upvotes = posts.reduce((acc, post) => acc + post.upvotes.length, 0);
+    const downvotes = posts.reduce(
+      (acc, post) => acc + post.downvotes.length,
+      0
+    );
+    const totalViews = posts.reduce((acc, post) => acc + post.views, 0);
+    const totalComments = posts.reduce(
+      (acc, post) => acc + post.comments.length,
+      0
+    );
+    const communitiesMembers = await Community.find({ members: user._id },);
+    const communityCreated = await Community.find({ creator: user._id });
+    const communities = communitiesMembers.length + communityCreated.length;
+    const followingTags = user.followedTags.length;
+    return JSON.parse(
+      JSON.stringify({
+        followers,
+        following,
+        upvotes,
+        downvotes,
+        totalComments,
+        totalViews,
+        posts: posts.length,
+        followingTags,
+        communities,
+      })
+    );
+  } catch (error) {
+    handleError(error);
+  }
+};

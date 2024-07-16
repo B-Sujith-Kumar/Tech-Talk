@@ -17,14 +17,23 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Sidebar from "@/app/(root)/Sidebar";
 import CreateCommunity from "../Community/CreateCommunity";
 import { SignInButton } from "./ClientComponents";
+import { getUser } from "@/lib/actions/user.actions";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+  } from "@/components/ui/popover"
+import ShowOptions from "./ShowOptions";
+  
 
-const Navbar = ({
+const Navbar = async ({
   userId,
   communities,
 }: {
   userId: string | null;
   communities: any[];
 }) => {
+    const user = await getUser(userId);
   return (
     <>
       <nav className="h-[3.35rem] fixed top-0 w-full flex items-center justify-between z-50 bg-white px-4 py-7">
@@ -89,8 +98,9 @@ const Navbar = ({
             <div className="sm:hidden">
               <UserButton afterSignOutUrl="/" />
             </div>
-            <div className="max-sm:hidden">
-              <UserButton afterSignOutUrl="/" showName={true} />
+            <div className="max-sm:hidden flex items-center gap-2">
+              <ShowOptions user={user} />
+              <UserButton afterSignOutUrl="/" showName={false} />
             </div>
           </SignedIn>
           <SignedOut>
