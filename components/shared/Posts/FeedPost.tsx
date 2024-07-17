@@ -25,7 +25,7 @@ const FeedPost = async ({
     const { data } = await getCommunitiesJoinedByUser();
     return (
         <div>
-            <div className="bg-white rounded-xl p-4">
+            <div className="bg-white rounded-xl p-4 ">
                 <div className="flex flex-row gap-2 items-center">
                     <Avatar>
                         <AvatarImage

@@ -9,6 +9,7 @@ import { isAuth } from "../auth";
 import { currentUser } from "@clerk/nextjs/server";
 import Community from "../database/models/community.model";
 import Post, { IPost } from "../database/models/post.model";
+import mongoose from "mongoose";
 
 export const createUser = async (user: createUserType) => {
   try {
@@ -215,7 +216,7 @@ export const getStats = async (clerkId: string) => {
       (acc, post) => acc + post.comments.length,
       0
     );
-    const communitiesMembers = await Community.find({ members: user._id },);
+    const communitiesMembers = await Community.find({ members: user._id });
     const communityCreated = await Community.find({ creator: user._id });
     const communities = communitiesMembers.length + communityCreated.length;
     const followingTags = user.followedTags.length;
@@ -236,3 +237,80 @@ export const getStats = async (clerkId: string) => {
     handleError(error);
   }
 };
+
+export const getFollowers = async (clerkId: string) => {
+  try {
+    await connectToDatabase();
+    const user = await User.findOne({ clerkId });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const followers = await User.find({ _id: { $in: user.followers } });
+    return JSON.parse(JSON.stringify(followers));
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const getFollowing = async (clerkId: string) => {
+    try {
+        await connectToDatabase();
+        const user = await User.findOne({ clerkId });
+        if (!user) {
+            throw new Error("User not found");
+        }
+        const following = await User.find({ _id: { $in: user.following } });
+        return JSON.parse(JSON.stringify(following));
+    } catch (error) {
+        handleError(error);
+    }
+}
+
+export const followUser = async (userId: string, currentUserId: string) => {
+  try {
+    await connectToDatabase();
+    const user = await User.findById(userId);
+    if (!user) {
+        return JSON.parse(JSON.stringify({ status: 500 }));
+    }
+    const currentUser = await User.findById(currentUserId);
+    if (!currentUser) {
+        return JSON.parse(JSON.stringify({ status: 500 }));
+    }
+    if (user.followers.includes(currentUser._id)) {
+      user.followers.pull(currentUser._id);
+      currentUser.following.pull(user._id);
+    } else {
+      user.followers.push(currentUser._id);
+      currentUser.following.push(user._id);
+    }
+    await user.save();
+    await currentUser.save();
+    revalidatePath(`/dashboard/followers`);
+    return JSON.parse(JSON.stringify({ status: 200 }));
+  } catch (error) {
+    return JSON.parse(JSON.stringify({ status: 500 }));
+  }
+};
+
+export const unFollowUser = async (userId: string, currentUserId: string) => {
+    try {
+        await connectToDatabase();
+        const user = await User.findById(userId);
+        if (!user) {
+            return JSON.parse(JSON.stringify({ status: 500 }));
+        }
+        const currentUser = await User.findById(currentUserId);
+        if (!currentUser) {
+            return JSON.parse(JSON.stringify({ status: 500 }));
+        }
+        user.followers.pull(currentUser._id);
+        currentUser.following.pull(user._id);
+        await user.save();
+        await currentUser.save();
+        revalidatePath(`/dashboard/followers`);
+        return JSON.parse(JSON.stringify({ status: 200 }));
+    } catch (error) {
+        return JSON.parse(JSON.stringify({ status: 500 }));
+    }
+}

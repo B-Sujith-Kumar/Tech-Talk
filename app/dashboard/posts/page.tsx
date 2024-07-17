@@ -21,7 +21,6 @@ const Dashboard = async () => {
   const user = await getUser(userId as string);
   const user_id = user._id;
   const posts = await getPosts(user_id as string);
-  console.log(posts);
   return (
     <div className="flex">
       <DashboardSidebar stats={stats} />
@@ -77,7 +76,7 @@ const Dashboard = async () => {
         <h1 className="text-2xl font-semibold py-2 mt-8 max-md:text-2xl">
           Your Posts
         </h1>
-        <div className="mt-2">
+        <div className="mt-2 overflow-hidden w-fit">
           {posts.length > 0 &&
             posts.map((post: IPostPopulated) => (
               <FeedPost
