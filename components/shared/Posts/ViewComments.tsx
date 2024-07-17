@@ -101,7 +101,7 @@ const ViewComments = ({
                         </div>
                         <div>
                           {reply.author._id.toString() ===
-                            currentUser._id?.toString() && (
+                            currentUser?._id?.toString() && (
                             <CommentOptions
                               comment={reply}
                               user={currentUser}
