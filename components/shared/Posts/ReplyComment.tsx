@@ -74,7 +74,7 @@ const ReplyComment = ({
         </DialogHeader>
         <div className="flex items-start gap-2">
           <Image
-            src={currentUser.profilePicture || ""}
+            src={currentUser?.profilePicture || ""}
             width={16}
             height={16}
             alt="Profile picture"

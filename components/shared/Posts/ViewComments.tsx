@@ -49,7 +49,7 @@ const ViewComments = ({
                   </div>
                   <div>
                     {comment.author._id.toString() ===
-                      currentUser._id?.toString() && (
+                      currentUser?._id?.toString() && (
                       <CommentOptions comment={comment} user={currentUser} post={post}  />
                     )}
                   </div>

@@ -106,7 +106,7 @@ const BookmarkPost = ({
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-wrap gap-3 gap-y-2">
-          {collections.map((collection: ICollection, id: number) => (
+          {collections?.map((collection: ICollection, id: number) => (
             <div key={id} className="flex items-center">
               <Checkbox
                 id={`collection-${collection._id}`}

@@ -14,7 +14,7 @@ export default function ViewCounter({
     useEffect(() => {
         const timer = setTimeout(() => {
             updateViewCount();
-        }, 5000);
+        }, 20000); 
 
         return () => clearTimeout(timer);
     }, []);
