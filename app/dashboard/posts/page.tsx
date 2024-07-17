@@ -1,5 +1,6 @@
 import DashboardPost from "@/components/shared/Dashboard/DashboardPost";
 import DashboardSidebar from "@/components/shared/Dashboard/DashboardSidebar";
+import PostComponent from "@/components/shared/Dashboard/PostComponent";
 import FeedPost from "@/components/shared/Posts/FeedPost";
 import { getPosts } from "@/lib/actions/post.action";
 import { getStats, getUser } from "@/lib/actions/user.actions";
@@ -22,7 +23,7 @@ const Dashboard = async () => {
   const user_id = user._id;
   const posts = await getPosts(user_id as string);
   return (
-    <div className="flex">
+    <div className="lg:flex">
       <DashboardSidebar stats={stats} />
       <div className="px-12 max-xl:px-8 max-lg:px-5 max-md:px-0 flex-1">
         <h1 className="text-2xl font-semibold py-2 max-md:text-2xl max-lg:mt-8">
@@ -76,10 +77,10 @@ const Dashboard = async () => {
         <h1 className="text-2xl font-semibold py-2 mt-8 max-md:text-2xl">
           Your Posts
         </h1>
-        <div className="mt-2 overflow-hidden w-fit">
+        <div className="mt-2">
           {posts.length > 0 &&
             posts.map((post: IPostPopulated) => (
-              <FeedPost
+              <PostComponent
                 key={post._id?.toString()}
                 post={post}
                 showBanner={false}

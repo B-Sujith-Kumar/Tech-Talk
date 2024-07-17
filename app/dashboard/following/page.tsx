@@ -17,7 +17,7 @@ const FollowingPage = async () => {
   const stats = await await getStats(userId as string);
   const following = await getFollowing(userId as string);
   return (
-    <div className="flex">
+    <div className="lg:flex">
       <DashboardSidebar stats={stats} />
       <div className="px-12 max-xl:px-8 max-lg:px-5 max-md:px-0 flex-1">
         <h1 className="text-2xl font-semibold py-2 max-md:text-2xl max-lg:mt-8">

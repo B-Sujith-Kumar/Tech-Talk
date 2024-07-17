@@ -90,7 +90,7 @@ const DashboardSidebar = ({ stats }: { stats: StatsType }) => {
       </div>
 
       <div
-        className="lg:hidden absolute -top-[4px] z-10 left-4 max-md:left-0 text-white p-2 rounded"
+        className="lg:hidden absolute -top-[24px] z-10 left-4 max-md:left-0 text-white p-2 rounded"
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? (
@@ -155,7 +155,7 @@ const DashboardSidebar = ({ stats }: { stats: StatsType }) => {
           <Link
             href="/dashboard/following"
             className={`flex  px-2 py-2 items-center ${
-              pathName.includes("/dashboard/follwing")
+              pathName.includes("/dashboard/following")
                 ? "bg-white rounded-md font-medium border text-black"
                 : "text-gray-700"
             } justify-between`}
