@@ -190,6 +190,7 @@ export default async function PostPage({
             <FollowButton
               isFollowing={isFollowing}
               postOwnerId={data.author._id.toString()}
+              currentUserId={currentUser._id.toString()}
             />
           )}
           {!userId && <NoAuthFollowButton />}

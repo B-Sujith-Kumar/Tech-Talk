@@ -70,7 +70,7 @@ const FollowCard = ({
             width={60}
             height={60}
             alt="Profile picture"
-            className="mx-auto rounded-full border"
+            className="mx-auto aspect-square rounded-full border"
           />
           <Link
             href={`/user/${user._id?.toString()}`}

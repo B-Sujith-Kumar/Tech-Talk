@@ -94,13 +94,13 @@ export async function getCommunitiesJoinedByUser() {
   }
 }
 
-export async function followHandler({ userId }: { userId: string }) {
+export async function followHandler({ userId, currentUserId }: { userId: string, currentUserId: string }) {
   try {
     let auth = await isAuth();
     if (!auth) return { status: 500, message: "User not authenticated" };
-    const user = await currentUser();
+    const user = await User.findById(currentUserId);
     await connectToDatabase();
-    const userObjectId = user?.publicMetadata?.userId as string;
+    const userObjectId = await getUserObjectId(user?.id);
     const userToFollow = await User.findById(userId);
     if (!userToFollow) return { status: 404, message: "User not found" };
     if (userToFollow.followers.includes(userObjectId!)) {
