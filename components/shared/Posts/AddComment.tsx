@@ -38,7 +38,7 @@ const AddComment = ({post, currentUser} : {post: IPostPopulated, currentUser: IU
   return (
     <div className="flex gap-4 items-start mt-6">
          <Image
-           src={currentUser.profilePicture!}
+           src={currentUser?.profilePicture!}
            width={42}
            height={42}
            alt="Profile picture"
