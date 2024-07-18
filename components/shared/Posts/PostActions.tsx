@@ -128,7 +128,7 @@ export function PostActions({
                   Delete
                 </AlertDialogAction>
                 <AlertDialogCancel
-                  className="bg-gray-500 font-semibold text-white hover:bg-gray-600 hover:text-white"
+                  className="bg-gray-500 mt-0 font-semibold text-white hover:bg-gray-600 hover:text-white"
                   onClick={() => setShowDeleteModal(false)}
                 >
                   Cancel

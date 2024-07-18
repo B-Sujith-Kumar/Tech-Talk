@@ -50,7 +50,7 @@ const DashboardSidebar = ({ stats }: { stats: StatsType }) => {
           <Link
             href="/dashboard/following"
             className={`flex  px-2 py-2 items-center ${
-              pathName.includes("/dashboard/following")
+              pathName === "/dashboard/following"
                 ? "bg-white rounded-md font-medium border text-black"
                 : "text-gray-700"
             } justify-between`}
@@ -155,7 +155,7 @@ const DashboardSidebar = ({ stats }: { stats: StatsType }) => {
           <Link
             href="/dashboard/following"
             className={`flex  px-2 py-2 items-center ${
-              pathName.includes("/dashboard/following")
+              pathName === "/dashboard/following"
                 ? "bg-white rounded-md font-medium border text-black"
                 : "text-gray-700"
             } justify-between`}

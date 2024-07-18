@@ -10,6 +10,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import Community from "../database/models/community.model";
 import Post, { IPost } from "../database/models/post.model";
 import mongoose from "mongoose";
+import Tag, { ITag } from "../database/models/tag.model";
 
 export const createUser = async (user: createUserType) => {
   try {
@@ -94,7 +95,13 @@ export async function getCommunitiesJoinedByUser() {
   }
 }
 
-export async function followHandler({ userId, currentUserId }: { userId: string, currentUserId: string }) {
+export async function followHandler({
+  userId,
+  currentUserId,
+}: {
+  userId: string;
+  currentUserId: string;
+}) {
   try {
     let auth = await isAuth();
     if (!auth) return { status: 500, message: "User not authenticated" };
@@ -231,6 +238,7 @@ export const getStats = async (clerkId: string) => {
         posts: posts.length,
         followingTags,
         communities,
+        tags: user.followedTags.length,
       })
     );
   } catch (error) {
@@ -253,29 +261,29 @@ export const getFollowers = async (clerkId: string) => {
 };
 
 export const getFollowing = async (clerkId: string) => {
-    try {
-        await connectToDatabase();
-        const user = await User.findOne({ clerkId });
-        if (!user) {
-            throw new Error("User not found");
-        }
-        const following = await User.find({ _id: { $in: user.following } });
-        return JSON.parse(JSON.stringify(following));
-    } catch (error) {
-        handleError(error);
+  try {
+    await connectToDatabase();
+    const user = await User.findOne({ clerkId });
+    if (!user) {
+      throw new Error("User not found");
     }
-}
+    const following = await User.find({ _id: { $in: user.following } });
+    return JSON.parse(JSON.stringify(following));
+  } catch (error) {
+    handleError(error);
+  }
+};
 
 export const followUser = async (userId: string, currentUserId: string) => {
   try {
     await connectToDatabase();
     const user = await User.findById(userId);
     if (!user) {
-        return JSON.parse(JSON.stringify({ status: 500 }));
+      return JSON.parse(JSON.stringify({ status: 500 }));
     }
     const currentUser = await User.findById(currentUserId);
     if (!currentUser) {
-        return JSON.parse(JSON.stringify({ status: 500 }));
+      return JSON.parse(JSON.stringify({ status: 500 }));
     }
     if (user.followers.includes(currentUser._id)) {
       user.followers.pull(currentUser._id);
@@ -294,21 +302,58 @@ export const followUser = async (userId: string, currentUserId: string) => {
 };
 
 export const unFollowUser = async (userId: string, currentUserId: string) => {
+  try {
+    await connectToDatabase();
+    const user = await User.findById(userId);
+    if (!user) {
+      return JSON.parse(JSON.stringify({ status: 500 }));
+    }
+    const currentUser = await User.findById(currentUserId);
+    if (!currentUser) {
+      return JSON.parse(JSON.stringify({ status: 500 }));
+    }
+    user.followers.pull(currentUser._id);
+    currentUser.following.pull(user._id);
+    await user.save();
+    await currentUser.save();
+    revalidatePath(`/dashboard/followers`);
+    return JSON.parse(JSON.stringify({ status: 200 }));
+  } catch (error) {
+    return JSON.parse(JSON.stringify({ status: 500 }));
+  }
+};
+
+export const getFollowingTags = async (clerkId: string) => {
+  try {
+    await connectToDatabase();
+    const user = await User.findOne({ clerkId }).populate("followedTags");
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const tags: ITag[] = user.followedTags;
+    return JSON.parse(JSON.stringify({tags}));
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const unfollowTag = async (tagId: string, userId: string) => {
     try {
         await connectToDatabase();
         const user = await User.findById(userId);
         if (!user) {
             return JSON.parse(JSON.stringify({ status: 500 }));
         }
-        const currentUser = await User.findById(currentUserId);
-        if (!currentUser) {
-            return JSON.parse(JSON.stringify({ status: 500 }));
+        const tagObjId = new mongoose.Types.ObjectId(tagId);
+        user.followedTags.pull(tagObjId);
+        const tag = await Tag.findById(tagId);
+        if (!tag) {
+        throw new Error("Tag not found");
         }
-        user.followers.pull(currentUser._id);
-        currentUser.following.pull(user._id);
+        tag.followers.pull(user._id);
         await user.save();
-        await currentUser.save();
-        revalidatePath(`/dashboard/followers`);
+        await tag.save();
+        revalidatePath(`/dashboard/following-tags`);
         return JSON.parse(JSON.stringify({ status: 200 }));
     } catch (error) {
         return JSON.parse(JSON.stringify({ status: 500 }));
