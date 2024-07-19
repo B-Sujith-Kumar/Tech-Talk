@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 📢 TechTalk
 
-## Getting Started
+Welcome to **TechTalk**, the ultimate social media platform tailored for developers. Share your technical expertise, collaborate with communities, and stay updated on the latest trends.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Advanced Text Editor**: Compose and format posts with a robust editor powered by TipTap. Enjoy features like bold text, headings, lists, links, italics, strikethroughs, and code snippets.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Community Engagement**: Join and create communities based on shared interests. Connect with fellow developers and follow the topics you care about.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Interactive Voting**: Upvote or downvote posts and comments to promote quality content and meaningful discussions.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- **User Following**: Keep track of other developers’ activities by following them and stay updated on their latest posts.
 
-## Learn More
+- **Trending Content**: Our custom algorithm highlights trending posts so you can easily find popular discussions and hot topics within the developer community.
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ Technologies Utilized
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Next.js**: A powerful React framework for server-rendered applications.
+- **TipTap**: A high-performance, extensible WYSIWYG editor for React and Next.js.
+- **MongoDB**: A NoSQL database for storing user information, posts, and community data.
+- **Mongoose**: An object modeling tool for MongoDB, designed to work seamlessly in asynchronous environments.
+- **Tailwind CSS**: A utility-first CSS framework for styling, enhanced with Tailwind Merge for better class management.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## 📝 Getting Started
 
-## Deploy on Vercel
+To run TechTalk locally, follow these instructions:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/B-Sujith-Kumar/tech-talk.git
+   ```
+2. **Navigate to the directory**: `cd tech-talk`
+3. **Install dependencies**: `npm install`
+4. **Set up environment variables** as follows:
+     ```env
+     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=""
+    CLERK_SECRET_KEY=""
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL="/sign-in"
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL="/sign-up"
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL="/"
+    NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL="/"
+    MONGODB_URI=""
+    WEBHOOK_SECRET=""
+    UPLOADTHING_SECRET=""
+    UPLOADTHING_APP_ID=""
+    ```
+5. Start the development server:
+   ```bash
+   npm run dev
+   ```
+## 👨🏻‍💻 Other Contributors
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- [ramzanshareef](https://github.com/ramzanshareef)
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps to contribute:
+
+1. Fork the repository
+2. Create a new branch (git checkout -b feature/YourFeature)
+3. Commit your changes (git commit -m 'Add some feature')
+4. Push to the branch (git push origin feature/YourFeature)
+5. Open a pull request
+
+## 👉 Contact
+
+For any inquiries or feedback, please reach out to:
+- **Name**: Banda Sujith Kumar
+- **Email**: sujith.suave@gmail.com
+- **GitHub**: [B-Sujith-Kumar](https://github.com/B-Sujith-Kumar)
