@@ -18,6 +18,7 @@ Welcome to **TechTalk**, the ultimate social media platform tailored for develop
 
 - **Next.js**: A powerful React framework for server-rendered applications.
 - **TipTap**: A high-performance, extensible WYSIWYG editor for React and Next.js.
+- **Clerk**: Comprehensive User Management Platform for secure authentication and session management.
 - **MongoDB**: A NoSQL database for storing user information, posts, and community data.
 - **Mongoose**: An object modeling tool for MongoDB, designed to work seamlessly in asynchronous environments.
 - **Tailwind CSS**: A utility-first CSS framework for styling, enhanced with Tailwind Merge for better class management.
