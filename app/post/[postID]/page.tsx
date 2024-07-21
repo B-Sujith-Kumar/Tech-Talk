@@ -48,7 +48,8 @@ export default async function PostPage({
       data.author.followers && data.author.followers.includes(userObjectId!);
   }
   const post = data;
-  const { data: communities } = await getCommunitiesJoinedByUser();
+  
+  const { data: communities } = await getCommunitiesJoinedByUser(currentUser);
 
   return (
     <div className="flex max-lg:flex-col px-10 max-lg:px-3 gap-4 pt-3 justify-between">

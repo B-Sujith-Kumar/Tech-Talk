@@ -10,6 +10,7 @@ import Comment, { IComment } from "../database/models/comment.model";
 import { revalidatePath } from "next/cache";
 import { IFeedPost } from "@/types/posts";
 import User, { IUser } from "../database/models/user.model";
+import Community from "../database/models/community.model";
 
 export async function createPost(data: {
   title: string;
@@ -17,6 +18,7 @@ export async function createPost(data: {
   tags?: string[];
   community?: mongoose.Schema.Types.ObjectId | string;
   coverImage?: string;
+  userCurrent: IUser;
 }) {
   try {
     let auth = isAuth();
@@ -34,19 +36,48 @@ export async function createPost(data: {
       data.community === ""
     ) {
       post = await Post.create({
-        author: user?.publicMetadata.userId,
+        author: data.userCurrent._id,
         title: data.title,
         content: data.content,
         coverImage: data.coverImage,
       });
     } else {
       post = await Post.create({
-        author: user?.publicMetadata.userId,
+        author: data.userCurrent._id,
         title: data.title,
         content: data.content,
         community: data.community as mongoose.Schema.Types.ObjectId,
         coverImage: data.coverImage,
       });
+      const community = await Community.findById(data.community);
+      await community.needsReview.push(post._id);
+      await community.save();
+      await Promise.all(
+        data.tags?.forEach(async (tag) => {
+          let existingTag: ITag | null = await Tag.findOne({ name: tag });
+          if (!existingTag) {
+            let newTag: ITag = await Tag.create({
+              name: tag,
+              posts: [post._id],
+            });
+            await Post.updateOne(
+              { _id: post._id },
+              { $push: { tags: newTag._id } }
+            );
+          } else {
+            existingTag?.posts?.push(
+              post._id as mongoose.Schema.Types.ObjectId
+            );
+            await Post.updateOne(
+              { _id: post._id },
+              { $push: { tags: existingTag._id } }
+            );
+            await existingTag.save();
+          }
+        }) ?? []
+      );
+      await post.save();
+      return { status: 200, message: "Post has been sent for review" };
     }
     await Promise.all(
       data.tags?.forEach(async (tag) => {
@@ -186,6 +217,29 @@ export async function deletePost(postID: mongoose.Schema.Types.ObjectId) {
   }
 }
 
+// export async function getAllPosts(options?: {
+//   limit?: number;
+//   skip?: number;
+//   sort?: string;
+//   order?: string;
+// }) {
+//   try {
+//     await connectToDatabase();
+//     let posts: IFeedPost[] = await Post.find()
+//       .populate("tags")
+//       .populate("author")
+//       .populate("community")
+//       .limit(options?.limit ?? 10)
+//       .skip(options?.skip ?? 0)
+//       .sort({
+//         createdAt: -1,
+//       });
+//     return { status: 200, data: JSON.parse(JSON.stringify(posts)) };
+//   } catch (error: any) {
+//     return { status: 500, message: error.message };
+//   }
+// }
+
 export async function getAllPosts(options?: {
   limit?: number;
   skip?: number;
@@ -194,7 +248,22 @@ export async function getAllPosts(options?: {
 }) {
   try {
     await connectToDatabase();
-    let posts: IFeedPost[] = await Post.find()
+
+    const communities = await Community.find();
+    let needReviewPostIds: any = [];
+    communities.forEach((community) => {
+      for (let i = 0; i < community.needsReview.length; i++) {
+        needReviewPostIds.push(community.needsReview[i]);
+      }
+    });
+
+    needReviewPostIds = needReviewPostIds.map(
+      (id: any) => new mongoose.Types.ObjectId(id)
+    );
+
+    let posts: IFeedPost[] = await Post.find({
+      _id: { $nin: needReviewPostIds },
+    })
       .populate("tags")
       .populate("author")
       .populate("community")
@@ -203,6 +272,7 @@ export async function getAllPosts(options?: {
       .sort({
         createdAt: -1,
       });
+
     return { status: 200, data: JSON.parse(JSON.stringify(posts)) };
   } catch (error: any) {
     return { status: 500, message: error.message };
@@ -418,6 +488,15 @@ export async function getPopularPosts() {
         },
       },
     ]);
+    const communities = await Community.find();
+    let needReviewPostIds: any = [];
+    communities.forEach((community) => {
+      for (let i = 0; i < community.needsReview.length; i++) {
+        needReviewPostIds.push(community.needsReview[i].toString());
+      }
+    });
+
+    data = data.filter((post: any) => !needReviewPostIds.includes(post._id.toString()));
     return { status: 200, data: JSON.parse(JSON.stringify(data)) };
   } catch (error: any) {
     return { status: 500, message: error.message };
@@ -661,4 +740,3 @@ export const getPosts = async (userId: string) => {
     return { status: 500, message: error.message };
   }
 };
-

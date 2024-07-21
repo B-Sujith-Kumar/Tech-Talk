@@ -13,12 +13,15 @@ import { ICommunity } from "@/lib/database/models/community.model";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs";
 import { getUser } from "@/lib/actions/user.actions";
+import { ICommunityPopulated } from "@/types";
 
-const CommunityOptions = async ({ community }: { community: ICommunity }) => {
+const CommunityOptions = async ({ community }: { community: ICommunityPopulated }) => {
   const { userId } = auth();
   const currentUser = await getUser(userId!);
-  const isMod = community.moderators.some((mod) => mod.toString() === currentUser._id.toString());
-  
+  const isMod =
+    community.moderators.some(
+      (mod) => mod.toString() === currentUser._id.toString()
+    ) || community.createdBy._id?.toString() === currentUser._id.toString();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -30,11 +33,13 @@ const CommunityOptions = async ({ community }: { community: ICommunity }) => {
         <DropdownMenuItem className="hover:bg-gray-300 px-3 py-3">
           Mute c/{community.name}
         </DropdownMenuItem>
-       {isMod && <DropdownMenuItem className="hover:bg-gray-300 px-3 py-3">
-          <Link href={`/community/${community._id?.toString()}/mod-tools`}>
-            Mod Tools
-          </Link>
-        </DropdownMenuItem>}
+        {isMod && (
+          <DropdownMenuItem className="hover:bg-gray-300 px-3 py-3">
+            <Link href={`/community/${community._id?.toString()}/mod-tools`}>
+              Mod Tools
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem className="hover:bg-gray-300 px-3 py-3">
           Add to favorites
         </DropdownMenuItem>

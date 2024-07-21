@@ -102,10 +102,10 @@ const Page = async ({ params, searchParams }: SearchParamProps) => {
                         </div>
                     )}
                     {posts?.slice(0, 1).map((post: any) => (
-                        <FeedPost key={post._id} post={post} showBanner={true} isInCommunity={true} />
+                        !community.needsReview.includes(post._id) && <FeedPost key={post._id} post={post} showBanner={true} isInCommunity={true} />
                     ))}
                     {posts?.slice(1).map((post: any) => (
-                        <FeedPost key={post._id} post={post} showBanner={false} isInCommunity={true} />
+                        !community.needsReview.includes(post._id) && <FeedPost key={post._id} post={post} showBanner={false} isInCommunity={true} />
                     ))}
                 </div>
                 <div className="bg-white px-4 py-2 max-xl:hidden w-[30%] text-gray-700 rounded-lg h-fit text-sm">

@@ -14,9 +14,10 @@ import { badgeVariants } from "@/components/ui/badge";
 import moment from "moment";
 import { VotesButtons } from "../Posts/ClientComponents";
 import { PostActions } from "../Posts/PostActions";
-import { getCommunitiesJoinedByUser } from "@/lib/actions/user.actions";
+import { getCommunitiesJoinedByUser, getUser } from "@/lib/actions/user.actions";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
+import { auth } from "@clerk/nextjs";
 
 const PostComponent = async ({
   post,
@@ -27,7 +28,9 @@ const PostComponent = async ({
   showBanner: boolean;
   isInCommunity?: boolean;
 }) => {
-  const { data } = await getCommunitiesJoinedByUser();
+    const {userId} = auth();
+    const currentUser = await getUser(userId);
+  const { data } = await getCommunitiesJoinedByUser(currentUser);
   return (
     <div className="">
       <div className="bg-white rounded-xl p-4">

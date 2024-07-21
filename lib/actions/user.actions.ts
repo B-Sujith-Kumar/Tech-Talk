@@ -80,14 +80,13 @@ export const getUserObjectId = async (clerkId: string) => {
   }
 };
 
-export async function getCommunitiesJoinedByUser() {
+export async function getCommunitiesJoinedByUser(currentUser: IUser) {
   let auth = await isAuth();
   if (!auth) return { status: 500, message: "User not authenticated" };
   try {
     await connectToDatabase();
-    const user = await currentUser();
     const data = await Community.find({
-      members: user?.publicMetadata?.userId,
+      members: currentUser._id,
     });
     return { status: 200, data: JSON.parse(JSON.stringify(data)) };
   } catch (error: any) {

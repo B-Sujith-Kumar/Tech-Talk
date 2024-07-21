@@ -3,16 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger, DialogHeader } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AtSignIcon, HashIcon, ImageUpIcon, PaperclipIcon, VideoIcon } from "lucide-react";
-import { currentUser } from "@clerk/nextjs";
+import { auth, currentUser } from "@clerk/nextjs";
 import { CreatePost as CreatePostComp } from "../_components/CreatePostComp";
 import { ICommunity } from "@/lib/database/models/community.model";
 import Link from "next/link";
+import { getUser } from "@/lib/actions/user.actions";
 
 export const CreatePost = async ({ communities }: {
     communities: ICommunity[];
 }) => {
     const user = await currentUser();
-
+    const {userId} = auth();
+    const curUser = await getUser(userId);
     return <>
         <div className="bg-white rounded-xl mt-6 p-2 px-4 pt-4">
             <div className="flex flex-row gap-x-4 items-center px-2 ">
@@ -70,6 +72,7 @@ export const CreatePost = async ({ communities }: {
                             <div>
                                 <CreatePostComp
                                     communities={communities}
+                                    currentUser={curUser}
                                 />
                             </div>
                         </DialogHeader>

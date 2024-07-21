@@ -132,6 +132,7 @@ export const getCommunityPosts = async (communityId: string) => {
         const posts: IPostPopulated[] = await Post.find({ community: community._id })
             .populate(["author", "tags"])
             .sort({ createdAt: -1 });
+        
         return {
             data: JSON.parse(JSON.stringify(posts)),
             success: true
@@ -430,3 +431,82 @@ export const getModerators = async (communityId: string) => {
     }
 }
 
+export const getNeedReviewPosts = async (communityId: string) => {
+    try {
+        await connectToDatabase();
+        const community: ICommunity | null = await Community.findById(communityId);
+        if (!community) {
+            return JSON.parse(
+                JSON.stringify({ error: "Community not found", success: false })
+            );
+        }
+        const posts = await Post.find({ _id: { $in: community.needsReview } })
+            .populate(["author", "tags"])
+            .sort({ createdAt: -1 });
+        return JSON.parse(JSON.stringify({ posts, success: true }));
+    } catch (error) {
+        console.log(error);
+        return JSON.parse(JSON.stringify({ error, success: false }));
+    }
+}
+
+export const approvePost = async (postId: string, communityId: string) => {
+    try {
+        await connectToDatabase();
+        const post = await Post.findById(postId);
+        if (!post) {
+            return JSON.parse(
+                JSON.stringify({ error: "Post not found", success: false })
+            );
+        }
+        const community = await Community.findById(communityId);
+        if (!community) {
+            return JSON.parse(
+                JSON.stringify({ error: "Community not found", success: false })
+            );
+        }
+        community.needsReview = community.needsReview.filter(
+            (review: mongoose.Types.ObjectId) => review.toString() !== postId
+        );
+        await community.save();
+        revalidatePath(`/community/${communityId}/mod-tools/queue`);
+        return JSON.parse(JSON.stringify({ success: true }));
+    } catch (error) {
+        console.log(error);
+        return JSON.parse(JSON.stringify({ error, success: false }));
+    }
+}
+
+export const removePost = async (postId: string, communityId: string) => {
+    try {
+        await connectToDatabase();
+        const post = await Post.findById(postId);
+        console.log(post);
+        if (!post) {
+            return JSON.parse(
+                JSON.stringify({ error: "Post not found", success: false })
+            );
+        }
+        const community = await Community.findById(communityId);
+        if (!community) {
+            return JSON.parse(
+                JSON.stringify({ error: "Community not found", success: false })
+            );
+        }
+        community.needsReview = community.needsReview.filter(
+            (review: mongoose.Types.ObjectId) => review.toString() !== postId
+        );
+        await Promise.all(
+            post.tags.map(async (tag: mongoose.Types.ObjectId) => {
+              await Tag.updateOne({ _id: tag }, { $pull: { posts: post._id } });
+            })
+          );
+        await Post.deleteOne({ _id: postId });
+        await community.save();
+        revalidatePath(`/community/${communityId}/mod-tools/queue`);
+        return JSON.parse(JSON.stringify({ success: true }));
+    } catch (error) {
+        console.log(error);
+        return JSON.parse(JSON.stringify({ error, success: false }));
+    }
+}

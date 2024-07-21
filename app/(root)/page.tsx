@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs";
 import { Stories } from "./stories";
 import { CreatePost } from "./_components/CreatePost";
-import { getCommunitiesJoinedByUser } from "@/lib/actions/user.actions";
+import { getCommunitiesJoinedByUser, getUser } from "@/lib/actions/user.actions";
 import { getAllPosts, getPopularPosts, getTrendingPosts } from "@/lib/actions/post.action";
 import FeedPost from "@/components/shared/Posts/FeedPost";
 import { HomePageViewPostOrderBy } from "./_components/ClientComponents";
@@ -11,8 +11,9 @@ import { Suspense } from "react";
 import Loading from "../loading";
 
 export default async function HomePage({ searchParams }: SearchParamProps) {
-    const { userId } = auth();
-    const { data } = await getCommunitiesJoinedByUser();
+    const {userId} = auth();
+    const currentUser = await getUser(userId);
+    const { data } = await getCommunitiesJoinedByUser(currentUser);
     let posts: IFeedPost[] = [];
     if (searchParams.orderBy === "trending") {
         posts = (await getTrendingPosts()).data;

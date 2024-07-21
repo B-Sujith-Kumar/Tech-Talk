@@ -8,7 +8,7 @@ import Navbar from "@/components/shared/Navbar/Navbar";
 import React from "react";
 import Sidebar from "./(root)/Sidebar";
 import { Toaster } from "@/components/ui/toaster";
-import { getCommunitiesJoinedByUser } from "@/lib/actions/user.actions";
+import { getCommunitiesJoinedByUser, getUser } from "@/lib/actions/user.actions";
 
 config.autoAddCss = false;
 
@@ -24,8 +24,9 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const { userId } = auth();
-    const { data, status } = await getCommunitiesJoinedByUser();
+    const {userId} = auth();
+    const currentUser = userId && await getUser(userId);
+    const { data, status } = await getCommunitiesJoinedByUser(currentUser);
     return (
         <ClerkProvider>
             <html lang="en">

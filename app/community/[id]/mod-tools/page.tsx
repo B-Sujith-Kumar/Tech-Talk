@@ -1,7 +1,12 @@
-import { getCommunity } from "@/lib/actions/community.actions";
+import NeedReviewPost from "@/components/shared/Community/NeedReviewPost";
+import FeedPost from "@/components/shared/Posts/FeedPost";
+import {
+  getCommunity,
+  getNeedReviewPosts,
+} from "@/lib/actions/community.actions";
 import { getUser } from "@/lib/actions/user.actions";
 import { ICommunity } from "@/lib/database/models/community.model";
-import { SearchParamProps } from "@/types";
+import { IPostPopulated, SearchParamProps } from "@/types";
 import { auth } from "@clerk/nextjs";
 import mongoose from "mongoose";
 import Link from "next/link";
@@ -11,7 +16,7 @@ const ModTools = async ({ params: { id } }: SearchParamProps) => {
   const { userId } = auth();
   const currentUser = await getUser(userId!);
   const { community } = await getCommunity(id);
-  console.log(community);
+  const { posts } = await getNeedReviewPosts(id);
   const isMod =
     (community.moderators &&
       community.moderators.some(
@@ -27,7 +32,7 @@ const ModTools = async ({ params: { id } }: SearchParamProps) => {
       </div>
     );
   return (
-    <div className="px-5">
+    <div className="px-5 max-sm:px-0">
       <p className="text-3xl font-semibold">Queue</p>
       <div className="flex gap-8 text-sm mt-5">
         <Link href="" className="font-semibold text-gray-600">
@@ -39,6 +44,11 @@ const ModTools = async ({ params: { id } }: SearchParamProps) => {
         <Link href="" className="font-semibold text-gray-600">
           Removed
         </Link>
+      </div>
+      <div className="mt-7">
+        {posts.map((post: IPostPopulated) => (
+          <NeedReviewPost key={post._id?.toString()!} post={post} community={community} />
+        ))}
       </div>
     </div>
   );
