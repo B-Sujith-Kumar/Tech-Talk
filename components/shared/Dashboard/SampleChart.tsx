@@ -10,7 +10,7 @@ const PostChart = ({ period, currentUser } : {period : string, currentUser: stri
         const fetchData = async () => {
             const data  = await getPosts(currentUser);
 
-            const postsByDate = data.reduce((acc, post) => {
+            const postsByDate = data.reduce((acc: any, post: any) => {
                 let date;
                 if (period === 'daily') {
                     date = new Date(post.createdAt).toLocaleDateString();
@@ -21,11 +21,11 @@ const PostChart = ({ period, currentUser } : {period : string, currentUser: stri
                 } else if (period === 'monthly') {
                     date = new Date(post.createdAt).toLocaleDateString('default', { year: 'numeric', month: 'long' });
                 }
-                acc[date] = (acc[date] || 0) + 1;
+                acc[date!] = (acc[date!] || 0) + 1;
                 return acc;
             }, {});
 
-            const formattedData = Object.entries(postsByDate).map(([date, count]) => ({ date, count }));
+            const formattedData: any = Object.entries(postsByDate).map(([date, count]) => ({ date, count }));
             setChartData(formattedData);
         };
 
