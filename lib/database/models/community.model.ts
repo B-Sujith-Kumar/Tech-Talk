@@ -9,6 +9,10 @@ export interface ICommunity extends Document {
     createdBy: mongoose.Schema.Types.ObjectId;
     tags: mongoose.Schema.Types.ObjectId[];
     members: mongoose.Schema.Types.ObjectId[];
+    moderators: mongoose.Schema.Types.ObjectId[];
+    needsReview?: mongoose.Schema.Types.ObjectId[];
+    reported?: mongoose.Schema.Types.ObjectId[];
+    removed?: mongoose.Schema.Types.ObjectId[];
     createdAt: Date;
 }
 
@@ -20,6 +24,10 @@ const communitySchema: Schema<ICommunity> = new Schema({
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     tags: [{ type: mongoose.Schema.ObjectId, ref: 'Tag', required: true }],
     members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    moderators: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
+    needsReview: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post', default: []  }],
+    reported: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post', default: []  }],
+    removed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post', default: []  }],
 }, {
     timestamps: true
 });

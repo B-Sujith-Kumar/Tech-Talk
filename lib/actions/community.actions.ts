@@ -345,3 +345,88 @@ export const getPopularCommunityPosts = async (communityId: string) => {
         return JSON.parse(JSON.stringify({ error, success: false }));
     }
 }
+
+export const getCommunityModerators = async (communityId: string) => {
+    try {
+        await connectToDatabase();
+        const community: ICommunity | null = await Community.findById(communityId).populate("moderators");
+        if (!community) {
+            return JSON.parse(
+                JSON.stringify({ error: "Community not found", success: false })
+            );
+        }
+        return JSON.parse(JSON.stringify(community.moderators));
+    } catch (error) {
+        console.log(error);
+        return JSON.parse(JSON.stringify({ error, success: false }));
+    }
+}
+
+export const addModerator = async (communityId: string, username: string) => {
+    try {
+        await connectToDatabase();
+        const community: ICommunity | null = await Community.findById(communityId);
+        if (!community) {
+            return JSON.parse(
+                JSON.stringify({ error: "Community not found", status: 500 })
+            );
+        }
+        const user: IUser | null = await User.findOne({ username });
+        if (!user) {
+            return JSON.parse(
+                JSON.stringify({ error: "Sorry, the username does not exists. Please try another username.", status: 500 })
+            );
+        }
+        console.log(community);
+        if (community.moderators.includes(user._id!)) {
+            return JSON.parse(
+                JSON.stringify({ error: "User is already a moderator", status: 500 })
+            );
+        }
+        community.moderators?.push(user._id!);
+        await community.save();
+        revalidatePath(`/community/${communityId}/mod-tools/moderators`);
+        return JSON.parse(JSON.stringify({ status: 200 }));
+    } catch (error) {
+        console.log(error);
+        return JSON.parse(JSON.stringify({ error, status: 500 }));
+    }
+}
+
+export const removeModerator = async (communityId: string, userId: string) => {
+    try {
+        await connectToDatabase();
+        const community: ICommunity | null = await Community.findById(communityId);
+        if (!community) {
+            return JSON.parse(
+                JSON.stringify({ error: "Community not found", status: 500 })
+            );
+        }
+        community.moderators = community.moderators.filter(
+            (moderator) => moderator.toString() !== userId
+        );
+        await community.save();
+        revalidatePath("/community/" + communityId + "/mod-tools/moderators");
+        return JSON.parse(JSON.stringify({ status: 200 }));
+    } catch (error) {
+        console.log(error);
+        return JSON.parse(JSON.stringify({ error, status: 500 }));
+    }
+}
+
+export const getModerators = async (communityId: string) => {
+    try {
+        await connectToDatabase();
+        const community: ICommunity | null = await Community.findById(communityId).populate("moderators");
+        if (!community) {
+            return JSON.parse(
+                JSON.stringify({ error: "Community not found", success: false })
+            );
+        }
+        return JSON.parse(JSON.stringify(community.moderators));
+    } catch (error) {
+        console.log(error);
+        return JSON.parse(JSON.stringify({ error, success: false }));
+    }
+}
+

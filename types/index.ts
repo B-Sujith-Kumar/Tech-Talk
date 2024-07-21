@@ -70,5 +70,20 @@ export type ICommentPopulated = {
     downvotes: IEngagement[];
     replies: ICommentPopulated[];
     createdAt: Date;
-    
+}
+
+export type ICommunityPopulated = {
+    _id?: mongoose.Schema.Types.ObjectId;
+    name: string;
+    description: string;
+    banner: string;
+    icon: string;
+    createdBy: IUser;
+    tags: ITag[];
+    members: IUser[];
+    moderators: IUser[];
+    needsReview: IPost[];
+    reported: IPost[];
+    removed: IPost[];
+    createdAt: Date;
 }

@@ -10,8 +10,15 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import { ICommunity } from "@/lib/database/models/community.model";
+import Link from "next/link";
+import { auth } from "@clerk/nextjs";
+import { getUser } from "@/lib/actions/user.actions";
 
-const CommunityOptions = ({community}: {community: ICommunity}) => {
+const CommunityOptions = async ({ community }: { community: ICommunity }) => {
+  const { userId } = auth();
+  const currentUser = await getUser(userId!);
+  const isMod = community.moderators.some((mod) => mod.toString() === currentUser._id.toString());
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -20,8 +27,17 @@ const CommunityOptions = ({community}: {community: ICommunity}) => {
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-0 flex flex-col bg-white">
-        <DropdownMenuItem className="hover:bg-gray-300 px-3 py-3">Mute c/{community.name}</DropdownMenuItem>
-        <DropdownMenuItem className="hover:bg-gray-300 px-3 py-3">Add to favorites</DropdownMenuItem>
+        <DropdownMenuItem className="hover:bg-gray-300 px-3 py-3">
+          Mute c/{community.name}
+        </DropdownMenuItem>
+       {isMod && <DropdownMenuItem className="hover:bg-gray-300 px-3 py-3">
+          <Link href={`/community/${community._id?.toString()}/mod-tools`}>
+            Mod Tools
+          </Link>
+        </DropdownMenuItem>}
+        <DropdownMenuItem className="hover:bg-gray-300 px-3 py-3">
+          Add to favorites
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

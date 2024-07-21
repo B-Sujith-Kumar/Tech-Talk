@@ -86,6 +86,16 @@ const DashboardSidebar = ({ stats }: { stats: StatsType }) => {
               {stats.communities}
             </span>
           </Link>
+          <Link
+            href="/dashboard/analytics"
+            className={`flex  px-2 py-2 items-center ${
+              pathName.includes("/dashboard/analytics")
+                ? "bg-white rounded-md font-medium border text-black"
+                : "text-gray-700"
+            } justify-between`}
+          >
+            <p>Analytics</p>
+          </Link>
         </nav>
       </div>
 
@@ -190,6 +200,16 @@ const DashboardSidebar = ({ stats }: { stats: StatsType }) => {
             <span className="bg-gray-300 px-2 rounded-md">
               {stats.communities}
             </span>
+          </Link>
+          <Link
+            href="/dashboard/analytics"
+            className={`flex  px-2 py-2 items-center ${
+              pathName.includes("/dashboard/analytics")
+                ? "bg-white rounded-md font-medium border text-black"
+                : "text-gray-700"
+            } justify-between`}
+          >
+            <p>Analytics</p>
           </Link>
         </nav>
       </div>
