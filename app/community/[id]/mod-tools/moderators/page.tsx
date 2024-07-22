@@ -1,6 +1,11 @@
 import ModeratorContainer from "@/components/shared/Community/ModeratorContainer";
+import ModeratorInvite from "@/components/shared/Community/ModeratorInvite";
 import ModeratorOptions from "@/components/shared/Community/ModeratorOptions";
-import { getCommunity, getModerators } from "@/lib/actions/community.actions";
+import {
+  getCommunity,
+  getModerators,
+  populateModInvites,
+} from "@/lib/actions/community.actions";
 import { getUser } from "@/lib/actions/user.actions";
 import { SearchParamProps } from "@/types";
 import { auth, useAuth } from "@clerk/nextjs";
@@ -12,6 +17,8 @@ const Moderators = async ({ params: { id } }: SearchParamProps) => {
   const { userId } = auth();
   const currentUser = await getUser(userId!);
   const moderators = await getModerators(community._id.toString());
+  const invitedModerators = await populateModInvites(community._id.toString());
+  console.log(invitedModerators);
   const isMod =
     (community.moderators &&
       community.moderators.some(
@@ -27,7 +34,7 @@ const Moderators = async ({ params: { id } }: SearchParamProps) => {
       </div>
     );
   return (
-    <div className="px-5">
+    <div className="sm:px-5">
       <p className="text-3xl font-semibold">Moderators</p>
       <div className="flex justify-end gap-3 mb-10">
         <ModeratorOptions
@@ -45,10 +52,17 @@ const Moderators = async ({ params: { id } }: SearchParamProps) => {
           community={community}
         />
       ) : (
-        <div className="text-2xl font-semibold text-center flex justify-center items-center h-full">
+        <div className="text-2xl text-gray-500 max-sm:text-xl font-semibold text-center flex justify-center items-center h-full mt-20">
           No moderators to show here
         </div>
       )}
+      <p className="text-2xl font-semibold mt-7">Invited moderators</p>
+      <div className="mb-10">
+        <ModeratorInvite
+          community={community}
+          invites={invitedModerators}
+        />
+      </div>
     </div>
   );
 };

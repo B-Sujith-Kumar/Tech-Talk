@@ -41,7 +41,7 @@ const ModeratorContainer = ({
         </div>
         <div className="mt-8 grid grid-cols-3 gap-3 max-sm:grid-cols-2 max-[410px]:grid-cols-1">
           {moderatorList.map((moderator: IUser) => (
-            <ModeratorCard user={moderator} isOwner={isOwner} community={community}/>
+            <ModeratorCard user={moderator} isOwner={isOwner} community={community} key={moderator._id?.toString()}/>
           ))}
         </div>
         {}
