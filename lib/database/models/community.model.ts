@@ -13,6 +13,7 @@ export interface ICommunity extends Document {
     needsReview?: mongoose.Schema.Types.ObjectId[];
     reported?: mongoose.Schema.Types.ObjectId[];
     removed?: mongoose.Schema.Types.ObjectId[];
+    moderatorInvites?: mongoose.Schema.Types.ObjectId[];
     createdAt: Date;
 }
 
@@ -28,6 +29,7 @@ const communitySchema: Schema<ICommunity> = new Schema({
     needsReview: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post', default: []  }],
     reported: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post', default: []  }],
     removed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post', default: []  }],
+    moderatorInvites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
 }, {
     timestamps: true
 });

@@ -87,3 +87,5 @@ export type ICommunityPopulated = {
     removed: IPost[];
     createdAt: Date;
 }
+
+export type invite = ICommunity;

@@ -16,6 +16,7 @@ export interface IUser extends Document {
     following?: mongoose.Schema.Types.ObjectId[];
     followedTags?: mongoose.Schema.Types.ObjectId[];
     firstLogin?: boolean;
+    moderatorInvites?: mongoose.Schema.Types.ObjectId[];
     createdAt?: Date;
 }
 
@@ -34,6 +35,7 @@ const userSchema: Schema<IUser> = new Schema({
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", default: [] }],
     followedTags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tag", default: [] }],
     firstLogin: { type: Boolean, default: true },
+    moderatorInvites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Community", default: [] }],
 }, {
     timestamps: true
 });
