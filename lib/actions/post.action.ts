@@ -11,6 +11,9 @@ import { revalidatePath } from "next/cache";
 import { IFeedPost } from "@/types/posts";
 import User, { IUser } from "../database/models/user.model";
 import Community from "../database/models/community.model";
+import { Knock } from "@knocklabs/node";
+
+
 
 export async function createPost(data: {
   title: string;
@@ -539,6 +542,7 @@ export const addComment = async (
 ) => {
   try {
     await connectToDatabase();
+    const knock = new Knock(process.env.KNOCK_API_SECRET);
     let post = await Post.findById(postID);
     if (!post)
       return JSON.parse(
@@ -552,7 +556,23 @@ export const addComment = async (
     let newComment = await Comment.findOne({ _id: comment._id }).populate(
       "author"
     );
+    const postAuthor: IUser = await User.findById(post.author) as IUser;
     post.comments.push(comment._id);
+    console.log("Triggering new-comment workflow");
+    await knock.workflows.trigger("tech-talk", {
+        data: {
+            post: postID,
+            comment: comment._id,
+            name: postAuthor.firstName + " " + postAuthor.lastName,
+            title: post.title,
+            commentAuthor: newComment.author.firstName + " " + newComment.author.lastName,
+        },
+        recipients: [{
+            id: postAuthor.clerkId,
+            name: postAuthor?.firstName + " " + postAuthor?.lastName,
+            email: postAuthor?.email,
+        }]
+    }).catch((error) => console.log(error));
     await post.save();
     revalidatePath(`/post/${postID.toString()}`);
     return JSON.parse(JSON.stringify({ status: 200, comment: newComment }));

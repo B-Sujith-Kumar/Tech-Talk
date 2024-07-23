@@ -530,111 +530,119 @@ export const getModInvites = async (clerkId: string) => {
 };
 
 export const acceptInvite = async (communityId: string, clerkId: string) => {
-    try {
-        await connectToDatabase();
-        const user = await User.findOne({ clerkId });
-        if (!user) {
-        return JSON.parse(
-            JSON.stringify({ error: "User not found", success: false })
-        );
-        }
-        const community = await Community.findById(communityId);
-        if (!community) {
-        return JSON.parse(
-            JSON.stringify({ error: "Community not found", success: false })
-        );
-        }
-        community.moderators.push(user._id!);
-        user.moderatorInvites = user.moderatorInvites.filter(
-        (invite : mongoose.Types.ObjectId) => invite.toString() !== community._id?.toString()
-        );
-        community.moderatorInvites = community.moderatorInvites.filter(
-        (invite : mongoose.Types.ObjectId) => invite.toString() !== user._id?.toString()
-        );
-        await community.save();
-        await user.save();
-        revalidatePath(`/community/${communityId}/mod-tools/moderators`);
-        return JSON.parse(JSON.stringify({ success: true }));
-    } catch (error) {
-        console.log(error);
-        return JSON.parse(JSON.stringify({ error, success: false }));
+  try {
+    await connectToDatabase();
+    const user = await User.findOne({ clerkId });
+    if (!user) {
+      return JSON.parse(
+        JSON.stringify({ error: "User not found", success: false })
+      );
     }
-}
+    const community = await Community.findById(communityId);
+    if (!community) {
+      return JSON.parse(
+        JSON.stringify({ error: "Community not found", success: false })
+      );
+    }
+    community.moderators.push(user._id!);
+    user.moderatorInvites = user.moderatorInvites.filter(
+      (invite: mongoose.Types.ObjectId) =>
+        invite.toString() !== community._id?.toString()
+    );
+    community.moderatorInvites = community.moderatorInvites.filter(
+      (invite: mongoose.Types.ObjectId) =>
+        invite.toString() !== user._id?.toString()
+    );
+    await community.save();
+    await user.save();
+    revalidatePath(`/community/${communityId}/mod-tools/moderators`);
+    return JSON.parse(JSON.stringify({ success: true }));
+  } catch (error) {
+    console.log(error);
+    return JSON.parse(JSON.stringify({ error, success: false }));
+  }
+};
 
 export const ignoreInvite = async (communityId: string, clerkId: string) => {
-    try {
-        await connectToDatabase();
-        const user = await User.findOne({ clerkId });
-        if (!user) {
-        return JSON.parse(
-            JSON.stringify({ error: "User not found", success: false })
-        );
-        }
-        const community = await Community.findById(communityId);
-        if (!community) {
-        return JSON.parse(
-            JSON.stringify({ error: "Community not found", success: false })
-        );
-        }
-        user.moderatorInvites = user.moderatorInvites.filter(
-        (invite : mongoose.Types.ObjectId) => invite.toString() !== community._id?.toString()
-        );
-        community.moderatorInvites = community.moderatorInvites.filter(
-        (invite : mongoose.Types.ObjectId) => invite.toString() !== user._id?.toString()
-        );
-        await community.save();
-        await user.save();
-        revalidatePath(`/community/${communityId}/mod-tools/moderators`);
-        return JSON.parse(JSON.stringify({ success: true }));
-    } catch (error) {
-        console.log(error);
-        return JSON.parse(JSON.stringify({ error, success: false }));
+  try {
+    await connectToDatabase();
+    const user = await User.findOne({ clerkId });
+    if (!user) {
+      return JSON.parse(
+        JSON.stringify({ error: "User not found", success: false })
+      );
     }
-}
+    const community = await Community.findById(communityId);
+    if (!community) {
+      return JSON.parse(
+        JSON.stringify({ error: "Community not found", success: false })
+      );
+    }
+    user.moderatorInvites = user.moderatorInvites.filter(
+      (invite: mongoose.Types.ObjectId) =>
+        invite.toString() !== community._id?.toString()
+    );
+    community.moderatorInvites = community.moderatorInvites.filter(
+      (invite: mongoose.Types.ObjectId) =>
+        invite.toString() !== user._id?.toString()
+    );
+    await community.save();
+    await user.save();
+    revalidatePath(`/community/${communityId}/mod-tools/moderators`);
+    return JSON.parse(JSON.stringify({ success: true }));
+  } catch (error) {
+    console.log(error);
+    return JSON.parse(JSON.stringify({ error, success: false }));
+  }
+};
 
 export const populateModInvites = async (communityId: string) => {
-    try {
-        await connectToDatabase();
-        const community = await Community.findById(communityId).populate("moderatorInvites");
-        if (!community) {
-        return JSON.parse(
-            JSON.stringify({ error: "Community not found", success: false })
-        );
-        }
-        return JSON.parse(JSON.stringify(community.moderatorInvites));
-    } catch (error) {
-        console.log(error);
-        return JSON.parse(JSON.stringify({ error, success: false }));
+  try {
+    await connectToDatabase();
+    const community = await Community.findById(communityId).populate(
+      "moderatorInvites"
+    );
+    if (!community) {
+      return JSON.parse(
+        JSON.stringify({ error: "Community not found", success: false })
+      );
     }
-}
+    return JSON.parse(JSON.stringify(community.moderatorInvites));
+  } catch (error) {
+    console.log(error);
+    return JSON.parse(JSON.stringify({ error, success: false }));
+  }
+};
 
 export const withdrawInvite = async (communityId: string, clerkId: string) => {
-    try {
-        await connectToDatabase();
-        const user = await User.findOne({ clerkId });
-        if (!user) {
-        return JSON.parse(
-            JSON.stringify({ error: "User not found", success: false })
-        );
-        }
-        const community = await Community.findById(communityId);
-        if (!community) {
-        return JSON.parse(
-            JSON.stringify({ error: "Community not found", success: false })
-        );
-        }
-        user.moderatorInvites = user.moderatorInvites.filter(
-        (invite : mongoose.Types.ObjectId) => invite.toString() !== community._id?.toString()
-        );
-        community.moderatorInvites = community.moderatorInvites.filter(
-        (invite : mongoose.Types.ObjectId) => invite.toString() !== user._id?.toString()
-        );
-        await community.save();
-        await user.save();
-        revalidatePath(`/community/${communityId}/mod-tools/moderators`);
-        return JSON.parse(JSON.stringify({ success: true }));
-    } catch (error) {
-        console.log(error);
-        return JSON.parse(JSON.stringify({ error, success: false }));
+  try {
+    await connectToDatabase();
+    const user = await User.findOne({ clerkId });
+    if (!user) {
+      return JSON.parse(
+        JSON.stringify({ error: "User not found", success: false })
+      );
     }
-}
+    const community = await Community.findById(communityId);
+    if (!community) {
+      return JSON.parse(
+        JSON.stringify({ error: "Community not found", success: false })
+      );
+    }
+    user.moderatorInvites = user.moderatorInvites.filter(
+      (invite: mongoose.Types.ObjectId) =>
+        invite.toString() !== community._id?.toString()
+    );
+    community.moderatorInvites = community.moderatorInvites.filter(
+      (invite: mongoose.Types.ObjectId) =>
+        invite.toString() !== user._id?.toString()
+    );
+    await community.save();
+    await user.save();
+    revalidatePath(`/community/${communityId}/mod-tools/moderators`);
+    return JSON.parse(JSON.stringify({ success: true }));
+  } catch (error) {
+    console.log(error);
+    return JSON.parse(JSON.stringify({ error, success: false }));
+  }
+};
