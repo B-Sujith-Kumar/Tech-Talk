@@ -1,5 +1,6 @@
-import { currentUser } from "@clerk/nextjs";
+import { currentUser, User } from "@clerk/nextjs/server";
 import Image from "next/image";
+import StoryComp from "./_components/StoryComp";
 
 export const Stories = async () => {
     const user = await currentUser();
@@ -8,16 +9,7 @@ export const Stories = async () => {
             <div id="stories">
                 <div className="flex flex-row items-center gap-x-4 p-2 px-4 *: overflow-x-scroll scrollbar-hidden bg-white rounded-md">
                     <div className="flex flex-col items-center w-16 relative">
-                        <Image
-                            src={user?.imageUrl as string}
-                            alt={user?.firstName + " " + user?.lastName}
-                            width={400}
-                            height={400}
-                            className="min-w-16 h-16 rounded-full border-2 object-cover cursor-pointer"
-                        />
-                        <p className="absolute bottom-4 left-10 bg-indigo-600 text-white rounded-full cursor-pointer mx-auto text-center w-6 h-6 border-2 border-gray-200 flex justify-center items-center">
-                            +
-                        </p>
+                        <StoryComp />
                         <span className="text-xs mt-1">
                             Your Story
                         </span>

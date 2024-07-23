@@ -19,7 +19,6 @@ export interface IPost extends Document {
 
 export interface IEngagement extends Document {
     user: mongoose.Schema.Types.ObjectId;
-    createdAt: Date;
 }
 
 const engagementSchema = new Schema<IEngagement>({

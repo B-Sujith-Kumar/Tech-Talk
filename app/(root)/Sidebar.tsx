@@ -122,9 +122,12 @@ export default function Sidebar({ isMobile = false, communitites }: {
                                 ))
                             }
                         </div>
-                        <span className="text-[0.6rem] text-gray-500 font-medium mt-2 p-2">
-                            View All
-                        </span>
+                        {communitites?.length > 4 && <div className="flex flex-row items-center justify-center gap-2 p-2">
+                            <Link href="/communities" className="text-xs text-indigo-500 font-medium">
+                                See all
+                            </Link>
+                        </div>
+                        }
                     </>}
                 </div>
                 <div className="text-[0.6rem] text-gray-500 p-2 mt-2 flex flex-col gap-2">
