@@ -77,6 +77,7 @@ export async function createPost(data: {
           }
         }) ?? []
       );
+      post.notifyUsersOnComment.push(data.userCurrent._id!);
       await post.save();
       return { status: 200, message: "Post has been sent for review" };
     }
@@ -543,7 +544,7 @@ export const addComment = async (
   try {
     await connectToDatabase();
     const knock = new Knock(process.env.KNOCK_API_SECRET);
-    let post = await Post.findById(postID);
+    let post = await Post.findById(postID).populate("notifyUsersOnComment");
     if (!post)
       return JSON.parse(
         JSON.stringify({ status: 404, message: "Post not found" })
@@ -558,6 +559,15 @@ export const addComment = async (
     );
     const postAuthor: IUser = (await User.findById(post.author)) as IUser;
     post.comments.push(comment._id);
+    const recipients: { id: string; name: string; email: string }[] = [];
+    post.notifyUsersOnComment.forEach((user: IUser) => {
+      if (user._id?.toString() !== userID)
+        recipients.push({
+          id: user.clerkId,
+          name: user.firstName + " " + user.lastName,
+          email: user.email,
+        });
+    });
     await knock.workflows
       .trigger("tech-talk", {
         data: {
@@ -568,13 +578,7 @@ export const addComment = async (
           commentAuthor:
             newComment.author.firstName + " " + newComment.author.lastName,
         },
-        recipients: [
-          {
-            id: postAuthor.clerkId,
-            name: postAuthor?.firstName + " " + postAuthor?.lastName,
-            email: postAuthor?.email,
-          },
-        ],
+        recipients: recipients,
       })
       .catch((error) => console.log(error));
     await post.save();
