@@ -8,6 +8,7 @@ import { connectToDatabase } from "../database";
 import { revalidatePath } from "next/cache";
 import mongoose from "mongoose";
 import Post from "../database/models/post.model";
+import { Knock } from "@knocklabs/node";
 
 export const createCommunity = async (data: createCommunityType) => {
   try {
@@ -456,6 +457,7 @@ export const approvePost = async (postId: string, communityId: string) => {
   try {
     await connectToDatabase();
     const post = await Post.findById(postId);
+    const knock = new Knock(process.env.KNOCK_API_SECRET);
     if (!post) {
       return JSON.parse(
         JSON.stringify({ error: "Post not found", success: false })
@@ -471,6 +473,24 @@ export const approvePost = async (postId: string, communityId: string) => {
       (review: mongoose.Types.ObjectId) => review.toString() !== postId
     );
     await community.save();
+    const populatedNotifiedUsers = await Community.findById(
+      communityId
+    ).populate("communityNotification");
+    const recipients: { id: string; email: string; name: string }[] = [];
+    populatedNotifiedUsers.communityNotification.forEach((user: IUser) => {
+      recipients.push({
+        id: user.clerkId,
+        email: user.email,
+        name: user.firstName + " " + user.lastName,
+      });
+    });
+    await knock.workflows.trigger("community-post-add", {
+      data: {
+        communityName: community.name,
+        postId: post._id,
+      },
+      recipients: recipients,
+    });
     revalidatePath(`/community/${communityId}/mod-tools/queue`);
     return JSON.parse(JSON.stringify({ success: true }));
   } catch (error) {
@@ -640,6 +660,62 @@ export const withdrawInvite = async (communityId: string, clerkId: string) => {
     await community.save();
     await user.save();
     revalidatePath(`/community/${communityId}/mod-tools/moderators`);
+    return JSON.parse(JSON.stringify({ success: true }));
+  } catch (error) {
+    console.log(error);
+    return JSON.parse(JSON.stringify({ error, success: false }));
+  }
+};
+
+export const turnOffCommunityNotification = async (
+  communityId: string,
+  userId: string
+) => {
+  try {
+    await connectToDatabase();
+    const user = await User.findById(userId);
+    if (!user) {
+      return JSON.parse(
+        JSON.stringify({ error: "User not found", success: false })
+      );
+    }
+    const community = await Community.findById(communityId);
+    if (!community) {
+      return JSON.parse(
+        JSON.stringify({ error: "Community not found", success: false })
+      );
+    }
+    community.communityNotification = community.communityNotification.filter(
+      (user: mongoose.Types.ObjectId) => user.toString() !== userId
+    );
+    await community.save();
+    return JSON.parse(JSON.stringify({ success: true }));
+  } catch (error) {
+    console.log(error);
+    return JSON.parse(JSON.stringify({ error, success: false }));
+  }
+};
+
+export const turnOnCommunityNotification = async (
+  communityId: string,
+  userId: string
+) => {
+  try {
+    await connectToDatabase();
+    const user = await User.findById(userId);
+    if (!user) {
+      return JSON.parse(
+        JSON.stringify({ error: "User not found", success: false })
+      );
+    }
+    const community = await Community.findById(communityId);
+    if (!community) {
+      return JSON.parse(
+        JSON.stringify({ error: "Community not found", success: false })
+      );
+    }
+    community.communityNotification.push(user._id!);
+    await community.save();
     return JSON.parse(JSON.stringify({ success: true }));
   } catch (error) {
     console.log(error);

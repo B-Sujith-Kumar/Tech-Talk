@@ -14,6 +14,7 @@ export interface ICommunity extends Document {
     reported?: mongoose.Schema.Types.ObjectId[];
     removed?: mongoose.Schema.Types.ObjectId[];
     moderatorInvites?: mongoose.Schema.Types.ObjectId[];
+    communityNotification?: mongoose.Schema.Types.ObjectId[];
     createdAt: Date;
 }
 
@@ -30,6 +31,7 @@ const communitySchema: Schema<ICommunity> = new Schema({
     reported: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post', default: []  }],
     removed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post', default: []  }],
     moderatorInvites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
+    communityNotification: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],
 }, {
     timestamps: true
 });
