@@ -13,6 +13,7 @@ export interface IPost extends Document {
     downvotes: IEngagement[];
     comments: mongoose.Schema.Types.ObjectId[];
     views: number;
+    notifyUsersOnComment: mongoose.Schema.Types.ObjectId[];
     createdAt: Date;
     getEngagementScore: () => number;
 }
@@ -35,6 +36,7 @@ const postSchema: Schema<IPost> = new Schema({
     upvotes: [engagementSchema],
     downvotes: [engagementSchema],
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
+    notifyUsersOnComment: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     views: { type: Number, default: 0 },
 }, {
     timestamps: true

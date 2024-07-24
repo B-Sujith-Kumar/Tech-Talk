@@ -31,7 +31,7 @@ const PostComponent = async ({
     const currentUser = await getUser(userId);
     const { data } = await getCommunitiesJoinedByUser(currentUser);
     return (
-        <div className="">
+        <div className="mt-3">
             <div className="bg-white rounded-xl p-4">
                 <div className="flex flex-row gap-2 items-center">
                     <Avatar>

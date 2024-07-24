@@ -21,92 +21,93 @@ export async function createPost(data: {
     coverImage?: string;
     userCurrent: IUser;
 }) {
-    try {
-        let auth = isAuth();
-        if (!auth)
-            return {
-                status: 401,
-                message: "Unauthorized",
-            };
-        const user = await currentUser();
-        await connectToDatabase();
-        let post: IPost;
-        if (
-            data.community === "public" ||
-            !data.community ||
-            data.community === ""
-        ) {
-            post = await Post.create({
-                author: data.userCurrent._id,
-                title: data.title,
-                content: data.content,
-                coverImage: data.coverImage,
+  try {
+    let auth = isAuth();
+    if (!auth)
+      return {
+        status: 401,
+        message: "Unauthorized",
+      };
+    const user = await currentUser();
+    await connectToDatabase();
+    let post: IPost;
+    if (
+      data.community === "public" ||
+      !data.community ||
+      data.community === ""
+    ) {
+      post = await Post.create({
+        author: data.userCurrent._id,
+        title: data.title,
+        content: data.content,
+        coverImage: data.coverImage,
+      });
+    } else {
+      post = await Post.create({
+        author: data.userCurrent._id,
+        title: data.title,
+        content: data.content,
+        community: data.community as mongoose.Schema.Types.ObjectId,
+        coverImage: data.coverImage,
+      });
+      const community = await Community.findById(data.community);
+      await community.needsReview.push(post._id);
+      await community.save();
+      await Promise.all(
+        data.tags?.forEach(async (tag) => {
+          let existingTag: ITag | null = await Tag.findOne({ name: tag });
+          if (!existingTag) {
+            let newTag: ITag = await Tag.create({
+              name: tag,
+              posts: [post._id],
             });
-        } else {
-            post = await Post.create({
-                author: data.userCurrent._id,
-                title: data.title,
-                content: data.content,
-                community: data.community as mongoose.Schema.Types.ObjectId,
-                coverImage: data.coverImage,
-            });
-            const community = await Community.findById(data.community);
-            await community.needsReview.push(post._id);
-            await community.save();
-            await Promise.all(
-                data.tags?.forEach(async (tag) => {
-                    let existingTag: ITag | null = await Tag.findOne({ name: tag });
-                    if (!existingTag) {
-                        let newTag: ITag = await Tag.create({
-                            name: tag,
-                            posts: [post._id],
-                        });
-                        await Post.updateOne(
-                            { _id: post._id },
-                            { $push: { tags: newTag._id } }
-                        );
-                    } else {
-                        existingTag?.posts?.push(
-                            post._id as mongoose.Schema.Types.ObjectId
-                        );
-                        await Post.updateOne(
-                            { _id: post._id },
-                            { $push: { tags: existingTag._id } }
-                        );
-                        await existingTag.save();
-                    }
-                }) ?? []
+            await Post.updateOne(
+              { _id: post._id },
+              { $push: { tags: newTag._id } }
             );
-            await post.save();
-            return { status: 200, message: "Post has been sent for review" };
-        }
-        await Promise.all(
-            data.tags?.forEach(async (tag) => {
-                let existingTag: ITag | null = await Tag.findOne({ name: tag });
-                if (!existingTag) {
-                    let newTag: ITag = await Tag.create({
-                        name: tag,
-                        posts: [post._id],
-                    });
-                    await Post.updateOne(
-                        { _id: post._id },
-                        { $push: { tags: newTag._id } }
-                    );
-                } else {
-                    existingTag?.posts?.push(post._id as mongoose.Schema.Types.ObjectId);
-                    await Post.updateOne(
-                        { _id: post._id },
-                        { $push: { tags: existingTag._id } }
-                    );
-                    await existingTag.save();
-                }
-            }) ?? []
-        );
-        await post.save();
-        return { status: 200, message: "Post created successfully" };
-    } catch (error: any) {
-        return { status: 500, message: error.message };
+          } else {
+            existingTag?.posts?.push(
+              post._id as mongoose.Schema.Types.ObjectId
+            );
+            await Post.updateOne(
+              { _id: post._id },
+              { $push: { tags: existingTag._id } }
+            );
+            await existingTag.save();
+          }
+        }) ?? []
+      );
+      post.notifyUsersOnComment.push(data.userCurrent._id!);
+      await post.save();
+      return { status: 200, message: "Post has been sent for review" };
     }
+    await Promise.all(
+      data.tags?.forEach(async (tag) => {
+        let existingTag: ITag | null = await Tag.findOne({ name: tag });
+        if (!existingTag) {
+          let newTag: ITag = await Tag.create({
+            name: tag,
+            posts: [post._id],
+          });
+          await Post.updateOne(
+            { _id: post._id },
+            { $push: { tags: newTag._id } }
+          );
+        } else {
+          existingTag?.posts?.push(post._id as mongoose.Schema.Types.ObjectId);
+          await Post.updateOne(
+            { _id: post._id },
+            { $push: { tags: existingTag._id } }
+          );
+          await existingTag.save();
+        }
+      }) ?? []
+    );
+    await post.save();
+    return { status: 200, message: "Post created successfully" };
+  } catch (error: any) {
+    return { status: 500, message: error.message };
+  }
 }
 
 export async function editPost(data: {
@@ -540,49 +541,52 @@ export const addComment = async (
     content: string,
     userID: string
 ) => {
-    try {
-        await connectToDatabase();
-        const knock = new Knock(process.env.KNOCK_API_SECRET);
-        let post = await Post.findById(postID);
-        if (!post)
-            return JSON.parse(
-                JSON.stringify({ status: 404, message: "Post not found" })
-            );
-        let comment = await Comment.create({
-            author: userID,
-            post: postID,
-            content: content,
+  try {
+    await connectToDatabase();
+    const knock = new Knock(process.env.KNOCK_API_SECRET);
+    let post = await Post.findById(postID).populate("notifyUsersOnComment");
+    if (!post)
+      return JSON.parse(
+        JSON.stringify({ status: 404, message: "Post not found" })
+      );
+    let comment = await Comment.create({
+      author: userID,
+      post: postID,
+      content: content,
+    });
+    let newComment = await Comment.findOne({ _id: comment._id }).populate(
+      "author"
+    );
+    const postAuthor: IUser = (await User.findById(post.author)) as IUser;
+    post.comments.push(comment._id);
+    const recipients: { id: string; name: string; email: string }[] = [];
+    post.notifyUsersOnComment.forEach((user: IUser) => {
+      if (user._id?.toString() !== userID)
+        recipients.push({
+          id: user.clerkId,
+          name: user.firstName + " " + user.lastName,
+          email: user.email,
         });
-        let newComment = await Comment.findOne({ _id: comment._id }).populate(
-            "author"
-        );
-        const postAuthor: IUser = (await User.findById(post.author)) as IUser;
-        post.comments.push(comment._id);
-        await knock.workflows
-            .trigger("tech-talk", {
-                data: {
-                    post: postID,
-                    comment: comment._id,
-                    name: postAuthor.firstName + " " + postAuthor.lastName,
-                    title: post.title,
-                    commentAuthor:
-                        newComment.author.firstName + " " + newComment.author.lastName,
-                },
-                recipients: [
-                    {
-                        id: postAuthor.clerkId,
-                        name: postAuthor?.firstName + " " + postAuthor?.lastName,
-                        email: postAuthor?.email,
-                    },
-                ],
-            })
-            .catch((error) => console.log(error));
-        await post.save();
-        revalidatePath(`/post/${postID.toString()}`);
-        return JSON.parse(JSON.stringify({ status: 200, comment: newComment }));
-    } catch (error: any) {
-        return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
-    }
+    });
+    await knock.workflows
+      .trigger("tech-talk", {
+        data: {
+          post: postID,
+          comment: comment._id,
+          name: postAuthor.firstName + " " + postAuthor.lastName,
+          title: post.title,
+          commentAuthor:
+            newComment.author.firstName + " " + newComment.author.lastName,
+        },
+        recipients: recipients,
+      })
+      .catch((error) => console.log(error));
+    await post.save();
+    revalidatePath(`/post/${postID.toString()}`);
+    return JSON.parse(JSON.stringify({ status: 200, comment: newComment }));
+  } catch (error: any) {
+    return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
+  }
 };
 
 export const upVoteComment = async (

@@ -49,6 +49,7 @@ export type IPostPopulated = {
     comments: IComment[];
     views: number;
     createdAt: Date;
+    notifyUsersOnComment: mongoose.Types.ObjectId[];
     getEngagementScore: () => number;
 }
 
