@@ -8,6 +8,7 @@ import User from "../database/models/user.model";
 import { revalidatePath } from "next/cache";
 import { imageRemove } from "../image";
 import mongoose from "mongoose";
+import { IPopulatedStoryCurrentUser } from "@/types/story";
 
 export async function createStory({ data }: {
     data: {
@@ -68,7 +69,92 @@ export async function getUserStories() {
         await connectToDatabase();
         let userDb = await User.findOne({ clerkId: user.id });
         if (!userDb) return { status: 404, message: "User not found" };
-        let stories: IStory[] = await Story.find({ owner: userDb._id }).populate("owner");
+        let stories: IPopulatedStoryCurrentUser[] = await Story.aggregate([
+            {
+                $match: {
+                    owner: userDb._id
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "owner",
+                    foreignField: "_id",
+                    as: "owner",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id: 1,
+                                firstName: 1,
+                                lastName: 1,
+                                username: 1,
+                                profilePicture: 1
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $addFields: {
+                    owner: {
+                        $arrayElemAt: ["$owner", 0]
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "storyviews",
+                    localField: "_id",
+                    foreignField: "story",
+                    as: "views",
+                    pipeline: [
+                        {
+                            $lookup: {
+                                from: "users",
+                                localField: "userID",
+                                foreignField: "_id",
+                                as: "user"
+                            }
+                        },
+                        {
+                            $addFields: {
+                                user: {
+                                    $arrayElemAt: ["$user", 0]
+                                }
+                            }
+                        },
+                        {
+                            $sort: {
+                                createdAt: -1
+                            }
+                        },
+                        {
+                            $project: {
+                                _id: 1,
+                                createdAt: 1,
+                                user: {
+                                    _id: 1,
+                                    firstName: 1,
+                                    lastName: 1,
+                                    username: 1,
+                                    profilePicture: 1
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    owner: 1,
+                    imageUrl: 1,
+                    imageKey: 1,
+                    createdAt: 1,
+                    views: 1,
+                }
+            }
+        ]);
         return { status: 200, data: JSON.parse(JSON.stringify(stories)) };
     }
     catch (error: any) {

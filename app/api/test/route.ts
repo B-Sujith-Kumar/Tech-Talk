@@ -1,4 +1,5 @@
 import { connectToDatabase } from "@/lib/database";
+import { Story } from "@/lib/database/models/story.model";
 import User from "@/lib/database/models/user.model";
 import mongoose from "mongoose";
 
@@ -6,83 +7,78 @@ export async function GET(req: Request) {
     try {
         await connectToDatabase();
         let userDb = {
-            _id: ""
+            _id: "668a5c734bb5c185ac75bdf0"
         }
-        let data = await User.aggregate([
+        let data = await Story.aggregate([
             {
                 $match: {
-                    _id: new mongoose.Types.ObjectId(userDb._id)
+                    owner: new mongoose.Types.ObjectId(userDb._id)
                 }
             },
             {
                 $lookup: {
-                    from: "stories",
-                    localField: "following",
-                    foreignField: "owner",
-                    as: "storiesData",
+                    from: "users",
+                    localField: "owner",
+                    foreignField: "_id",
+                    as: "owner",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id: 1,
+                                firstName: 1,
+                                lastName: 1,
+                                username: 1,
+                                profilePicture: 1
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $addFields: {
+                    owner: {
+                        $arrayElemAt: ["$owner", 0]
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "storyviews",
+                    localField: "_id",
+                    foreignField: "story",
+                    as: "views",
                     pipeline: [
                         {
                             $lookup: {
                                 from: "users",
-                                localField: "owner",
+                                localField: "userID",
                                 foreignField: "_id",
-                                as: "owner",
+                                as: "user"
                             }
                         },
                         {
                             $addFields: {
-                                owner: {
-                                    $arrayElemAt: ["$owner", 0]
+                                user: {
+                                    $arrayElemAt: ["$user", 0]
                                 }
                             }
                         },
                         {
-                            $lookup: {
-                                from: "storyviews",
-                                let: { storyId: "$_id" },
-                                pipeline: [
-                                    {
-                                        $match: {
-                                            $expr: {
-                                                $and: [
-                                                    { $eq: ["$story", "$$storyId"] },
-                                                    {
-                                                        $eq: [
-                                                            "$userID",
-                                                            new mongoose.Types.ObjectId(userDb._id)
-                                                        ]
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    }
-                                ],
-                                as: "isViewed"
-                            },
-                        },
-                        {
-                            $addFields: {
-                                isViewed: { $gt: [{ $size: "$isViewed" }, 0] }
-                            }
-                        },
-                        {
                             $sort: {
-                                isViewed: 1,
-                                createdAt: -1
+                                createdAt: -1 // Sort by latest view
                             }
                         },
                         {
                             $project: {
-                                imageUrl: 1,
+                                _id: 1,
                                 createdAt: 1,
-                                owner: {
+                                user: {
                                     _id: 1,
                                     firstName: 1,
                                     lastName: 1,
                                     username: 1,
                                     profilePicture: 1
-                                },
-                                isViewed: 1
+                                }
                             }
                         }
                     ]
@@ -90,18 +86,15 @@ export async function GET(req: Request) {
             },
             {
                 $project: {
-                    _id: 0,
-                    storiesData: 1,
+                    _id: 1,
+                    owner: 1,
+                    imageUrl: 1,
+                    imageKey: 1,
+                    createdAt: 1,
+                    views: 1,
                 }
-            },
-            {
-                $unwind: "$storiesData"
-            },
-            {
-                $replaceRoot: { newRoot: "$storiesData" }
             }
         ]);
-
 
         return Response.json({
             data

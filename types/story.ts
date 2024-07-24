@@ -13,3 +13,30 @@ export interface IPopulatedStory {
     createdAt: Date;
     isViewed: boolean;
 }
+
+export interface IPopulatedStoryCurrentUser {
+    _id: mongoose.Schema.Types.ObjectId;
+    owner: {
+        _id: mongoose.Schema.Types.ObjectId;
+        username: string;
+        firstName: string;
+        lastName: string;
+        profilePicture: string;
+    };
+    imageUrl: string;
+    imageKey: string;
+    createdAt: Date;
+    views: [
+        {
+            _id: mongoose.Schema.Types.ObjectId;
+            createdAt: Date;
+            user: {
+                _id: mongoose.Schema.Types.ObjectId;
+                username: string;
+                firstName: string;
+                lastName: string;
+                profilePicture: string;
+            };
+        }
+    ]
+}

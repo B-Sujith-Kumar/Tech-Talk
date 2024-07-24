@@ -1,11 +1,8 @@
-import { currentUser } from "@clerk/nextjs/server";
-import Image from "next/image";
 import CreateStoryComp from "./_components/StoryComp";
 import { getFollowingPeoplesStories, getUserStories } from "@/lib/actions/story.actions";
 import ViewStoryComp from "./_components/ViewStory";
 
 export const Stories = async () => {
-    const user = await currentUser();
     const userStoriesData = await getUserStories();
     const followingPeopleStoriesData = await getFollowingPeoplesStories();
     return (
@@ -20,7 +17,7 @@ export const Stories = async () => {
                             Your Story
                         </span>
                     </div>
-                    <ViewStoryComp 
+                    <ViewStoryComp
                         userStoriesData={followingPeopleStoriesData.data}
                     />
                 </div>

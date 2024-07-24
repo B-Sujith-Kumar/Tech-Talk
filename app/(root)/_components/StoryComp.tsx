@@ -2,7 +2,7 @@
 
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Key, useEffect, useState } from "react";
 import { UploadButton, UploadDropzone } from "@/lib/uploadthing";
 import { useForm } from "react-hook-form";
@@ -13,16 +13,18 @@ import { Form, FormField, FormControl, FormItem, FormMessage } from "@/component
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { createStory, deleteStory } from "@/lib/actions/story.actions";
-import { ArrowUpToLineIcon, CloudUploadIcon, MoveLeftIcon, MoveRightIcon, Trash2Icon } from "lucide-react";
+import { ArrowUpToLineIcon, CloudUploadIcon, EyeIcon, MoveLeftIcon, MoveRightIcon, Trash2Icon } from "lucide-react";
 import { imageRemove } from "@/lib/image";
 import { AlertDialog, AlertDialogContent, AlertDialogTrigger, AlertDialogTitle, AlertDialogCancel, AlertDialogDescription, AlertDialogHeader, AlertDialogFooter, AlertDialogAction } from "@/components/ui/alert-dialog";
 import moment from "moment";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { IPopulatedStory } from "@/types/story";
+import { IPopulatedStoryCurrentUser } from "@/types/story";
 import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { useRouter } from "next/navigation";
 
-export default function CreateStoryComp({ userStoriesData }: { userStoriesData: IPopulatedStory[] }) {
+export default function CreateStoryComp({ userStoriesData }: { userStoriesData: IPopulatedStoryCurrentUser[] }) {
     const { user } = useUser();
     const [isOpen, setIsOpen] = useState(false);
     const [uploadingMessage, setUploadingMessage] = useState("");
@@ -31,6 +33,7 @@ export default function CreateStoryComp({ userStoriesData }: { userStoriesData: 
     const [currentStory, setCurrentStory] = useState(0);
     const [progress, setProgress] = useState(0);
     const [stopProgress, setStopProgress] = useState(false);
+    const router = useRouter();
 
     const form = useForm<z.infer<typeof createStorySchema>>({
         resolver: zodResolver(createStorySchema),
@@ -44,7 +47,7 @@ export default function CreateStoryComp({ userStoriesData }: { userStoriesData: 
         let res = await createStory({ data });
         if (res.status === 200) {
             toast({
-                variant: "success",
+                variant: "default",
                 title: "Success!!",
                 description: res.message
             });
@@ -194,7 +197,7 @@ export default function CreateStoryComp({ userStoriesData }: { userStoriesData: 
                                             imageKey !== "" && await imageRemove(imageKey).then((res) => {
                                                 if (res.status === 200) {
                                                     toast({
-                                                        variant: "success",
+                                                        variant: "default",
                                                         title: "Success!!",
                                                         description: res.message
                                                     });
@@ -320,10 +323,10 @@ export default function CreateStoryComp({ userStoriesData }: { userStoriesData: 
                                 className="bg-indigo-600 hover:bg-indigo-700 text-white hover:text-white"
                                 onClick={async (e) => {
                                     e.preventDefault();
-                                    let res = await deleteStory({ storyId: userStoriesData[currentStory]._id as string });
+                                    let res = await deleteStory({ storyId: userStoriesData[currentStory]._id as unknown as string });
                                     if (res.status === 200) {
                                         toast({
-                                            variant: "success",
+                                            variant: "default",
                                             title: "Success!!",
                                             description: res.message
                                         });
@@ -342,6 +345,45 @@ export default function CreateStoryComp({ userStoriesData }: { userStoriesData: 
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
+                <DialogFooter className="bg-white w-fit h-fit p-1 rounded-lg m-0 absolute bottom-6 hover:bg-white/70 cursor-pointer left-40 sm:left-60">
+                    <HoverCard openDelay={200} >
+                        <HoverCardTrigger className="flex flex-row items-center justify-center gap-2">
+                            <EyeIcon className="h-6 w-6" />
+                            {userStoriesData[currentStory].views.length}
+                        </HoverCardTrigger>
+                        <HoverCardContent className="">
+                            {userStoriesData[currentStory].views.map((view, index) => (
+                                    <div key={index} className="flex flex-row items-center gap-2 p-2">
+                                        <Avatar>
+                                            <AvatarImage
+                                                src={view.user.profilePicture}
+                                                alt={view.user.firstName + view.user.lastName}
+                                                onClick={() => router.push(`/user/${view.user._id}`)}
+                                            />
+                                            <AvatarFallback>
+                                                {view.user.firstName[0] + view.user.lastName[0]}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex flex-col">
+                                            <Link href={`/user/${view.user._id}
+                                                `}
+                                                className="text-sm font-semibold text-gray-800"
+                                            >
+                                                {view.user.firstName} {view.user.lastName}
+                                            </Link>
+                                            <span className="text-xs text-gray-500">
+                                                viewed {moment(view.createdAt).fromNow()}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                                {userStoriesData[currentStory].views.length <=0 && <div className="flex flex-row items-center gap-2 p-2">
+                                    No views yet
+                                    </div>
+                                    }
+                        </HoverCardContent>
+                    </HoverCard>
+                </DialogFooter>
             </DialogContent>
         </Dialog>}
     </>

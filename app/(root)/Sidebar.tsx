@@ -11,9 +11,14 @@ export default async function Sidebar({ isMobile = false, communitites }: {
 }) {
     const isSignedIn = await isAuth();
     const user = await currentUser();
-    const followers = await getFollowers(user?.id as string);
-    const following = await getFollowing(user?.id as string);
-    const totalPosts = await getTotalPosts(user?.id as string);
+    let followers = [];
+    let following = [];
+    let totalPosts: { status: number; posts: any; message?: undefined; } | { status: number; message: any; posts?: undefined; } = { status: 0, posts: [] };
+    if (isSignedIn) {
+        followers = await getFollowers(user?.id as string);
+        following = await getFollowing(user?.id as string);
+        totalPosts = await getTotalPosts(user?.id as string);
+    }
 
     return <>
         <div className={` ${isMobile === false ? "w-1/5 xl:w-1/5 max-lg:hidden space-y-3" : ""} `}>
@@ -54,7 +59,7 @@ export default async function Sidebar({ isMobile = false, communitites }: {
                         </div>
                         <div className="flex flex-col items-center">
                             <span className="text-base font-medium">
-                                {totalPosts.posts.length}
+                                {totalPosts?.posts?.length}
                             </span>
                             <span className="text-xs text-slate-500">
                                 Posts

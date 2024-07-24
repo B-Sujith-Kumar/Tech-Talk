@@ -111,7 +111,7 @@ export function PostActions({
                       toast({
                         title: "Post deleted successfully",
                         description: "The post has been deleted successfully.",
-                        variant: "success",
+                        variant: "default",
                       });
                     } else {
                       setOpen(false);
