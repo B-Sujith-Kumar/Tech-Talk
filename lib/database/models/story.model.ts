@@ -4,6 +4,7 @@ import mongoose, { Document } from "mongoose";
 export interface IStory extends Document {
     owner: mongoose.Schema.Types.ObjectId;
     imageUrl: string;
+    imageKey: string;
     createdAt: Date;
 }
 
@@ -16,6 +17,7 @@ export interface IStoryView extends Document {
 const storySchema = new mongoose.Schema<IStory>({
     owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     imageUrl: { type: String, required: true },
+    imageKey: { type: String, required: true },
     createdAt: { type: Date, default: Date.now, expires: "24h" },
 }, { timestamps: true });
 

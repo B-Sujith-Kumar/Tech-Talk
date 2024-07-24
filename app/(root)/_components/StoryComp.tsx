@@ -3,7 +3,7 @@
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useEffect, useState } from "react";
+import { Key, useEffect, useState } from "react";
 import { UploadButton, UploadDropzone } from "@/lib/uploadthing";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -12,20 +12,25 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormControl, FormItem, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import { createStory } from "@/lib/actions/story.actions";
-import { ArrowUpToLineIcon, CloudUploadIcon, Trash2Icon } from "lucide-react";
+import { createStory, deleteStory } from "@/lib/actions/story.actions";
+import { ArrowUpToLineIcon, CloudUploadIcon, MoveLeftIcon, MoveRightIcon, Trash2Icon } from "lucide-react";
 import { imageRemove } from "@/lib/image";
+import { IStory } from "@/lib/database/models/story.model";
+import { AlertDialog, AlertDialogContent, AlertDialogTrigger, AlertDialogTitle, AlertDialogCancel, AlertDialogDescription, AlertDialogHeader, AlertDialogFooter, AlertDialogAction } from "@/components/ui/alert-dialog";
 
-export default function CreateStoryComp() {
+export default function CreateStoryComp({ userStoriesData }: { userStoriesData: IStory[] }) {
     const { user } = useUser();
     const [isOpen, setIsOpen] = useState(false);
     const [uploadingMessage, setUploadingMessage] = useState("");
     const [imageKey, setImageKey] = useState("");
+    const [showUserStories, setShowUserStories] = useState(false);
+    const [currentStory, setCurrentStory] = useState(0);
 
     const form = useForm<z.infer<typeof createStorySchema>>({
         resolver: zodResolver(createStorySchema),
         defaultValues: {
             imageUrl: "",
+            imageKey: "",
         }
     });
 
@@ -59,8 +64,15 @@ export default function CreateStoryComp() {
                 alt={user?.firstName && user.lastName ? user.firstName[0] + " " + user.lastName[0] : ""}
                 width={400}
                 height={400}
-                className="min-w-16 h-16 rounded-full border-2 object-cover cursor-pointer"
-                onClick={() => setIsOpen(true)}
+                className={` min-w-16 h-16 rounded-full border-2 object-cover p-1
+                    ${userStoriesData.length > 0 ? "border-indigo-500 cursor-pointer" : ""}
+                    `}
+                onClick={(e) => {
+                    e.preventDefault();
+                    if (userStoriesData.length > 0) {
+                        setShowUserStories(true);
+                    }
+                }}
             />
             <p className="absolute bottom-4 left-10 bg-indigo-600 text-white rounded-full cursor-pointer mx-auto text-center w-6 h-6 border-2 border-gray-200 flex justify-center items-center"
                 onClick={() => setIsOpen(true)}
@@ -78,6 +90,21 @@ export default function CreateStoryComp() {
                                 onSubmit={form.handleSubmit(onSubmit)}
                                 className="space-y-4 overflow-y-scroll scrollbar-hidden w-full max-w-full"
                             >
+                                <FormField
+                                    control={form.control}
+                                    name="imageKey"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-col">
+                                            <FormControl>
+                                                <input
+                                                    type="hidden"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                                 <FormField
                                     control={form.control}
                                     name="imageUrl"
@@ -99,6 +126,7 @@ export default function CreateStoryComp() {
                                                                 onClientUploadComplete={(res) => {
                                                                     form.setValue("imageUrl", res[0].url);
                                                                     setImageKey(res[0].key);
+                                                                    form.setValue("imageKey", res[0].key);
                                                                 }}
                                                                 onUploadError={(err: any) => {
                                                                     form.setError("imageUrl", { message: err.message });
@@ -165,7 +193,7 @@ export default function CreateStoryComp() {
                                     <Button
                                         type="button"
                                         variant="primary"
-                                        className="w-fit"
+                                        className="bg-indigo-600 hover:bg-indigo-700 focus:outline-none"
                                         onClick={form.handleSubmit(onSubmit)}
                                     >
                                         <ArrowUpToLineIcon className="h-5 w-5" />
@@ -177,5 +205,80 @@ export default function CreateStoryComp() {
                 </DialogHeader>
             </DialogContent>
         </Dialog>
+        {showUserStories && <Dialog open={showUserStories} onOpenChange={setShowUserStories} >
+            <DialogContent className="max-h-[85vh] p-0 rounded max-sm:max-w-[90%] border-collapse">
+                <Image
+                    src={userStoriesData[currentStory].imageUrl}
+                    alt={`Story ${currentStory}`}
+                    width={400}
+                    height={400}
+                    className="h-[40rem] w-full rounded"
+                />
+                <MoveLeftIcon
+                    className={` h-6 w-6 text-white border-2 border-white rounded-full bg-gray-900 bg-opacity-50 p-1 hover:bg-opacity-75 absolute transform md:-translate-x-20 -translate-y-1/2 top-1/2 disabled:opacity-50 translate-x-4
+                        ${currentStory > 0 ? "cursor-pointer" : "cursor-not-allowed"}
+                                `}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        currentStory > 0 && setCurrentStory(currentStory - 1);
+                    }}
+                    aria-disabled={currentStory === 0}
+                />
+                <MoveRightIcon
+                    className={` h-6 w-6 text-white border-2 border-white rounded-full bg-gray-900 bg-opacity-50 p-1 hover:bg-opacity-75 absolute transform md:translate-x-[35rem] -translate-y-1/2 top-1/2 disabled:opacity-50 translate-x-[20rem]
+                        ${currentStory < userStoriesData.length - 1 ? "cursor-pointer" : "cursor-not-allowed"}
+                                `}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        currentStory < userStoriesData.length - 1 && setCurrentStory(currentStory + 1);
+                    }}
+                    aria-disabled={currentStory === userStoriesData.length - 1}
+                />
+                <AlertDialog>
+                    <AlertDialogTrigger asChild className="absolute top-2 right-12 text-red-600 border border-red-600 rounded-full p-1 bg-white bg-opacity-50 hover:bg-opacity-75 hover:text-red-700 cursor-pointer">
+                        <Trash2Icon className="h-8 w-8" />
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="max-sm:max-w-[95%] rounded-xl">
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                Are you sure, you want to delete this story?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete your
+                                story from the server.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel
+                                className="bg-red-500 hover:bg-red-600 text-white hover:text-white"
+                            >Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                                className="bg-indigo-600 hover:bg-indigo-700 text-white hover:text-white"
+                                onClick={async (e) => {
+                                    e.preventDefault();
+                                    let res = await deleteStory({ storyId: userStoriesData[currentStory]._id as string });
+                                    if (res.status === 200) {
+                                        toast({
+                                            variant: "success",
+                                            title: "Success!!",
+                                            description: res.message
+                                        });
+                                        setShowUserStories(false);
+                                    }
+                                    else {
+                                        toast({
+                                            variant: "destructive",
+                                            title: "Error deleting story",
+                                            description: res.message
+                                        });
+                                        setShowUserStories(false);
+                                    }
+                                }}
+                            >Yes</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            </DialogContent>
+        </Dialog>}
     </>
 }
