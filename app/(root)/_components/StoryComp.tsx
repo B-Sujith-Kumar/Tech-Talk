@@ -15,16 +15,22 @@ import { toast } from "@/components/ui/use-toast";
 import { createStory, deleteStory } from "@/lib/actions/story.actions";
 import { ArrowUpToLineIcon, CloudUploadIcon, MoveLeftIcon, MoveRightIcon, Trash2Icon } from "lucide-react";
 import { imageRemove } from "@/lib/image";
-import { IStory } from "@/lib/database/models/story.model";
 import { AlertDialog, AlertDialogContent, AlertDialogTrigger, AlertDialogTitle, AlertDialogCancel, AlertDialogDescription, AlertDialogHeader, AlertDialogFooter, AlertDialogAction } from "@/components/ui/alert-dialog";
+import moment from "moment";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { IPopulatedStory } from "@/types/story";
+import Link from "next/link";
+import { Progress } from "@/components/ui/progress";
 
-export default function CreateStoryComp({ userStoriesData }: { userStoriesData: IStory[] }) {
+export default function CreateStoryComp({ userStoriesData }: { userStoriesData: IPopulatedStory[] }) {
     const { user } = useUser();
     const [isOpen, setIsOpen] = useState(false);
     const [uploadingMessage, setUploadingMessage] = useState("");
     const [imageKey, setImageKey] = useState("");
     const [showUserStories, setShowUserStories] = useState(false);
     const [currentStory, setCurrentStory] = useState(0);
+    const [progress, setProgress] = useState(0);
+    const [stopProgress, setStopProgress] = useState(false);
 
     const form = useForm<z.infer<typeof createStorySchema>>({
         resolver: zodResolver(createStorySchema),
@@ -56,6 +62,25 @@ export default function CreateStoryComp({ userStoriesData }: { userStoriesData: 
             });
         }
     }
+
+    useEffect(() => {
+        if (!stopProgress) {
+            let timer: any;
+            if (progress < 100) {
+                timer = setTimeout(() => setProgress(progress + 6.7), 1000);
+            }
+            if (progress >= 100) {
+                if (currentStory < userStoriesData.length - 1) {
+                    setCurrentStory(currentStory + 1);
+                }
+                if (currentStory === userStoriesData.length - 1) {
+                    setCurrentStory(0);
+                }
+                setProgress(0);
+            }
+            return () => clearTimeout(timer);
+        }
+    }, [progress, stopProgress]);
 
     return <>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -206,14 +231,52 @@ export default function CreateStoryComp({ userStoriesData }: { userStoriesData: 
             </DialogContent>
         </Dialog>
         {showUserStories && <Dialog open={showUserStories} onOpenChange={setShowUserStories} >
-            <DialogContent className="max-h-[85vh] p-0 rounded max-sm:max-w-[90%] border-collapse">
+            <DialogContent className="max-h-[85vh] p-0 m-0 rounded max-sm:max-w-[90%] border-collapse border-none flex flex-col gap-0">
+                <DialogHeader className="m-0 p-0 bg-gray-200 z-50">
+                    <div className="bg-blue-600 h-1" style={{
+                        width: `${progress}%`
+                    }}></div>
+                </DialogHeader>
                 <Image
                     src={userStoriesData[currentStory].imageUrl}
                     alt={`Story ${currentStory}`}
                     width={400}
                     height={400}
                     className="h-[40rem] w-full rounded"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        setStopProgress(!stopProgress);
+                    }}
+                    onDoubleClick={(e) => {
+                        e.preventDefault();
+                        setStopProgress(!stopProgress);
+                    }}
+                    onClickCapture={(e) => {
+                        e.preventDefault();
+                        setStopProgress(!stopProgress);
+                    }}
+                    onDragCapture={(e) => {
+                        e.preventDefault();
+                        setStopProgress(!stopProgress);
+                    }}
                 />
+                <span className="flex flex-row items-center gap-2 p-2 pr-3 bg-white/85 text-black w-fit rounded-br-2xl absolute top-0">
+                    <Avatar>
+                        <AvatarImage
+                            src={userStoriesData[currentStory]?.owner.profilePicture}
+                            alt={userStoriesData[currentStory]?.owner.firstName + userStoriesData[currentStory]?.owner.lastName}
+                        />
+                        <AvatarFallback>
+                            {userStoriesData[currentStory]?.owner.firstName[0] + userStoriesData[currentStory]?.owner.lastName[0]}
+                        </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                        You
+                        <span className="text-xs text-gray-500">
+                            {moment(userStoriesData[currentStory]?.createdAt).fromNow()}
+                        </span>
+                    </div>
+                </span>
                 <MoveLeftIcon
                     className={` h-6 w-6 text-white border-2 border-white rounded-full bg-gray-900 bg-opacity-50 p-1 hover:bg-opacity-75 absolute transform md:-translate-x-20 -translate-y-1/2 top-1/2 disabled:opacity-50 translate-x-4
                         ${currentStory > 0 ? "cursor-pointer" : "cursor-not-allowed"}
@@ -221,6 +284,7 @@ export default function CreateStoryComp({ userStoriesData }: { userStoriesData: 
                     onClick={(e) => {
                         e.preventDefault();
                         currentStory > 0 && setCurrentStory(currentStory - 1);
+                        currentStory > 0 && setProgress(0);
                     }}
                     aria-disabled={currentStory === 0}
                 />
@@ -230,7 +294,7 @@ export default function CreateStoryComp({ userStoriesData }: { userStoriesData: 
                                 `}
                     onClick={(e) => {
                         e.preventDefault();
-                        currentStory < userStoriesData.length - 1 && setCurrentStory(currentStory + 1);
+                        currentStory < userStoriesData.length - 1 && setCurrentStory(currentStory + 1); currentStory < userStoriesData.length - 1 && setProgress(0);
                     }}
                     aria-disabled={currentStory === userStoriesData.length - 1}
                 />

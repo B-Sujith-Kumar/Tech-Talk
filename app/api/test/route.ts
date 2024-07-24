@@ -1,124 +1,109 @@
 import { connectToDatabase } from "@/lib/database";
-import Post from "@/lib/database/models/post.model";
+import User from "@/lib/database/models/user.model";
+import mongoose from "mongoose";
 
 export async function GET(req: Request) {
     try {
         await connectToDatabase();
-        let data = await Post.aggregate([
+        let userDb = {
+            _id: ""
+        }
+        let data = await User.aggregate([
             {
                 $match: {
-                    $or: [
-                        {
-                            "upvotes.createdAt": {
-                                $gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
-                            }
-                        },
-                        {
-                            "downvotes.createdAt": {
-                                $gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
-                            }
-                        },
-                        {
-                            "comments.createdAt": {
-                                $gte: new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
-                            }
-                        }
-                    ]
+                    _id: new mongoose.Types.ObjectId(userDb._id)
                 }
             },
             {
                 $lookup: {
-                    from: "tags",
-                    as: "tags",
-                    localField: "tags",
-                    foreignField: "_id",
+                    from: "stories",
+                    localField: "following",
+                    foreignField: "owner",
+                    as: "storiesData",
                     pipeline: [
                         {
-                            $project: {
-                                _id: 1,
-                                name: 1
+                            $lookup: {
+                                from: "users",
+                                localField: "owner",
+                                foreignField: "_id",
+                                as: "owner",
                             }
-                        }
-                    ]
-                }
-            },
-            {
-                $lookup: {
-                    from: "communities",
-                    as: "community",
-                    localField: "community",
-                    foreignField: "_id",
-                    pipeline: [
+                        },
                         {
-                            $project: {
-                                _id: 1,
-                                name: 1,
-                                icon: 1
+                            $addFields: {
+                                owner: {
+                                    $arrayElemAt: ["$owner", 0]
+                                }
                             }
-                        }
-                    ]
-                }
-            },
-            {
-                $addFields:{
-                    community: {
-                        $arrayElemAt: ["$community", 0]
-                    }
-                }
-            },
-            {
-                $addFields: {
-                    engagementScore: {
-                        $subtract: [
-                            {
-                                $add: [
-                                    { $size: "$upvotes" },
-                                    { $size: "$comments" }
-                                ]
+                        },
+                        {
+                            $lookup: {
+                                from: "storyviews",
+                                let: { storyId: "$_id" },
+                                pipeline: [
+                                    {
+                                        $match: {
+                                            $expr: {
+                                                $and: [
+                                                    { $eq: ["$story", "$$storyId"] },
+                                                    {
+                                                        $eq: [
+                                                            "$userID",
+                                                            new mongoose.Types.ObjectId(userDb._id)
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                ],
+                                as: "isViewed"
                             },
-                            { $size: "$downvotes" }
-                        ]
-                    }
-                }
-            },
-            {
-                $sort: {
-                    engagementScore: -1
-                }
-            },
-            {
-                $limit: 10
-            },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "author",
-                    foreignField: "_id",
-                    as: "author",
-                    pipeline: [
+                        },
+                        {
+                            $addFields: {
+                                isViewed: { $gt: [{ $size: "$isViewed" }, 0] }
+                            }
+                        },
+                        {
+                            $sort: {
+                                isViewed: 1,
+                                createdAt: -1
+                            }
+                        },
                         {
                             $project: {
-                                _id: 1,
-                                name: 1,
-                                firstName: 1,
-                                lastName: 1,
-                                profilePicture: 1
+                                imageUrl: 1,
+                                createdAt: 1,
+                                owner: {
+                                    _id: 1,
+                                    firstName: 1,
+                                    lastName: 1,
+                                    username: 1,
+                                    profilePicture: 1
+                                },
+                                isViewed: 1
                             }
                         }
                     ]
                 }
             },
             {
-                $addFields: {
-                    author: {
-                        $arrayElemAt: ["$author", 0]
-                    }
+                $project: {
+                    _id: 0,
+                    storiesData: 1,
                 }
+            },
+            {
+                $unwind: "$storiesData"
+            },
+            {
+                $replaceRoot: { newRoot: "$storiesData" }
             }
         ]);
 
+
         return Response.json({
-            message: "Hello, World!",
             data
         });
     }

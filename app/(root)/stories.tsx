@@ -2,6 +2,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import Image from "next/image";
 import CreateStoryComp from "./_components/StoryComp";
 import { getFollowingPeoplesStories, getUserStories } from "@/lib/actions/story.actions";
+import ViewStoryComp from "./_components/ViewStory";
 
 export const Stories = async () => {
     const user = await currentUser();
@@ -19,22 +20,9 @@ export const Stories = async () => {
                             Your Story
                         </span>
                     </div>
-                    {new Array(20).fill(0).map((_, i) => (
-                        <div key={i} className="flex flex-col items-center w-16 relative">
-                            <Image
-                                src="/images/1.jpeg"
-                                alt="Image 2"
-                                width={400}
-                                height={400}
-                                className={` min-w-16 h-16 rounded-full border-2 object-cover cursor-pointer p-1
-                                ${i % 2 === 0 ? "border-indigo-500" : ""}
-                                `}
-                            />
-                            <span className="text-xs mt-1">
-                                User {i}
-                            </span>
-                        </div>
-                    ))}
+                    <ViewStoryComp 
+                        userStoriesData={followingPeopleStoriesData.data}
+                    />
                 </div>
             </div>
         </>
