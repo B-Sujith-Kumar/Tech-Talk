@@ -1,6 +1,6 @@
-import { currentUser, User } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import Image from "next/image";
-import StoryComp from "./_components/StoryComp";
+import CreateStoryComp from "./_components/StoryComp";
 
 export const Stories = async () => {
     const user = await currentUser();
@@ -9,7 +9,7 @@ export const Stories = async () => {
             <div id="stories">
                 <div className="flex flex-row items-center gap-x-4 p-2 px-4 *: overflow-x-scroll scrollbar-hidden bg-white rounded-md">
                     <div className="flex flex-col items-center w-16 relative">
-                        <StoryComp />
+                        <CreateStoryComp />
                         <span className="text-xs mt-1">
                             Your Story
                         </span>

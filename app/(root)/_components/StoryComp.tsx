@@ -3,7 +3,7 @@
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { UploadButton, UploadDropzone } from "@/lib/uploadthing";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -13,16 +13,19 @@ import { Form, FormField, FormControl, FormItem, FormMessage } from "@/component
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { createStory } from "@/lib/actions/story.actions";
+import { ArrowUpToLineIcon, CloudUploadIcon, Trash2Icon } from "lucide-react";
+import { imageRemove } from "@/lib/image";
 
-export default function StoryComp() {
+export default function CreateStoryComp() {
     const { user } = useUser();
     const [isOpen, setIsOpen] = useState(false);
+    const [uploadingMessage, setUploadingMessage] = useState("");
+    const [imageKey, setImageKey] = useState("");
 
     const form = useForm<z.infer<typeof createStorySchema>>({
         resolver: zodResolver(createStorySchema),
         defaultValues: {
             imageUrl: "",
-            clerkID: user?.id as string,
         }
     });
 
@@ -36,8 +39,11 @@ export default function StoryComp() {
             });
             form.reset();
             setIsOpen(false);
+            setUploadingMessage("");
+            setImageKey("");
         }
         else {
+            setUploadingMessage("");
             toast({
                 variant: "destructive",
                 title: "Error creating story",
@@ -81,57 +87,42 @@ export default function StoryComp() {
                                                 <div className="flex flex-col-reverse gap-5 items-start mb-3 mt-2">
                                                     {field.value === "" ? (
                                                         <>
-                                                            <UploadButton
+                                                            <UploadDropzone
                                                                 endpoint="imageUploader"
-                                                                onClientUploadComplete={(res: any) => {
-                                                                    form.setValue("imageUrl", res[0].url);
-                                                                }}
+                                                                className="w-full h-60 sm:h-96 rounded-lg border-2 border-dashed border-gray-300 flex justify-center items-center cursor-pointer hover:border-indigo-600 focus:border-indigo-600 focus:border-dashed active:border-indigo-600 active:border-dashed focus-visible:border-indigo-600 focus-visible:border-dashed relative"
                                                                 appearance={{
-                                                                    button:
-                                                                        "bg-indigo-600 hover:bg-indigo-700 text-white rounded-md p-2 w-fit text-center cursor-pointer h-10",
+                                                                    uploadIcon: "h-10 w-10 text-indigo-500 hover:text-indigo-600 cursor-pointer",
+                                                                    button: "bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-opacity-50 rounded-lg px-4 py-2",
+                                                                    allowedContent: "text-gray-500 text-sm font-medium mt-2 text-center w-full max-w-full whitespace-nowrap overflow-hidden overflow-ellipsis animate-pulse",
+                                                                    label: "text-gray-500 text-sm font-medium mt-2 text-center w-full max-w-full whitespace-nowrap overflow-hidden overflow-ellipsis text-center text-xl",
+                                                                }}
+                                                                onClientUploadComplete={(res) => {
+                                                                    form.setValue("imageUrl", res[0].url);
+                                                                    setImageKey(res[0].key);
+                                                                }}
+                                                                onUploadError={(err: any) => {
+                                                                    form.setError("imageUrl", { message: err.message });
                                                                 }}
                                                                 content={{
-                                                                    button({
-                                                                        ready,
-                                                                        isUploading,
-                                                                    }: {
-                                                                        ready: boolean;
-                                                                        isUploading: boolean;
-                                                                    }) {
-                                                                        if (ready && !isUploading)
-                                                                            return (
-                                                                                <div className="">
-                                                                                    {field.value !== ""
-                                                                                        ? "Change Image"
-                                                                                        : "Upload Image"}
-                                                                                </div>
-                                                                            );
-                                                                        if (isUploading) return <div>Uploading</div>;
-                                                                    },
-                                                                    allowedContent({
-                                                                        ready,
-                                                                        fileTypes,
-                                                                        isUploading,
-                                                                    }: {
-                                                                        ready: boolean;
-                                                                        fileTypes: string[];
-                                                                        isUploading: boolean;
-                                                                    }) {
-                                                                        if (!ready) return "";
-                                                                        if (ready) return "";
-                                                                        if (isUploading) return "";
-                                                                    },
+                                                                    uploadIcon: <CloudUploadIcon
+                                                                        className="h-10 w-10 text-indigo-500 hover:text-indigo-600 cursor-pointer"
+                                                                    />,
+                                                                    label: "Upload Image",
+                                                                    allowedContent: "Images Only",
+                                                                }}
+                                                                onUploadBegin={(fileName) => {
+                                                                    setUploadingMessage(`Uploading ${fileName}...`);
                                                                 }}
                                                             />
-                                                        </>
-                                                    )
+                                                            {uploadingMessage && <DialogDescription>{uploadingMessage}</DialogDescription>}
+                                                        </>)
                                                         :
                                                         <Image
                                                             src={field.value}
                                                             alt="Banner"
                                                             height={4}
                                                             width={20}
-                                                            className="h-full sm:h-60 object-contain w-full rounded-lg"
+                                                            className="h-[70vh] block object-contain w-full rounded-lg"
                                                         />
                                                     }
                                                 </div>
@@ -145,12 +136,31 @@ export default function StoryComp() {
                                         type="reset"
                                         variant="destructive"
                                         className="w-fit"
-                                        onClick={(e) => {
+                                        onClick={async (e) => {
                                             e.preventDefault();
+                                            imageKey !== "" && await imageRemove(imageKey).then((res) => {
+                                                if (res.status === 200) {
+                                                    toast({
+                                                        variant: "success",
+                                                        title: "Success!!",
+                                                        description: res.message
+                                                    });
+                                                    setImageKey("");
+                                                }
+                                                else {
+                                                    toast({
+                                                        variant: "destructive",
+                                                        title: "Error deleting image",
+                                                        description: res.message
+                                                    });
+                                                    setImageKey("");
+                                                }
+                                            });
+                                            setUploadingMessage("");
                                             form.reset();
                                         }}
                                     >
-                                        Clear Form
+                                        <Trash2Icon className="h-5 w-5" />
                                     </Button>
                                     <Button
                                         type="button"
@@ -158,7 +168,7 @@ export default function StoryComp() {
                                         className="w-fit"
                                         onClick={form.handleSubmit(onSubmit)}
                                     >
-                                        Post Story
+                                        <ArrowUpToLineIcon className="h-5 w-5" />
                                     </Button>
                                 </div>
                             </form>

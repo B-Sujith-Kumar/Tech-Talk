@@ -9,7 +9,6 @@ import User from "../database/models/user.model";
 export async function createStory({ data }: {
     data: {
         imageUrl: string;
-        clerkID: string;
     }
 }) {
     try {
@@ -17,9 +16,8 @@ export async function createStory({ data }: {
         if (!auth) return { status: 401, message: "Unauthorized" };
         const user = await currentUser();
         if (!user) return { status: 401, message: "Unauthorized" };
-        if (user.id !== data.clerkID) return { status: 401, message: "Unauthorized" };
         await connectToDatabase();
-        let userDb = await User.findOne({ clerkID: user.id });
+        let userDb = await User.findOne({ clerkId: user.id });
         if (!userDb) return { status: 404, message: "User not found" };
         await Story.create({
             imageUrl: data.imageUrl,
