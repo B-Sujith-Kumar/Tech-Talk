@@ -1,43 +1,44 @@
-"use client";
-
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { HandshakeIcon, HouseIcon, Images, LucideCalendarRange, Video } from "lucide-react";
-import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useUser } from "@clerk/nextjs";
 import { ICommunity } from "@/lib/database/models/community.model";
+import Links from "./_components/SIdebar/Link";
+import { isAuth } from "@/lib/auth";
+import { currentUser } from "@clerk/nextjs/server";
+import { getFollowers, getFollowing, getTotalPosts } from "@/lib/actions/user.actions";
 
-export default function Sidebar({ isMobile = false, communitites }: {
+export default async function Sidebar({ isMobile = false, communitites }: {
     isMobile?: boolean,
     communitites: ICommunity[]
 }) {
-    const pathname = usePathname();
-    const { isSignedIn, user } = useUser();
+    const isSignedIn = await isAuth();
+    const user = await currentUser();
+    const followers = await getFollowers(user?.id as string);
+    const following = await getFollowing(user?.id as string);
+    const totalPosts = await getTotalPosts(user?.id as string);
+
     return <>
         <div className={` ${isMobile === false ? "w-1/5 xl:w-1/5 max-lg:hidden space-y-3" : ""} `}>
             {isSignedIn && <div id="profile" className="bg-white rounded-md max-md:mt-3 p-3 max-md:p-0">
                 <div className="flex flex-col gap-3 items-center bg-gray-100 rounded-md overflow-x-scroll scrollbar-hidden p-1">
                     <div className="flex flex-row items-center justify-start gap-2 w-full px-2">
                         <Avatar>
-                            <AvatarImage src={user.imageUrl} />
+                            <AvatarImage src={user?.imageUrl} />
                             <AvatarFallback>
-                                {user.fullName}
+                                {user?.firstName && user?.firstName[0]}{user?.lastName && user?.lastName[0] || "U"}
                             </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col space-y-[1px] text-wrap">
                             <span className="text-base font-medium">
-                                {user.fullName}
+                                {user?.firstName + " " + user?.lastName}
                             </span>
                             <span className="text-xs">
-                                @{user.username}
+                                @{user?.username}
                             </span>
                         </div>
                     </div>
-                    <div className="flex flex-row items-center justify-between mt-2 w-full px-2">
+                    <div className="flex flex-row items-center justify-between mt-2 w-full px-4">
                         <div className="flex flex-col items-center">
                             <span className="text-base font-medium">
-                                2.3k
+                                {followers.length}
                             </span>
                             <span className="text-xs text-slate-500">
                                 Followers
@@ -45,7 +46,7 @@ export default function Sidebar({ isMobile = false, communitites }: {
                         </div>
                         <div className="flex flex-col items-center">
                             <span className="text-base font-medium">
-                                235
+                                {following.length}
                             </span>
                             <span className="text-xs text-slate-500">
                                 Following
@@ -53,7 +54,7 @@ export default function Sidebar({ isMobile = false, communitites }: {
                         </div>
                         <div className="flex flex-col items-center">
                             <span className="text-base font-medium">
-                                80
+                                {totalPosts.posts.length}
                             </span>
                             <span className="text-xs text-slate-500">
                                 Posts
@@ -62,83 +63,7 @@ export default function Sidebar({ isMobile = false, communitites }: {
                     </div>
                 </div>
             </div>}
-            <div id="links">
-                <div className="bg-white rounded-md p-3 mt-2">
-                    <div className="flex flex-col gap-1">
-                        <Link href="/" className={` flex flex-row items-center gap-3  text-gray-600 p-2 hover:bg-indigo-600/90 hover:text-white hover:rounded-lg
-                ${pathname === "/" && "bg-indigo-600/90 text-white rounded-lg"} `}
-                        >
-                            <HouseIcon size={18} />
-                            Feed
-                        </Link>
-                        <Link href="/profile" className={` flex flex-row items-center gap-3  text-gray-600  p-2 hover:bg-indigo-600/90 hover:text-white  hover:rounded-lg
-                ${pathname === "/profile" && "bg-indigo-600/90 text-white rounded-lg"} `}
-                        >
-                            <HandshakeIcon size={18} />
-                            Friends
-                        </Link>
-                        <Link href="/events" className={` flex flex-row items-center gap-3  text-gray-600  p-2 hover:bg-indigo-600/90 hover:text-white  hover:rounded-lg
-                ${pathname === "/events" && "bg-indigo-600/90 text-white  rounded-lg"} `}
-                        >
-                            <LucideCalendarRange size={18} />
-                            Events
-                        </Link>
-                        <Link href="/videos" className={` flex flex-row items-center gap-3  text-gray-600  p-2 hover:bg-indigo-600/90 hover:text-gray-200 hover:rounded-lg
-                ${pathname === "/videos" && "bg-indigo-600/90 text-gray-200 rounded-lg"} `}
-                        >
-                            <Video size={18} />
-                            Videos
-                        </Link>
-                        <Link href="/images" className={` flex flex-row items-center gap-3  text-gray-600  p-2 hover:bg-indigo-600/90 hover:text-gray-200 hover:rounded-lg
-                ${pathname === "/images" && "bg-indigo-600/90 text-gray-200 rounded-lg"} `}
-                        >
-                            <Images size={18} />
-                            Images
-                        </Link>
-                    </div>
-                    {isSignedIn && <>
-                        <div className="border-t border-gray-200 w-full my-2"></div>
-                        <span className="text-[0.6rem] text-gray-500 mt-2 p-2">
-                            COMMUNITIES YOU ARE IN
-                        </span>
-                        <div className="flex flex-col p-2 gap-2 *:flex *:flex-row *:items-center *:gap-2 *:cursor-pointer">
-                            {
-                                communitites?.map((community, index) => (
-                                    <Link
-                                        key={index}
-                                        href={`/community/${community._id}`}
-                                    >
-                                        <Image
-                                            src={community.icon as string}
-                                            width={50}
-                                            height={50}
-                                            alt={community.name}
-                                            className="h-6 w-6 rounded"
-                                        />
-                                        <span className="text-xs text-gray-600 font-medium">
-                                            {community.name}
-                                        </span>
-                                    </Link>
-                                ))
-                            }
-                        </div>
-                        {communitites?.length > 4 && <div className="flex flex-row items-center justify-center gap-2 p-2">
-                            <Link href="/communities" className="text-xs text-indigo-500 font-medium">
-                                See all
-                            </Link>
-                        </div>
-                        }
-                    </>}
-                </div>
-                <div className="text-[0.6rem] text-gray-500 p-2 mt-2 flex flex-col gap-2">
-                    <span>
-                        Privacy · Advertising · Cookies
-                    </span>
-                    <span>
-                        Tech Talk {"©"} {new Date().getFullYear()}
-                    </span>
-                </div>
-            </div>
+            <Links communitites={communitites} />
         </div>
     </>
 }
