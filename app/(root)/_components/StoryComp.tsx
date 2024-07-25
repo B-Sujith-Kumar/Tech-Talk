@@ -23,6 +23,7 @@ import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { useRouter } from "next/navigation";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 
 export default function CreateStoryComp({ userStoriesData }: { userStoriesData: IPopulatedStoryCurrentUser[] }) {
     const { user } = useUser();
@@ -346,13 +347,17 @@ export default function CreateStoryComp({ userStoriesData }: { userStoriesData: 
                     </AlertDialogContent>
                 </AlertDialog>
                 <DialogFooter className="bg-white w-fit h-fit p-1 rounded-lg m-0 absolute bottom-6 hover:bg-white/70 cursor-pointer left-40 sm:left-60">
-                    <HoverCard openDelay={200} >
-                        <HoverCardTrigger className="flex flex-row items-center justify-center gap-2">
+                    <Drawer>
+                        <DrawerTrigger className="flex flex-row items-center justify-center gap-2 px-2 py-1">
                             <EyeIcon className="h-6 w-6" />
                             {userStoriesData[currentStory].views.length}
-                        </HoverCardTrigger>
-                        <HoverCardContent className="">
-                            {userStoriesData[currentStory].views.map((view, index) => (
+                        </DrawerTrigger>
+                        <DrawerContent className="sm:w-96 mx-auto">
+                            <div className="max-h-60 overflow-y-auto">
+                                {userStoriesData[currentStory]?.views?.length <= 0 && <div className="flex flex-row items-center gap-2 p-2">
+                                    No views yet
+                                </div>}
+                                {userStoriesData[currentStory]?.views?.map((view, index) => (
                                     <div key={index} className="flex flex-row items-center gap-2 p-2">
                                         <Avatar>
                                             <AvatarImage
@@ -365,10 +370,7 @@ export default function CreateStoryComp({ userStoriesData }: { userStoriesData: 
                                             </AvatarFallback>
                                         </Avatar>
                                         <div className="flex flex-col">
-                                            <Link href={`/user/${view.user._id}
-                                                `}
-                                                className="text-sm font-semibold text-gray-800"
-                                            >
+                                            <Link href={`/user/${view.user._id}`} className="text-sm font-semibold text-gray-800">
                                                 {view.user.firstName} {view.user.lastName}
                                             </Link>
                                             <span className="text-xs text-gray-500">
@@ -377,12 +379,9 @@ export default function CreateStoryComp({ userStoriesData }: { userStoriesData: 
                                         </div>
                                     </div>
                                 ))}
-                                {userStoriesData[currentStory].views.length <=0 && <div className="flex flex-row items-center gap-2 p-2">
-                                    No views yet
-                                    </div>
-                                    }
-                        </HoverCardContent>
-                    </HoverCard>
+                            </div>
+                        </DrawerContent>
+                    </Drawer>
                 </DialogFooter>
             </DialogContent>
         </Dialog>}
