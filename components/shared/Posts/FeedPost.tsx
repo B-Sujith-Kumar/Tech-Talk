@@ -116,7 +116,7 @@ const FeedPost = ({
                         <span className="text-xs font-medium">{post.views}</span>
                     </div>
                     <div>
-                        <VotesButtons post={post} userObjectId={currentUser._id} />
+                        <VotesButtons post={post} userObjectId={currentUser?._id} />
                     </div>
                     <div>
                         <MessageCircleIcon className="w-4 h-4 " />
