@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { DialogContent, Dialog, DialogTrigger, DialogHeader } from "@/components/ui/dialog";
+import { DialogContent, Dialog, DialogHeader } from "@/components/ui/dialog";
 import { MoveLeftIcon, MoveRightIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { IPopulatedStory } from "@/types/story";
@@ -50,7 +50,7 @@ export default function ViewStoryComp({ userStoriesData }: {
     }, [progress, stopProgress]);
 
     return <>
-        <div className="flex flex-row items-center gap-x-4 *: overflow-x-scroll scrollbar-hidden bg-white rounded-md">
+        <div className="flex flex-row items-center gap-x-4 overflow-x-scroll scrollbar-hidden bg-white rounded-md">
             {userStoriesData?.map((story: IPopulatedStory, i) => (
                 <div key={i} className="flex flex-col items-center w-16 relative">
                     <Image
@@ -59,7 +59,7 @@ export default function ViewStoryComp({ userStoriesData }: {
                         width={400}
                         height={400}
                         className={` min-w-16 h-16 rounded-full border-2 object-cover cursor-pointer p-1
-                                ${!story.isViewed? "border-indigo-500" : ""}
+                                ${!story.isViewed ? "border-indigo-500" : ""}
                                 `}
                         onClick={async (e) => {
                             e.preventDefault();
@@ -73,9 +73,11 @@ export default function ViewStoryComp({ userStoriesData }: {
                             setUpdateView(false);
                         }}
                     />
-                    <span className="text-xs mt-1">
-                        {story.owner.username}
-                    </span>
+                    <Link className="text-xs mt-1"
+                        href={`/user/${story.owner._id}`}
+                    >
+                        {story.owner.username.trim().length > 5 ? story.owner.username.trim().slice(0, 5) + "..." : story.owner.username.trim()}
+                    </Link>
                 </div>
             ))}
         </div>
