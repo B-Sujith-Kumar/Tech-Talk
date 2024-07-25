@@ -316,6 +316,7 @@ export const followUser = async (userId: string, currentUserId: string) => {
     await user.save();
     await currentUser.save();
     revalidatePath(`/dashboard/followers`);
+    revalidatePath(`/profile/${user.username}`);
     return JSON.parse(JSON.stringify({ status: 200 }));
   } catch (error) {
     return JSON.parse(JSON.stringify({ status: 500 }));

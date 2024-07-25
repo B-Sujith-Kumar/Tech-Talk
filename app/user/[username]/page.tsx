@@ -1,14 +1,17 @@
 import FeedPost from "@/components/shared/Posts/FeedPost";
+import FollowButton from "@/components/shared/Profile/FollowButton";
 import InfoContainer from "@/components/shared/Profile/InfoContainer";
 import { getPosts } from "@/lib/actions/post.action";
 import {
   getRecentComments,
   getStats,
+  getUser,
   getUserByUserName,
 } from "@/lib/actions/user.actions";
 import { IUser } from "@/lib/database/models/user.model";
 import { formatDate } from "@/lib/utils";
 import { ICommentPopulated, IPostPopulated } from "@/types";
+import { auth } from "@clerk/nextjs";
 import {
   Cake,
   Divide,
@@ -30,8 +33,11 @@ type ProfileProps = {
 const ProfilePage = async ({ params: { username } }: ProfileProps) => {
   const user: IUser = await getUserByUserName(username);
   const stats = await getStats(user.clerkId);
+  const { userId } = auth();
+  const currentUser = await getUser(userId);
   const comments = await getRecentComments(user.clerkId);
   let posts = await getPosts(user._id?.toString()!);
+  const isFollowing = currentUser.following.includes(user._id);
   posts.reverse();
   if (!user) {
     return <div>User not found</div>;
@@ -40,25 +46,48 @@ const ProfilePage = async ({ params: { username } }: ProfileProps) => {
     <div className="h-full">
       <div className="h-40 bg-indigo-500 relative rounded-lg"></div>
       <div className="relative -mt-10 z-10 max-lg:px-2">
-        <div className="bg-white max-w-5xl mx-auto border rounded-lg relative">
+        <div className="bg-white max-w-5xl shadow-md mx-auto border border-b-0 rounded-lg relative">
           <div className="relative">
             <Image
               src={user.profilePicture!}
               width={50}
               height={50}
               alt={user.username}
-              className="aspect-square p-[8px] border-white bg-indigo-500 w-24 -top-12 rounded-full absolute  left-[45%] max-sm:left-[40%]"
+              className="aspect-square p-[8px] border-white bg-indigo-500 w-24 -top-12 rounded-full absolute  left-[45%] max-sm:left-[40%] max-[430px]:left-[38%]"
             />
           </div>
+          {user._id?.toString() !== currentUser._id?.toString() && (
+            <FollowButton
+              currentUser={currentUser}
+              user={user}
+              isFollowing={isFollowing}
+            />
+          )}
           <div
             className={`pb-6 ${
               user.education || user.work ? "border-b-[1px]" : ""
             }`}
           >
-            <p className="text-2xl font-semibold mt-16 text-center text-gray-800">
+            <p
+              className={`text-2xl font-semibold ${
+                user._id?.toString() !== currentUser._id?.toString()
+                  ? "mt-5"
+                  : "mt-16"
+              } text-center text-gray-800`}
+            >
               {user.firstName + " " + user.lastName}
             </p>
             <p className="text-center mt-3 max-w-[65%] mx-auto">{user.bio}</p>
+            <div className="flex justify-center items-center mt-4 gap-10">
+                <div className="flex items-center gap-2">
+                    <p className="text-gray-600 font-semibold">{stats.followers}</p>
+                    <p className="text-gray-600 ">Followers</p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <p className="text-gray-600 font-semibold">{stats.following}</p>
+                    <p className="text-gray-600">Following</p>
+                </div>
+            </div>
             <div className="flex flex-wrap justify-center gap-10 gap-y-5 mt-6">
               {user.location && (
                 <div className="flex items-center gap-2 text-gray-600 justify-center">
@@ -124,54 +153,68 @@ const ProfilePage = async ({ params: { username } }: ProfileProps) => {
                 content={user.availableFor}
               />
             )}
-            <div className="bg-white flex flex-col gap-4 px-4 p-3 border rounded-lg text-gray-600">
+            <div className="bg-white flex flex-col shadow-md border-b-0 gap-4 px-4 p-3 border rounded-lg text-gray-600">
               <div className="flex items-center gap-2">
                 <Newspaper size={20} />
-                <p>{stats.posts} post{stats.posts === 1 ? "" : "s"} published</p>
+                <p>
+                  {stats.posts} post{stats.posts === 1 ? "" : "s"} published
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <Hash size={20} />
-                <p>{stats.followingTags} tag{stats.followingTags === 1 ? "" : "s"} followed</p>
+                <p>
+                  {stats.followingTags} tag
+                  {stats.followingTags === 1 ? "" : "s"} followed
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <MessageCircle size={20} />
-                <p>{comments.length} comment{comments.length === 1 ? "" : "s"} written</p>
+                <p>
+                  {comments.length} comment{comments.length === 1 ? "" : "s"}{" "}
+                  written
+                </p>
               </div>
             </div>
           </div>
           <div className="flex-1 md:w-[70%]">
-            <div className="bg-white pt-4 rounded-lg">
+            <div className="bg-white pt-4 rounded-lg shadow-md">
               <p className="text-xl px-4 pb-3 font-semibold text-gray-800">
                 Recent Comments
               </p>
               {comments.length > 0 && <p className="border-[0.5px]"></p>}
-              {comments.length > 0 ? <div className="flex flex-col">
-                {comments.map((comment: ICommentPopulated, id: number) => (
-                  <Link href={`/post/${comment.post._id?.toString()}`}>
-                    <div
-                      key={comment._id?.toString()!}
-                      className="flex flex-col px-3 py-3 gap-1"
-                    >
-                      <p className="text-gray-700 font-semibold">
-                        {comment.post.title}
-                      </p>
-                      <div className="text-gray-600 flex gap-2 items-center">
-                        <p className="line-clamp-1 max-sm:w-[70%]">
-                          {comment.content}
+              {comments.length > 0 ? (
+                <div className="flex flex-col">
+                  {comments.map((comment: ICommentPopulated, id: number) => (
+                    <Link href={`/post/${comment.post._id?.toString()}`}>
+                      <div
+                        key={comment._id?.toString()!}
+                        className="flex flex-col px-3 py-3 gap-1"
+                      >
+                        <p className="text-gray-700 font-semibold">
+                          {comment.post.title}
                         </p>
-                        <p className="text-gray-500 text-sm">
-                          {moment(comment.createdAt).fromNow()}
-                        </p>
+                        <div className="text-gray-600 flex gap-2 items-center">
+                          <p className="line-clamp-1 max-sm:w-[70%]">
+                            {comment.content}
+                          </p>
+                          <p className="text-gray-500 text-sm">
+                            {moment(comment.createdAt).fromNow()}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    {id !== comments.length - 1 && (
-                      <p className="border-[0.5px]"></p>
-                    )}
-                  </Link>
-                ))}
-              </div> : <div>
-                <p className="text-center pb-3 text-gray-600">No comments found</p>
-                </div>}
+                      {id !== comments.length - 1 && (
+                        <p className="border-[0.5px]"></p>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div>
+                  <p className="text-center pb-3 text-gray-600">
+                    No comments found
+                  </p>
+                </div>
+              )}
             </div>
             <div>
               <div className=" py-4 rounded-lg">

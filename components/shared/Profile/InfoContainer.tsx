@@ -8,7 +8,7 @@ const InfoContainer = ({
   content: string;
 }) => {
   return (
-    <div className="bg-white rounded-lg border">
+    <div className="bg-white rounded-lg border border-b-0 shadow-md">
       <p className="px-3 py-3 font-semibold  text-gray-800">{title}</p>
       <p className="border-[0.4px]"></p>
       <p className="px-3 py-3 text-gray-700">{content}</p>
