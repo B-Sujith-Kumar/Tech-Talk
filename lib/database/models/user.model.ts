@@ -18,6 +18,12 @@ export interface IUser extends Document {
     firstLogin?: boolean;
     moderatorInvites?: mongoose.Schema.Types.ObjectId[];
     commentNotifications?: boolean;
+    websiteUrl?: string;
+    skills?: string;
+    work?: string;
+    education?: string;
+    currentlyLearning?: string;
+    availableFor?: string;
     createdAt?: Date;
 }
 
@@ -38,6 +44,12 @@ const userSchema: Schema<IUser> = new Schema({
     firstLogin: { type: Boolean, default: true },
     moderatorInvites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Community", default: [] }],
     commentNotifications: { type: Boolean, default: true },
+    websiteUrl: { type: String, default: "" },
+    skills: { type: String, default: "" },
+    work: { type: String, default: "" },
+    education: { type: String, default: "" },
+    currentlyLearning: { type: String, default: "" },
+    availableFor: { type: String, default: "" },
 }, {
     timestamps: true
 });

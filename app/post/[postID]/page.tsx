@@ -77,7 +77,7 @@ export default async function PostPage({
             <div className="flex flex-col">
               <span className="text-sm font-medium flex flex-row items-center">
                 <Link
-                  href={`/user/${data.author._id}`}
+                  href={`/user/${data.author.username}`}
                   className="flex items-center"
                 >
                   {data.author.firstName + " " + data.author.lastName}

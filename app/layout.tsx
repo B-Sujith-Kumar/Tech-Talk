@@ -30,7 +30,7 @@ export default async function RootLayout({
     return (
         <ClerkProvider>
             <html lang="en">
-                <body className="font-sans">
+                <body className="font-sans bg-gray-100">
                     <Toaster />
                     <Navbar
                         userId={userId}

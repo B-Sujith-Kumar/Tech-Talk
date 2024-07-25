@@ -51,7 +51,7 @@ const FeedPost = async ({
           </Avatar>
           <div className="flex flex-col">
             <span className="text-sm font-medium flex flex-row gap-1 items-center">
-              <Link href={`/user/${post.author._id}`}>
+              <Link href={`/user/${post.author.username}`}>
                 {post.author.firstName + " " + post.author.lastName}{" "}
               </Link>
               {!isInCommunity && post.community && (

@@ -37,7 +37,7 @@ const ViewComments = ({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <Link
-                      href={`/user/${comment.author._id}`}
+                      href={`/user/${comment.author.username}`}
                       className="font-semibold"
                     >
                       {comment.author.firstName + " " + comment.author.lastName}
