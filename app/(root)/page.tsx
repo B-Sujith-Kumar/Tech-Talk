@@ -5,10 +5,11 @@ import { getCommunitiesJoinedByUser, getUser } from "@/lib/actions/user.actions"
 import { getAllPosts, getPopularPosts, getTrendingPosts } from "@/lib/actions/post.action";
 import FeedPost from "@/components/shared/Posts/FeedPost";
 import { HomePageViewPostOrderBy } from "./_components/ClientComponents";
-import { IPostPopulated, SearchParamProps } from "@/types";
+import { SearchParamProps } from "@/types";
 import { IFeedPost } from "@/types/posts";
 import { Suspense } from "react";
 import Loading from "../loading";
+import InfiniteScroll from "./_components/InfiniteScroll";
 
 export default async function HomePage({ searchParams }: SearchParamProps) {
     const { userId } = auth();
@@ -36,23 +37,15 @@ export default async function HomePage({ searchParams }: SearchParamProps) {
             </div>
             <div id="posts">
                 <Suspense fallback={<Loading />}>
-                    <div className="flex flex-col gap-3">
-                        {posts?.length === 0 && (
-                            <div className="flex items-center justify-center h-40">
-                                <p className="text-gray-500">
-                                    {searchParams.orderBy === "trending" ? "Looks like nothing is trending 😥!!" : searchParams.orderBy === "popular" ? "Looks like nothing is popular 😥!!" : "No posts available 😥!!"}
-                                </p>
-                            </div>
-                        )}
-                        {posts?.slice(0, 1).map((post: any) => (
-                            <FeedPost key={post._id} post={post} showBanner={true} />
-                        ))}
-                        {posts?.slice(1).map((post: any) => (
-                            <FeedPost key={post._id} post={post} showBanner={false} />
-                        ))}
-                    </div>
+                    <InfiniteScroll
+                        posts={posts}
+                        communitiesData={communitiesData.status === 200 ? communitiesData.data : []}
+                        searchParams={searchParams}
+                        currentUser={currentUser}
+                        key={Math.random()}
+                    />
                 </Suspense>
-            </div >
+            </div>
         </>
     );
 }
