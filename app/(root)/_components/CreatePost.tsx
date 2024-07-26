@@ -39,7 +39,7 @@ export const CreatePost = async ({ communities }: {
                 <Dialog>
                     <DialogTrigger className="w-full max-sm:hidden">
                         <textarea
-                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:opacity-50 peer placeholder-transparent h-10 scrollbar-hidden bg-gray-100 max-sm:placeholder:text-xs"
+                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-1 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:opacity-50 peer placeholder-transparent h-10 scrollbar-hidden bg-gray-100 max-sm:placeholder:text-xs"
                             placeholder="What's on your mind?"
                             name="comment"
                             required

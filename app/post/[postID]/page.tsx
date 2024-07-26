@@ -164,7 +164,7 @@ export default async function PostPage({
       <div className="flex-1 bg-white shadow-xl rounded-xl h-fit pb-4 flex-shrink-0">
         <div className="bg-gray-800 h-9 rounded-t-xl"></div>
         <Link
-          href={`/user/${data.author._id}`}
+          href={`/user/${data.author.username}`}
           className="flex px-4 gap-2 items-end relative bottom-3"
         >
           <Image

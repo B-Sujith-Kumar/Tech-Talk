@@ -40,7 +40,7 @@ export default async function Sidebar({ isMobile = false, communitites }: {
                             </span>
                         </div>
                     </div>
-                    <div className="flex flex-row items-center justify-between mt-2 w-full px-4">
+                    <div className="flex flex-row items-center justify-between mt-2 w-full px-0">
                         <div className="flex flex-col items-center">
                             <span className="text-base font-medium">
                                 {followers.length}

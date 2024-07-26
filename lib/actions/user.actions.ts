@@ -13,6 +13,8 @@ import mongoose from "mongoose";
 import Tag, { ITag } from "../database/models/tag.model";
 import { Knock } from "@knocklabs/node";
 import Comment from "../database/models/comment.model";
+import * as z from "zod";
+import { profileSchema } from "@/schemas/profile.schema";
 
 export const createUser = async (user: createUserType) => {
     try {
@@ -452,3 +454,19 @@ export const getRecentComments = async (clerkId: string) => {
         return JSON.parse(JSON.stringify(error.message));
     }
 };
+
+export const updateUserDetails = async (clerkId: string, user: z.infer<typeof profileSchema>) => {
+    try {
+        await connectToDatabase();
+        const updatedUser = await User.findOneAndUpdate({ clerkId }, user, {
+            new: true,
+        });
+        if (!updatedUser) {
+            throw new Error("User update failed");
+        }
+        revalidatePath("/profile");
+        return JSON.parse(JSON.stringify({ status: 200, user: updatedUser }));
+    } catch (error) {
+        return JSON.parse(JSON.stringify({ status: 200 }));
+    }
+}

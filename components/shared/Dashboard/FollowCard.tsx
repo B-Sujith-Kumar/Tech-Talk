@@ -73,7 +73,7 @@ const FollowCard = ({
             className="mx-auto aspect-square rounded-full border"
           />
           <Link
-            href={`/user/${user._id?.toString()}`}
+            href={`/user/${user.username?.toString()}`}
             className="text-center text-lg mt-2 font-semibold text-indigo-600"
           >
             {user.firstName + " " + user.lastName}

@@ -18,13 +18,20 @@ const ShowOptions = ({ user }: { user: IUser }) => {
             {user.firstName + " " + user.lastName}
           </p>
         </PopoverTrigger>
-        <PopoverContent className="w-[200px] mt-2 right-8 px-2 py-2 relative">
+        <PopoverContent className="w-[200px] flex flex-col rounded-md mt-2 right-8 px-2 py-2 relative">
           <Link
             href={"/dashboard/posts"}
             className="w-full hover:text-indigo-700 underline-offset-2 hover:underline py-1 px-2"
             onClick={() => setOpen(false)}
           >
             Dashboard
+          </Link>
+          <Link
+            href={"/profile"}
+            className="w-full hover:text-indigo-700 underline-offset-2 hover:underline py-1 px-2"
+            onClick={() => setOpen(false)}
+          >
+            Profile
           </Link>
         </PopoverContent>
       </Popover>
