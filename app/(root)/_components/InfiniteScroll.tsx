@@ -3,7 +3,7 @@
 import FeedPost from "@/components/shared/Posts/FeedPost";
 import { ICommunity } from "@/lib/database/models/community.model";
 import { IFeedPost } from "@/types/posts";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Loader2Icon } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { getAllPosts, getPopularPosts, getTrendingPosts } from "@/lib/actions/post.action";
@@ -20,8 +20,11 @@ const InfiniteScroll = ({
     currentUser: any;
 }) => {
     const [postsData, setPostsData] = useState<IFeedPost[] | []>(posts);
+    const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(1);
     const [ref, inView] = useInView();
+    const [pending, startTransition] = useTransition();
+    const [noMorePosts, setNoMorePosts] = useState(false);
 
     async function fetchMorePosts() {
         let newPosts: IFeedPost[] = [];
@@ -40,13 +43,21 @@ const InfiniteScroll = ({
                 skip: page * 3
             })).data;
         }
+        if (newPosts.length === 0) {
+            setNoMorePosts(true);
+            return;
+        }
         setPage(page + 1);
+        setLoading(false);
         setPostsData([...postsData, ...newPosts]);
     }
 
     useEffect(() => {
-        if (inView) {
-            fetchMorePosts();
+        if (inView && !loading) {
+            setLoading(true);
+            startTransition(() => {
+                fetchMorePosts();
+            });
         }
     }, [inView]);
 
@@ -79,8 +90,13 @@ const InfiniteScroll = ({
             ))}
             <Loader2Icon
                 ref={ref}
-                className="animate-spin mx-auto invisible"
+                className={`animate-spin mx-auto ${loading && !noMorePosts ? "block" : "invisible"}`}
             />
+            {noMorePosts && (
+                <div className="flex items-center justify-center h-40">
+                    <p className="text-gray-500">No more posts available 😥!!</p>
+                </div>
+            )}
         </div>
     )
 }

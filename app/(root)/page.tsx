@@ -36,15 +36,15 @@ export default async function HomePage({ searchParams }: SearchParamProps) {
                 </div>
             </div>
             <div id="posts">
-                <Suspense fallback={<Loading />}>
-                    <InfiniteScroll
-                        posts={posts}
-                        communitiesData={communitiesData.status === 200 ? communitiesData.data : []}
-                        searchParams={searchParams}
-                        currentUser={currentUser}
-                        key={Math.random()}
-                    />
-                </Suspense>
+                <InfiniteScroll
+                    posts={posts}
+                    communitiesData={communitiesData.status === 200 ? communitiesData.data : []}
+                    searchParams={searchParams}
+                    currentUser={currentUser}
+                    key={Math.random()}
+                />
+                {/* <Suspense fallback={<Loading />}>
+                </Suspense> */}
             </div>
         </>
     );
