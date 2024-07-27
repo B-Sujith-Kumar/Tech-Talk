@@ -15,6 +15,7 @@ import { Knock } from "@knocklabs/node";
 import Comment from "../database/models/comment.model";
 import * as z from "zod";
 import { profileSchema } from "@/schemas/profile.schema";
+import { getAuth, clerkClient } from '@clerk/nextjs/server';
 
 export const createUser = async (user: createUserType) => {
     try {
@@ -458,6 +459,20 @@ export const getRecentComments = async (clerkId: string) => {
 export const updateUserDetails = async (clerkId: string, user: z.infer<typeof profileSchema>) => {
     try {
         await connectToDatabase();
+        console.log(user);
+        const existingDetails = await User.findOne({ clerkId });
+        if (existingDetails.username !== user.username) {
+            const existingUser = await User.findOne({ username: user.username });
+            if (existingUser) {
+                return JSON.parse(JSON.stringify({ status: 409, message: "Username already exists" }));
+            }
+            const params = { firstName: user.firstName, lastName: user.lastName, username: user.username };
+            const updatedUser = await clerkClient.users.updateUser(clerkId, params);
+            if (!updatedUser) {
+                return JSON.parse(JSON.stringify({ status: 500, message: "User update failed" }));
+            }
+        }
+        user = { ...user, profilePicture: existingDetails.profilePicture };
         const updatedUser = await User.findOneAndUpdate({ clerkId }, user, {
             new: true,
         });
