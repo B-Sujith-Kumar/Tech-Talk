@@ -92,7 +92,7 @@ const InfiniteScroll = ({
                 ref={ref}
                 className={`animate-spin mx-auto ${loading && !noMorePosts ? "block" : "invisible"}`}
             />
-            {noMorePosts && (
+            {noMorePosts && !(postsData.length===0) && (
                 <div className="flex items-center justify-center h-40">
                     <p className="text-gray-500">No more posts available 😥!!</p>
                 </div>

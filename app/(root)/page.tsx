@@ -3,7 +3,6 @@ import { Stories } from "./stories";
 import { CreatePost } from "./_components/CreatePost";
 import { getCommunitiesJoinedByUser, getUser } from "@/lib/actions/user.actions";
 import { getAllPosts, getPopularPosts, getTrendingPosts } from "@/lib/actions/post.action";
-import FeedPost from "@/components/shared/Posts/FeedPost";
 import { HomePageViewPostOrderBy } from "./_components/ClientComponents";
 import { SearchParamProps } from "@/types";
 import { IFeedPost } from "@/types/posts";
@@ -36,15 +35,15 @@ export default async function HomePage({ searchParams }: SearchParamProps) {
                 </div>
             </div>
             <div id="posts">
-                <InfiniteScroll
-                    posts={posts}
-                    communitiesData={communitiesData.status === 200 ? communitiesData.data : []}
-                    searchParams={searchParams}
-                    currentUser={currentUser}
-                    key={Math.random()}
-                />
-                {/* <Suspense fallback={<Loading />}>
-                </Suspense> */}
+                <Suspense fallback={<Loading />}>
+                    <InfiniteScroll
+                        posts={posts}
+                        communitiesData={communitiesData.status === 200 ? communitiesData.data : []}
+                        searchParams={searchParams}
+                        currentUser={currentUser}
+                        key={Math.random()}
+                    />
+                </Suspense>
             </div>
         </>
     );
