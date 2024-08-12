@@ -3,6 +3,7 @@
 import mongoose from "mongoose";
 import { isAuth } from "../auth";
 import Tag from "../database/models/tag.model";
+import { connectToDatabase } from "../database";
 
 export const getTag = async (id: string, options?: {
     limit?: number;
@@ -18,6 +19,7 @@ export const getTag = async (id: string, options?: {
                 message: "Unauthorized",
             };
         }
+        await connectToDatabase();
         const data = await Tag.aggregate([
             {
                 $match: {
