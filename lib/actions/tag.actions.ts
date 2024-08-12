@@ -1,18 +1,27 @@
-import { connectToDatabase } from "@/lib/database";
-import { Story } from "@/lib/database/models/story.model";
-import Tag from "@/lib/database/models/tag.model";
-import User from "@/lib/database/models/user.model";
-import mongoose from "mongoose";
+"use server";
 
-export async function GET(req: Request) {
+import mongoose from "mongoose";
+import { isAuth } from "../auth";
+import Tag from "../database/models/tag.model";
+
+export const getTag = async (id: string, options?: {
+    limit?: number;
+    skip?: number;
+    sort?: string;
+    order?: string;
+}) => {
     try {
-        await connectToDatabase();
-        let tagID = "668ce32040cca2c4c8bb4187";
-        // get all posts with this tag as included in it using mongodb aggregation
+        let auth = isAuth();
+        if (!auth) {
+            return {
+                status: 401,
+                message: "Unauthorized",
+            };
+        }
         const data = await Tag.aggregate([
             {
                 $match: {
-                    _id: new mongoose.Types.ObjectId(tagID)
+                    _id: new mongoose.Types.ObjectId(id),
                 },
             },
             {
@@ -73,18 +82,34 @@ export async function GET(req: Request) {
                                 },
                             },
                         },
+                        {
+                            $lookup: {
+                                from: "tags",
+                                as: "tags",
+                                localField: "tags",
+                                foreignField: "_id",
+                                pipeline: [
+                                    {
+                                        $project: {
+                                            _id: 1,
+                                            name: 1,
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                        {
+                            $limit: options?.limit ?? 2,
+                        },
+                        {
+                            $skip: options?.skip ?? 0,
+                        },
                     ]
                 }
-            }
+            },
         ]);
-        return Response.json({
-            data
-        });
+        return { status: 200, data: JSON.parse(JSON.stringify(data)) };
+    } catch (error: any) {
+        return { status: 500, message: error.message };
     }
-    catch (error: any) {
-        return Response.json({
-            status: 500,
-            error
-        });
-    }
-}
+};

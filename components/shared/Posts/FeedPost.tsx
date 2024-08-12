@@ -34,21 +34,21 @@ const FeedPost = ({
                 <div className="flex flex-row gap-2 items-center">
                     <Avatar>
                         <AvatarImage
-                            src={post.author.profilePicture}
-                            alt={post.author.username}
+                            src={post?.author?.profilePicture}
+                            alt={post?.author?.username}
                             className="h-10 w-10 rounded-full"
                         />
                         <AvatarFallback>
-                            {post.author.firstName ? post.author.firstName[0] + " " : ""}
-                            {post.author.lastName ? post.author.lastName[0] : ""}{" "}
+                            {post?.author?.firstName ? post?.author?.firstName[0] + " " : ""}
+                            {post?.author?.lastName ? post?.author?.lastName[0] : ""}{" "}
                         </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                         <span className="text-sm font-medium flex flex-row gap-1 items-center">
-                            <Link href={`/user/${post.author.username}`}>
-                                {post.author.firstName + " " + post.author.lastName}{" "}
+                            <Link href={`/user/${post?.author?.username}`}>
+                                {post?.author?.firstName + " " + post?.author?.lastName}{" "}
                             </Link>
-                            {!isInCommunity && post.community && (
+                            {!isInCommunity && post?.community && (
                                 <>
                                     in
                                     <Link
@@ -56,22 +56,22 @@ const FeedPost = ({
                                             badgeVariants({ variant: "outline" }) +
                                             " flex flex-row gap-1 hover:bg-indigo-500 hover:text-white"
                                         }
-                                        href={`/community/${post.community._id}`}
+                                        href={`/community/${post?.community?._id}`}
                                     >
                                         <Image
-                                            src={post.community.icon || ""}
+                                            src={post?.community?.icon || ""}
                                             width={20}
                                             height={20}
-                                            alt={post.community.name}
+                                            alt={post?.community?.name}
                                             className="rounded-full"
                                         />
-                                        {post.community.name}
+                                        {post?.community?.name}
                                     </Link>
                                 </>
                             )}
                         </span>
                         <span className="text-xs text-gray-500">
-                            {moment(post.createdAt).fromNow()}
+                            {moment(post?.createdAt).fromNow()}
                         </span>
                     </div>
                     {currentUser?._id && (
@@ -80,7 +80,7 @@ const FeedPost = ({
                 </div>
                 {showBanner && (
                     <Image
-                        src={post.coverImage}
+                        src={post?.coverImage}
                         width={500}
                         height={300}
                         alt="Next.js"
@@ -89,13 +89,13 @@ const FeedPost = ({
                 )}
                 <div className="mt-2 p-1">
                     <div className="flex my-2 gap-x-2">
-                        {post.tags.map((tag) => (
+                        {post?.tags?.map((tag) => (
                             <Link
                                 key={tag?._id?.toString()}
                                 className="bg-indigo-500 text-white px-2 py-1 text-xs font-medium rounded-full"
                                 href={`/tag/${tag._id?.toString()}/`}
                             >
-                                {tag.name}
+                                {tag?.name}
                             </Link>
                         ))}
                     </div>
@@ -103,17 +103,17 @@ const FeedPost = ({
                         className="text-2xl font-semibold max-sm:text line-clamp-2"
                         href={`/post/${post._id?.toString()}`}
                     >
-                        {post.title}
+                        {post?.title}
                     </Link>
                     <div className="line-clamp-2 text-sm leading-relaxed mt-3 text-gray-500">
-                        <RenderPost content={post.content} />
+                        <RenderPost content={post?.content} />
                     </div>
                 </div>
                 <hr className="mt-2 border-gray-200" />
                 <div className="flex flex-row gap-4 mt-2 p-2 *:flex *:flex-row *:gap-2 *:items-center">
                     <div>
                         <FontAwesomeIcon icon={faEye} className="text-gray-500" size="sm" />
-                        <span className="text-xs font-medium">{post.views}</span>
+                        <span className="text-xs font-medium">{post?.views}</span>
                     </div>
                     <div>
                         <VotesButtons post={post} userObjectId={currentUser?._id} />
@@ -121,10 +121,10 @@ const FeedPost = ({
                     <div>
                         <MessageCircleIcon className="w-4 h-4 " />
                         <span className="text-xs sm:hidden font-medium">
-                            {post.comments.length}
+                            {post?.comments?.length}
                         </span>
                         <span className="text-xs max-sm:hidden font-medium">
-                            {post.comments.length} Comments
+                            {post?.comments?.length} Comments
                         </span>
                     </div>
                     <div>

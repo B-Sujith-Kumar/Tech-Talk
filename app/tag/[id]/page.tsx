@@ -1,14 +1,25 @@
+import InfiniteScroll from "@/app/(root)/_components/InfiniteScroll";
+import Loading from "@/app/loading";
 import DeleteCollection from "@/components/shared/Bookmarks/DeleteCollection";
 import UpdateCollection from "@/components/shared/Bookmarks/UpdateCollection";
 import FeedPost from "@/components/shared/Posts/FeedPost";
 import { getCollection } from "@/lib/actions/collection.actions";
+import { getTag } from "@/lib/actions/tag.actions";
 import { getCommunitiesJoinedByUser, getUser } from "@/lib/actions/user.actions";
 import { IPostPopulated, SearchParamProps } from "@/types";
 import { auth } from "@clerk/nextjs/server";
-import React from "react";
+import React, { Suspense } from "react";
 
-const CollectionPage = async ({ params: { id } }: SearchParamProps) => {
-    const collection = await getCollection(id);
+const TagPage = async ({ searchParams, params }:
+    {
+        searchParams: any;
+        params: { id: string; name?: string };
+    }
+) => {
+    const tagData = await getTag(params.id, {
+        limit: 3,
+        skip: 0
+    });
     const { userId } = auth();
     const currentUser = await getUser(userId);
     const communitiesData = await getCommunitiesJoinedByUser(currentUser);
@@ -17,16 +28,11 @@ const CollectionPage = async ({ params: { id } }: SearchParamProps) => {
             <div className="flex items-center justify-between flex-wrap">
                 <div>
                     <h1 className="text-2xl font-semibold">
-                        {collection.name} collection
+                        {tagData.status === 200 ? tagData.data[0].name : "Tag"}
                     </h1>
-                    <p className="mt-1 text-gray-600 mb-4">{collection.description}</p>
-                </div>
-                <div className="flex gap-2">
-                    <UpdateCollection collection={collection} />
-                    <DeleteCollection collectionId={id} />
                 </div>
             </div>
-            {collection?.posts?.map((post: IPostPopulated, id: number) => (
+            {tagData.data[0]?.posts?.map((post: IPostPopulated, id: number) => (
                 <div className="mt-4" key={id}>
                     <FeedPost
                         post={post}
@@ -38,8 +44,19 @@ const CollectionPage = async ({ params: { id } }: SearchParamProps) => {
                     />
                 </div>
             ))}
+            <div id="posts">
+                <Suspense fallback={<Loading />}>
+                    <InfiniteScroll
+                        posts={tagData.data[0]?.posts}
+                        communitiesData={communitiesData.status === 200 ? communitiesData.data : []}
+                        searchParams={searchParams}
+                        currentUser={currentUser}
+                        key={Math.random()}
+                    />
+                </Suspense>
+            </div>
         </div>
     );
 };
 
-export default CollectionPage;
+export default TagPage;

@@ -7,6 +7,8 @@ import { useEffect, useState, useTransition } from "react";
 import { Loader2Icon } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { getAllPosts, getPopularPosts, getTrendingPosts } from "@/lib/actions/post.action";
+import { usePathname } from "next/navigation";
+import { getTag } from "@/lib/actions/tag.actions";
 
 const InfiniteScroll = ({
     posts,
@@ -25,25 +27,35 @@ const InfiniteScroll = ({
     const [ref, inView] = useInView();
     const [pending, startTransition] = useTransition();
     const [noMorePosts, setNoMorePosts] = useState(false);
+    const pathname = usePathname();
 
     async function fetchMorePosts() {
         let newPosts: IFeedPost[] = [];
-        if (searchParams.orderBy === "trending") {
-            newPosts = (await getTrendingPosts({
+        if (pathname.includes("/tag/")) {
+            let tagID = pathname.split("/")[2];
+            newPosts = (await getTag(tagID, {
+                limit: 3,
                 skip: page * 3
-            })).data;
+            })).data[0]?.posts;
         }
-        else if (searchParams.orderBy === "popular") {
-            newPosts = (await getPopularPosts({
-                skip: page * 3
-            })).data;
+        if (!pathname.includes("/tag/")) {
+            if (searchParams.orderBy === "trending") {
+                newPosts = (await getTrendingPosts({
+                    skip: page * 3
+                })).data;
+            }
+            else if (searchParams.orderBy === "popular") {
+                newPosts = (await getPopularPosts({
+                    skip: page * 3
+                })).data;
+            }
+            else {
+                newPosts = (await getAllPosts({
+                    skip: page * 3
+                })).data;
+            }
         }
-        else {
-            newPosts = (await getAllPosts({
-                skip: page * 3
-            })).data;
-        }
-        if (newPosts.length === 0) {
+        if (newPosts?.length === 0) {
             setNoMorePosts(true);
             return;
         }
@@ -70,18 +82,18 @@ const InfiniteScroll = ({
                     </p>
                 </div>
             )}
-            {postsData?.slice(0, 1).map((post: any) => (
+            {postsData?.slice(0, 1)?.map((post: any) => (
                 <FeedPost
-                    key={post._id}
+                    key={post?._id}
                     post={post}
                     showBanner={true}
                     communitiesData={communitiesData}
                     currentUser={currentUser}
                 />
             ))}
-            {postsData?.slice(1).map((post: any) => (
+            {postsData?.slice(1)?.map((post: any) => (
                 <FeedPost
-                    key={post._id}
+                    key={post?._id}
                     post={post}
                     showBanner={false}
                     communitiesData={communitiesData}
@@ -92,7 +104,7 @@ const InfiniteScroll = ({
                 ref={ref}
                 className={`animate-spin mx-auto ${loading && !noMorePosts ? "block" : "invisible"}`}
             />
-            {noMorePosts && !(postsData.length===0) && (
+            {noMorePosts && !(postsData.length === 0) && (
                 <div className="flex items-center justify-center h-40">
                     <p className="text-gray-500">No more posts available 😥!!</p>
                 </div>
