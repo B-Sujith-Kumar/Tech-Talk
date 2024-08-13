@@ -1,7 +1,7 @@
 import { IComment } from "@/lib/database/models/comment.model";
 import { ICommunity } from "@/lib/database/models/community.model";
 import { IEngagement, IPost } from "@/lib/database/models/post.model";
-import { ITag } from "@/lib/database/models/tag.model";
+
 import { IUser } from "@/lib/database/models/user.model";
 import mongoose from "mongoose";
 
@@ -86,6 +86,13 @@ export type ICommunityPopulated = {
     needsReview: IPost[];
     reported: IPost[];
     removed: IPost[];
+    createdAt: Date;
+}
+
+export type ITag = {
+    _id?: mongoose.Schema.Types.ObjectId;
+    name: string;
+    posts: mongoose.Schema.Types.ObjectId[];
     createdAt: Date;
 }
 
