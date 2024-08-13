@@ -101,10 +101,10 @@ export const getTag = async (id: string, options?: {
                             },
                         },
                         {
-                            $limit: options?.limit ?? 2,
+                            $skip: options?.skip ?? 0,
                         },
                         {
-                            $skip: options?.skip ?? 0,
+                            $limit: 3,
                         },
                     ]
                 }

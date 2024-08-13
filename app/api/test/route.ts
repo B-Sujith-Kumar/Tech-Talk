@@ -7,12 +7,12 @@ import mongoose from "mongoose";
 export async function GET(req: Request) {
     try {
         await connectToDatabase();
-        let tagID = "668ce32040cca2c4c8bb4187";
+        let id = "";
         // get all posts with this tag as included in it using mongodb aggregation
         const data = await Tag.aggregate([
             {
                 $match: {
-                    _id: new mongoose.Types.ObjectId(tagID)
+                    _id: new mongoose.Types.ObjectId(id),
                 },
             },
             {
@@ -73,9 +73,31 @@ export async function GET(req: Request) {
                                 },
                             },
                         },
+                        {
+                            $lookup: {
+                                from: "tags",
+                                as: "tags",
+                                localField: "tags",
+                                foreignField: "_id",
+                                pipeline: [
+                                    {
+                                        $project: {
+                                            _id: 1,
+                                            name: 1,
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                        {
+                            $skip: 3,
+                        },
+                        {
+                            $limit: 3,
+                        },
                     ]
                 }
-            }
+            },
         ]);
         return Response.json({
             data

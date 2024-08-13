@@ -16,10 +16,7 @@ const TagPage = async ({ searchParams, params }:
         params: { id: string; name?: string };
     }
 ) => {
-    const tagData = await getTag(params.id, {
-        limit: 3,
-        skip: 0
-    });
+    const tagData = await getTag(params.id);
     const { userId } = auth();
     const currentUser = await getUser(userId);
     const communitiesData = await getCommunitiesJoinedByUser(currentUser);
@@ -27,27 +24,17 @@ const TagPage = async ({ searchParams, params }:
         <div>
             <div className="flex items-center justify-between flex-wrap">
                 <div>
-                    <h1 className="text-2xl font-semibold">
-                        {tagData.status === 200 ? tagData.data[0].name : "Tag"}
+                    <h1 className={`text-2xl font-semibold 
+                        ${tagData.data.length > 0 ? "text-black" : "text-red-500"}
+                        `}>
+                        {tagData.data.length > 0 ? tagData.data[0]?.name : "Invalid Tag"}
                     </h1>
                 </div>
             </div>
-            {tagData.data[0]?.posts?.map((post: IPostPopulated, id: number) => (
-                <div className="mt-4" key={id}>
-                    <FeedPost
-                        post={post}
-                        showBanner={false}
-                        isInCommunity={true}
-                        key={id}
-                        communitiesData={communitiesData.status === 200 ? communitiesData.data : []}
-                        currentUser={currentUser}
-                    />
-                </div>
-            ))}
             <div id="posts">
                 <Suspense fallback={<Loading />}>
                     <InfiniteScroll
-                        posts={tagData.data[0]?.posts}
+                        posts={tagData.data.length > 0 ? tagData.data[0]?.posts : []}
                         communitiesData={communitiesData.status === 200 ? communitiesData.data : []}
                         searchParams={searchParams}
                         currentUser={currentUser}

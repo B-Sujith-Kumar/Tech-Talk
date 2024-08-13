@@ -33,10 +33,17 @@ const InfiniteScroll = ({
         let newPosts: IFeedPost[] = [];
         if (pathname.includes("/tag/")) {
             let tagID = pathname.split("/")[2];
-            newPosts = (await getTag(tagID, {
+            let data = (await getTag(tagID, {
                 limit: 3,
                 skip: page * 3
-            })).data[0]?.posts;
+            })).data;
+            if (data.length > 0) {
+                newPosts = data[0]?.posts;
+            }
+            else {
+                setNoMorePosts(true);
+                return;
+            }
         }
         if (!pathname.includes("/tag/")) {
             if (searchParams.orderBy === "trending") {
