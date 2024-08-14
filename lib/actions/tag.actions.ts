@@ -19,10 +19,12 @@ export const getTag = async (
   try {
     let auth = isAuth();
     if (!auth) {
-      return JSON.parse(JSON.stringify({
-        status: 401,
-        message: "Unauthorized",
-      }));
+      return JSON.parse(
+        JSON.stringify({
+          status: 401,
+          message: "Unauthorized",
+        })
+      );
     }
     await connectToDatabase();
     const data = await Tag.aggregate([
@@ -181,7 +183,9 @@ export const followTag = async (clerkId: string, tagId: string) => {
     await user.save();
     await tag.save();
     revalidatePath(`/tag/${tagId}`);
-    return JSON.parse(JSON.stringify({ status: 200, message: "Tag followed successfully" }));
+    return JSON.parse(
+      JSON.stringify({ status: 200, message: "Tag followed successfully" })
+    );
   } catch (error: any) {
     return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
   }
@@ -222,6 +226,51 @@ export const unfollowTag = async (clerkId: string, tagId: string) => {
     revalidatePath(`/tag/${tagId}`);
     return JSON.parse(
       JSON.stringify({ status: 200, message: "Tag unfollowed successfully" })
+    );
+  } catch (error: any) {
+    return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
+  }
+};
+
+export const getPopularTags = async () => {
+  try {
+    await connectToDatabase();
+    const popularTags = await Tag.aggregate([
+      {
+        $addFields: {
+          totalPopularity: {
+            $add: [
+              { $size: "$posts" },
+              { $size: "$followers" },
+              { $size: "$communities" },
+            ],
+          },
+        },
+      },
+      { $sort: { totalPopularity: -1 } },
+      { $limit: 15 },
+    ]);
+    return JSON.parse(JSON.stringify({ status: 200, tags: popularTags }));
+  } catch (error: any) {
+    return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
+  }
+};
+
+export const followTags = async (clerkId: string, tags: string[]) => {
+  try {
+    await connectToDatabase();
+    let tagIds = [];
+    for (let i = 0; i < tags.length; i++) {
+      const tag = await Tag.findOne({ name: tags[i] });
+      if (tag) {
+        tagIds.push(tag._id);
+      }
+    }
+    tagIds.forEach(async (tag) => {
+      await followTag(clerkId, tag);
+    });
+    return JSON.parse(
+      JSON.stringify({ status: 200, message: "Tags followed successfully" })
     );
   } catch (error: any) {
     return JSON.parse(JSON.stringify({ status: 500, message: error.message }));
