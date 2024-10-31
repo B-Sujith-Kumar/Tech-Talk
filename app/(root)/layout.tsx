@@ -17,7 +17,6 @@ export default async function RootLayout({
                     <Sidebar communitites={data} />
                     <div className="xl:w-7/12 max-lg:w-full lg:w-4/5 overflow-y-scroll scrollbar-hidden">{children}</div>
                     <div className="xl:w-1/4 max-xl:hidden lg:1/5">
-                        This is the third box
                     </div>
                 </div>
             </main>
